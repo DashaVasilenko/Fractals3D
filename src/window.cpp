@@ -1,8 +1,5 @@
 #include "window.h"
 
-
-
-
 int Window::Init() {
     // init GLFW
     if (!glfwInit())
@@ -31,7 +28,7 @@ int Window::Init() {
  	    glewExperimental = true; 
  	    if (glewInit() != GLEW_OK) { glfwTerminate(); return -1; }
     #endif
-    
+
     return 0;
  }
 
