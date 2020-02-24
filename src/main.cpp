@@ -1,10 +1,10 @@
 #include <iostream>
-
-#include "window.h"
 #include <string>
-#include <fstream>
-#include <streambuf>
+//#include <fstream>
+//#include <streambuf>
+#include "window.h"
 #include "renderer.h"
+#include "shaderProgram.h"
 
 int main() {
     Window window;
@@ -18,68 +18,14 @@ int main() {
  	renderer.SetHeight(window.GetHeight());
  	renderer.Init();
 
-	//////////////////////////////////////////////////////////////////////////////////
- 	std::ifstream t("glsl/quad_vertex.glsl");
- 	std::string str;
- 	t.seekg(0, std::ios::end);   
- 	str.reserve(t.tellg());
- 	t.seekg(0, std::ios::beg);
- 	str.assign((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
+	std::map<GLenum, std::string> mapSources;
+ 	mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
+ 	mapSources[GL_FRAGMENT_SHADER] = "glsl/quad_pixel.glsl";
 
- 	GLuint vertexShader;
- 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
- 	const char* vertexSource =  str.c_str();
- 	glShaderSource(vertexShader, 1, &vertexSource, NULL);
- 	glCompileShader(vertexShader);
-
- 	GLint success;
- 	GLchar infoLog[512];
- 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-
- 	if(!success) {
- 		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
- 		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
- 	}
- 	////////////////////////////////////////////////////////////////////////////////////////
-	
-	std::ifstream t2("glsl/quad_pixel.glsl");
- 	std::string str2;
- 	t2.seekg(0, std::ios::end);   
- 	str2.reserve(t2.tellg());
- 	t2.seekg(0, std::ios::beg);
- 	str2.assign((std::istreambuf_iterator<char>(t2)), std::istreambuf_iterator<char>());
-
- 	GLuint fragmentShader;
- 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
- 	const char* fragmentSource =  str2.c_str();
- 	glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
- 	glCompileShader(fragmentShader);
-
-
- 	GLint success2;
- 	GLchar infoLog2[512];
- 	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success2);
-
- 	if(!success2) {
- 		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog2);
- 		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog2 << std::endl;
- 	}
-	///////////////////////////////////////////////////////////////////////////////////////////
-
-	GLuint shaderProgram;
- 	shaderProgram = glCreateProgram();
-
- 	glAttachShader(shaderProgram, vertexShader);
- 	glAttachShader(shaderProgram, fragmentShader);
- 	glLinkProgram(shaderProgram);
-
-	GLint success3;
- 	GLchar infoLog3[512];
- 	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success3);
- 	if (!success) {
- 		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog3);
- 		std::cout << "ERROR::SHADER::LINKING_FAILED\n" << infoLog3 << std::endl;
- 	}
+	ShaderProgram program;
+ 	program.Init(mapSources);
+ 	program.Compile();
+ 	program.Link();
 
 	GLfloat vertices[] = {
     -1.0f,  1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
@@ -93,29 +39,32 @@ int main() {
 		0, 2, 3
 	};
 
-	GLuint VAO;
+	GLuint VAO; // создаем буфер VAO (vertex array object)
  	glGenVertexArrays(1, &VAO);
- 	glBindVertexArray(VAO);
+ 	glBindVertexArray(VAO); // привязываем буфер
 
-	GLuint VBO;
+	GLuint VBO; // создаем буфер VBO (vertex buffer objects)
 	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO); 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);  // привязываем буфер
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // копирования вершинных данных в этот буфер
 
 	GLuint IBO;
 	glGenBuffers(1, &IBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO); 
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
+	// сообщаем OpenGL как он должен интерпретировать вершинные данные
+ 	// (какой аргумент шейдера мы хотим настроить(layout (location = 0)), размер аргумента в шейдере, тип данных,
+ 	//  необходимость нормализовать входные данные, расстояние между наборами данных, смещение начала данных в буфере)
  	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
- 	glEnableVertexAttribArray(0);
+ 	glEnableVertexAttribArray(0); // включаем атрибуты, т.е. передаем вершинному атрибуту позицию аргумента
  	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat)) );
  	glEnableVertexAttribArray(1);
 	
  	while (!glfwWindowShouldClose(window.GetPointer())) {
 		renderer.Update();
+		program.Run();
 
- 		glUseProgram(shaderProgram);
  		glBindVertexArray(VAO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO); 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
@@ -124,8 +73,7 @@ int main() {
      	glfwPollEvents();
  	}
 
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
+	program.Delete();
  	window.Destroy();
  	return 0;
 }

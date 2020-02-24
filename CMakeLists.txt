@@ -7,7 +7,7 @@ find_package (glfw3 REQUIRED)
 
 find_package (GLEW REQUIRED STATIC)
 
-add_executable(main src/main.cpp src/window.cpp src/renderer.cpp)
+add_executable(main src/main.cpp src/window.cpp src/renderer.cpp src/shaderProgram.cpp)
 target_include_directories(main PUBLIC include)
 
 target_link_libraries(main ${GLEW_LIBRARY} ${OPENGL_LIBRARIES} glfw)
