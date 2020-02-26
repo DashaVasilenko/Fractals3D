@@ -92,6 +92,13 @@ vec4 PhongPointLight(vec3 ambientColor, vec3 diffuseColor, vec3 specularColor, f
     return clamp(vec4(ambient + diffuse + specular, 1.0), 0.0f, 1.0f);
 }
 
+vec4 Lambert(vec3 color, vec3 dir_light, vec3 point) {
+    vec3 directional_light = normalize(dir_light);
+    vec3 outNormal = computeNormal(point); 
+    float kd = clamp(dot(directional_light, outNormal), 0.0f, 1.0f);
+    return kd*vec4(color, 1.0);
+}
+
 void main() {
     vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
     vec3 dir = rayDirection(45.0, iResolution, pixelCoord);
@@ -120,4 +127,5 @@ void main() {
     */
 
     outColor = PhongPointLight(ambientColor, diffuseColor, specularColor, shininess, point, eye);
+    //outColor = Lambert(vec3(0.0, 1.0 , 0.0), vec3(0.0f, 1.0f, 1.0f), point);
 } 
