@@ -66,7 +66,9 @@ vec3 rayDirection(float fieldOfView, vec2 size, vec2 fragCoord) {
     float z = size.y / tan(radians(fieldOfView) / 2.0);
     //vec4(viewDir, 0.0)).xyz
     //return normalize(vec3(xy, -z));
-    return normalize(vec3(viewMatrix*vec4(normalize(vec3(xy, -z)), 0.0)));
+    //return normalize(vec3(viewMatrix*vec4(normalize(vec3(xy, -z)), 0.0)));
+    return normalize(vec3(vec4(normalize(vec3(xy, -z)), 0.0)*viewMatrix));
+
 }
 
 //Compute the normal on the surface at point p, using the gradient of the SDF, 
