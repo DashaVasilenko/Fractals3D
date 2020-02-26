@@ -19,9 +19,9 @@ private:
     glm::vec3 right;
     glm::vec3 front;
 
-    float pitch = 0.0f;
-    float roll = 0.0f;
-    float yaw = -90.0f;
+    float pitch = 0.0f; // тангаж (наклон вверх вниз)
+    float roll = 0.0f; // крен
+    float yaw = -90.0f; // рыскание (поворот влево вправо)
 
     glm::vec3 position;
     float speed = 5.0f;

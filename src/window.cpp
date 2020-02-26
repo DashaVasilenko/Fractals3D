@@ -32,7 +32,7 @@ int Window::Init() {
  	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); 
  	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); 
  	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); 
- 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+ 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE); // выключение возможности изменения размера окна
 
     // Mac OS build fix
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // uncomment this statement to fix compilation on OS X
@@ -43,8 +43,8 @@ int Window::Init() {
         exit(EXIT_FAILURE);
     }
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
-    glfwSetKeyCallback(window, OnKeyPressed);  
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // скрыть курсор мыши  
+    glfwSetKeyCallback(window, OnKeyPressed); // передача функции для клавиатуры в GLFW
     glfwSetCursorPosCallback(window, OnMouseMove);
     // context
  	glfwMakeContextCurrent(window);

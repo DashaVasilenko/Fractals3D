@@ -126,7 +126,8 @@ void main() {
     vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
 
     vec3 dir = rayDirection(45.0, iResolution, pixelCoord);
-    vec3 eye = vec3(0.0, 0.0, 5.0);
+    //vec3 eye = vec3(0.0, 0.0, 5.0);
+    vec3 eye = -viewMatrix[3].xyz;
     float dist = shortestDistanceToSurface(eye, dir, MIN_DIST, MAX_DIST);
     
     if (dist > MAX_DIST - EPSILON) {

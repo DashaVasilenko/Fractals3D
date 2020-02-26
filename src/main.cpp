@@ -64,22 +64,20 @@ int main() {
 
 
 	// в рендерер
-	//glm::mat4 projection = glm::mat4(1.0f);
  	Camera camera;
  	double currentTime = 0.0;
- 	double lastTime = 0.0;
- 	//glm::mat4 model = glm::mat4(1.0f);
+ 	double lastTime = 0.0; // Время вывода последнего кадра
+	glm::mat4 view = camera.GetViewMatrix();
+	//std::cout << view[3].x << view[3].y << view[3].z << std::endl; 
 	
  	while (!glfwWindowShouldClose(window.GetPointer())) {
 		currentTime = glfwGetTime();
- 		float deltaTime = currentTime - lastTime;
+ 		float deltaTime = currentTime - lastTime; // Время, прошедшее между последним и текущим кадром
  		lastTime = currentTime;
- 		//calculate time
 
 		renderer.Update();
 
 		glm::mat4 view = camera.GetViewMatrix();
- 		//glm::mat4 mvp = projection*view*model;
 
 		program.Run();
 		program.SetUniform("iResolution", glm::vec2(window.GetWidth(), window.GetHeight()));

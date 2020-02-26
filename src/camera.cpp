@@ -41,19 +41,12 @@ void Camera::UpdatePosition(const float& delta) {
 }
 
 void Camera::UpdateVectors() {
-    
     yaw += InputSystem::deltaCursPosX*mouse_sense;
     pitch += InputSystem::deltaCursPosY*mouse_sense;
 
     if (pitch > 90.0f) pitch = 89.0f;
     if (pitch < -90.0f) pitch = -89.0f;
 
-    //glm::quat pitch_quat = glm::angleAxis(pitch, right);
-    //glm::quat yaw_quat = glm::angleAxis(yaw, up);
-    //glm::quat result_quat = glm::cross(pitch_quat, yaw_quat);
-    //glm::normalize(result_quat);
-    //front = glm::rotate(result_quat, front);
-    //right = glm::rotate(result_quat, right);
     glm::vec3 tmpFront;
     tmpFront.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
     tmpFront.y = sin(glm::radians(pitch));
