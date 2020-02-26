@@ -5,6 +5,7 @@
 #include "window.h"
 #include "renderer.h"
 #include "shaderProgram.h"
+#include "camera.h"
 
 int main() {
     Window window;
@@ -60,15 +61,35 @@ int main() {
  	glEnableVertexAttribArray(0); // включаем атрибуты, т.е. передаем вершинному атрибуту позицию аргумента
  	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat)) );
  	//glEnableVertexAttribArray(1);
+
+
+	// в рендерер
+	//glm::mat4 projection = glm::mat4(1.0f);
+ 	Camera camera;
+ 	double currentTime = 0.0;
+ 	double lastTime = 0.0;
+ 	//glm::mat4 model = glm::mat4(1.0f);
 	
  	while (!glfwWindowShouldClose(window.GetPointer())) {
+		currentTime = glfwGetTime();
+ 		float deltaTime = currentTime - lastTime;
+ 		lastTime = currentTime;
+ 		//calculate time
+
 		renderer.Update();
+
+		glm::mat4 view = camera.GetViewMatrix();
+ 		//glm::mat4 mvp = projection*view*model;
+
 		program.Run();
 		program.SetUniform("iResolution", glm::vec2(window.GetWidth(), window.GetHeight()));
+		program.SetUniform("View", view);
 
  		glBindVertexArray(VAO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO); 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
+
+		camera.Update(deltaTime);
 
  		glfwSwapBuffers(window.GetPointer());
      	glfwPollEvents();

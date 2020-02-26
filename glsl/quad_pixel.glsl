@@ -1,5 +1,6 @@
 #version 330
 
+in mat4 viewMatrix;
 out vec4 outColor;
 
 uniform vec2 iResolution; 
@@ -63,7 +64,9 @@ vec3 rayDirection(float fieldOfView, vec2 size, vec2 fragCoord) {
     vec2 xy = fragCoord - size / 2.0;
     //vec2 xy = 2.0 * (fragCoord/iResolution.xy - 0.5);
     float z = size.y / tan(radians(fieldOfView) / 2.0);
-    return normalize(vec3(xy, -z));
+    //vec4(viewDir, 0.0)).xyz
+    //return normalize(vec3(xy, -z));
+    return normalize(vec3(viewMatrix*vec4(normalize(vec3(xy, -z)), 0.0)));
 }
 
 //Compute the normal on the surface at point p, using the gradient of the SDF, 
