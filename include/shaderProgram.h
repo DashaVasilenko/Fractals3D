@@ -3,6 +3,10 @@
 
 #include "window.h"
 #include <map>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+//#include "errors.h"
 
 class ShaderProgram {
 public:
@@ -11,6 +15,9 @@ public:
     void Link();
     void Run();
     void Delete();
+
+    void SetUniform(const char* name, const glm::vec2&);
+
 private:
     std::map<GLenum, std::string> mapSources;
     std::map<GLenum, GLuint> mapShaders;

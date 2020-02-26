@@ -58,12 +58,13 @@ int main() {
  	//  необходимость нормализовать входные данные, расстояние между наборами данных, смещение начала данных в буфере)
  	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
  	glEnableVertexAttribArray(0); // включаем атрибуты, т.е. передаем вершинному атрибуту позицию аргумента
- 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat)) );
- 	glEnableVertexAttribArray(1);
+ 	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat)) );
+ 	//glEnableVertexAttribArray(1);
 	
  	while (!glfwWindowShouldClose(window.GetPointer())) {
 		renderer.Update();
 		program.Run();
+		program.SetUniform("iResolution", glm::vec2(window.GetWidth(), window.GetHeight()));
 
  		glBindVertexArray(VAO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO); 
