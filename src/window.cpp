@@ -44,8 +44,8 @@ int Window::Init() {
     }
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // скрыть курсор мыши  
-    glfwSetKeyCallback(window, OnKeyPressed); // передача функции для клавиатуры в GLFW
     glfwSetCursorPosCallback(window, OnMouseMove);
+    glfwSetKeyCallback(window, OnKeyPressed); // передача функции для клавиатуры в GLFW
     // context
  	glfwMakeContextCurrent(window);
 

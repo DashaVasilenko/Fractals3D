@@ -67,17 +67,21 @@ int main() {
  	Camera camera;
  	double currentTime = 0.0;
  	double lastTime = 0.0; // Время вывода последнего кадра
-	glm::mat4 view = camera.GetViewMatrix();
+	//glm::mat4 view = camera.GetViewMatrix();
 	//std::cout << view[3].x << view[3].y << view[3].z << std::endl; 
 	
  	while (!glfwWindowShouldClose(window.GetPointer())) {
+		glfwPollEvents(); // проверяет события (ввод с клавиатуры, перемещение мыши) и вызывает функции обратного вызова(callback))
 		currentTime = glfwGetTime();
  		float deltaTime = currentTime - lastTime; // Время, прошедшее между последним и текущим кадром
  		lastTime = currentTime;
+		camera.Update(deltaTime);
+		glm::mat4 view = camera.GetViewMatrix();
+
 
 		renderer.Update();
 
-		glm::mat4 view = camera.GetViewMatrix();
+		//glm::mat4 view = camera.GetViewMatrix();
 
 		program.Run();
 		program.SetUniform("iResolution", glm::vec2(window.GetWidth(), window.GetHeight()));
@@ -87,10 +91,10 @@ int main() {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO); 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 
-		camera.Update(deltaTime);
+		//camera.Update(deltaTime);
 
  		glfwSwapBuffers(window.GetPointer());
-     	glfwPollEvents();
+     	//glfwPollEvents();
  	}
 
 	program.Delete();
