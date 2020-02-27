@@ -61,14 +61,14 @@ int main() {
  	glEnableVertexAttribArray(0); // включаем атрибуты, т.е. передаем вершинному атрибуту позицию аргумента
  	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat)) );
  	//glEnableVertexAttribArray(1);
-
-
+ 
 	// в рендерер
  	Camera camera;
  	double currentTime = 0.0;
  	double lastTime = 0.0; // Время вывода последнего кадра
 	//glm::mat4 view = camera.GetViewMatrix();
 	//std::cout << view[3].x << view[3].y << view[3].z << std::endl; 
+	//std::cout << std::rand() << std::endl;
 	
  	while (!glfwWindowShouldClose(window.GetPointer())) {
 		glfwPollEvents(); // проверяет события (ввод с клавиатуры, перемещение мыши) и вызывает функции обратного вызова(callback))
@@ -78,11 +78,7 @@ int main() {
 		camera.Update(deltaTime);
 		glm::mat4 view = camera.GetViewMatrix();
 
-
 		renderer.Update();
-
-		//glm::mat4 view = camera.GetViewMatrix();
-
 		program.Run();
 		program.SetUniform("iResolution", glm::vec2(window.GetWidth(), window.GetHeight()));
 		program.SetUniform("View", view);
@@ -90,11 +86,7 @@ int main() {
  		glBindVertexArray(VAO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO); 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
-
-		//camera.Update(deltaTime);
-
  		glfwSwapBuffers(window.GetPointer());
-     	//glfwPollEvents();
  	}
 
 	program.Delete();
