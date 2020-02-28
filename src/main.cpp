@@ -82,6 +82,7 @@ int main() {
 		program.Run();
 		program.SetUniform("iResolution", glm::vec2(window.GetWidth(), window.GetHeight()));
 		program.SetUniform("View", view);
+		program.SetUniform("Time", glfwGetTime());
 
  		glBindVertexArray(VAO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO); 

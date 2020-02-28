@@ -7,12 +7,14 @@
 in mat4 viewMatrix;
 out vec4 outColor;
 
-uniform vec2 iResolution; 
+uniform vec2 iResolution;
+
+uniform float Time;
 
 const int MAX_MARCHING_STEPS = 255;
 const float MIN_DIST = 0.0;
-const float MAX_DIST = 100.0;
-const float EPSILON = 0.0001;
+const float MAX_DIST = 50.0;
+const float EPSILON = 0.005;
  
 //Signed distance function for a sphere centered at the origin with radius 1.0;
 float sphereSDF(vec3 point, float radius) {
@@ -36,6 +38,60 @@ float differenceSDF(float distA, float distB) {
     return max(distA, -distB);
 }
 
+/*
+float sierpinskiTriangle(vec3 z)
+{
+    float Iterations = 30;
+    float Scale = 3.0f;
+
+	vec3 a1 = vec3(1,1,1);
+	vec3 a2 = vec3(-1,-1,1);
+	vec3 a3 = vec3(1,-1,-1);
+	vec3 a4 = vec3(-1,1,-1);
+	vec3 c;
+	float n = 0;
+	float dist, d;
+	while (n < Iterations) {
+		c = a1; dist = length(z-a1);
+	    d = length(z-a2); if (d < dist) { c = a2; dist=d; }
+		d = length(z-a3); if (d < dist) { c = a3; dist=d; }
+		d = length(z-a4); if (d < dist) { c = a4; dist=d; }
+		z = Scale*z-c*(Scale-1.0);
+		n++;
+	}
+	return length(z) * pow(Scale, -n);
+}
+*/
+
+float mandelbulbFractal(vec3 pos) {
+    int Iterations = 8;
+    float Bailout = 10.0f;
+    float Power = 9.0*sin(Time / 50.0f);
+
+	vec3 z = pos;
+	float dr = 1.0;
+	float r = 0.0;
+	for (int i = 0; i < Iterations ; i++) {
+		r = length(z);
+		if (r>Bailout) break;
+		
+		// convert to polar coordinates
+		float theta = acos(z.z/r);
+		float phi = atan(z.y,z.x);
+		dr =  pow( r, Power-1.0)*Power*dr + 1.0;
+		
+		// scale and rotate the point
+		float zr = pow( r,Power);
+		theta = theta*Power;
+		phi = phi*Power;
+		
+		// convert back to cartesian coordinates
+		z = zr*vec3(sin(theta)*cos(phi), sin(phi)*sin(theta), cos(theta));
+		z+=pos;
+	}
+	return 0.5*log(r)*r/dr;
+}
+
 // Absolute value of the return value indicates the distance to the surface. 
 // Sign indicates whether the point is inside or outside the surface, negative indicating inside.
 float sceneSDF(vec3 point) {
@@ -44,11 +100,20 @@ float sceneSDF(vec3 point) {
     //return intersectSDF(cubeDist, sphereDist);
     //return sphereSDF(point, 1.0);
 
+/*
     float t = sphereSDF(point-vec3(3,-2.5,10), 2.5);
     t = unionSDF(t, sphereSDF(point-vec3(-3, -2.5, 10), 2.5));
     t = unionSDF(t, sphereSDF(point-vec3(0, 2.0, 10), 2.5));
     t = unionSDF(t, planeSDF(point, vec4(0, 1, 0, 5.5)));
     return t;
+*/
+
+    point.x = mod(point.x, 2.0f) - 1.0f;
+    point.z = mod(point.z, 2.0f) - 1.0f;
+    //return mod(point, 5.0f)- /2.0;
+    return mandelbulbFractal(point);
+
+    //return sierpinskiTriangle(point);
 }
 
 /*
@@ -90,7 +155,7 @@ vec3 rayDirection(float fieldOfView, vec2 size, vec2 fragCoord) {
     return normalize(dir);
 }
 
-//Compute the normal on the surface at point p, using the gradient of the SDF, 
+//Compute the normal on the surface at point p, using the gradient of the SDF
 vec3 computeNormal(vec3 p) {
     return normalize(vec3(
         sceneSDF(vec3(p.x + EPSILON, p.y, p.z)) - sceneSDF(vec3(p.x - EPSILON, p.y, p.z)),
@@ -101,7 +166,7 @@ vec3 computeNormal(vec3 p) {
 
 // https://www.iquilezles.org/www/articles/rmshadows/rmshadows.htm
 // w is the size of the light source, and controls how hard/soft the shadows are
-float softshadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end, float w )
+float softShadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end, float w )
 { 
     float res = 1.0;
     float ph = 1e20;
@@ -120,6 +185,7 @@ float softshadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end
 }
 
 // s is a scale variable determining the darkening effects of the occlusion
+// http://www2.compute.dtu.dk/pubdb/views/edoc_download.php/6392/pdf/imm6392.pdf
 float ambientOcclusion(vec3 point, vec3 normal, float step, float samples, float s) {
     float ao = 0.0f;
     float dist;
@@ -136,7 +202,6 @@ float ambientOcclusion(vec3 point, vec3 normal, float step, float samples, float
 // Lighting contribution of a direction light source via Phong illumination.
 vec4 PhongDirectionLight(vec3 ambientColor, vec3 diffuseColor, vec3 specularColor, float shininess, vec3 point, vec3 eye)
 {
-    // направленный источник света
     const vec3 lightDirection = vec3(0.0f, -1.0f, 0.0f);
     /*
     const vec3 ambientLightColor = vec3(0.5, 0.5, 0.5); // интенсивность фонового света
@@ -160,7 +225,7 @@ vec4 PhongDirectionLight(vec3 ambientColor, vec3 diffuseColor, vec3 specularColo
     #ifdef FLAG_SOFT_SHADOWS
         vec3 shadowRayOrigin = point + computeNormal(point)*0.01;
         vec3 shadowRayDir = normalize(vec3(-lightDirection));
-        shadow = softshadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, 3.0);
+        shadow = softShadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, 3.0);
     #endif
 
     vec3 light_direction = normalize(vec3(-lightDirection)); // L для направленного

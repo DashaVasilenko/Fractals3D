@@ -18,6 +18,7 @@ public:
 
     void SetUniform(const char* name, const glm::vec2&);
     void SetUniform(const char* name, const glm::mat4&);
+    void SetUniform(const char* name, float value);
 
 private:
     std::map<GLenum, std::string> mapSources;
