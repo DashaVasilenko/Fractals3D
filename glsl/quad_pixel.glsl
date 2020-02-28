@@ -1,7 +1,8 @@
 #version 330
 
-#define FLAG_SHADOWS
+//#define FLAG_SHADOWS
 //#define FLAG_SOFT_SHADOWS
+#define FLAG_AMBIENTOCCLUSION
 
 in mat4 viewMatrix;
 out vec4 outColor;
@@ -45,7 +46,7 @@ float sceneSDF(vec3 point) {
 
     float t = sphereSDF(point-vec3(3,-2.5,10), 2.5);
     t = unionSDF(t, sphereSDF(point-vec3(-3, -2.5, 10), 2.5));
-    t = unionSDF(t, sphereSDF(point-vec3(0, 2.5, 10), 2.5));
+    t = unionSDF(t, sphereSDF(point-vec3(0, 2.0, 10), 2.5));
     t = unionSDF(t, planeSDF(point, vec4(0, 1, 0, 5.5)));
     return t;
 }
@@ -59,7 +60,7 @@ float sceneSDF(vec3 point) {
     direction: the normalized direction to march in
     start: the starting distance away from the eye
     end: the max distance away from the eye to march before giving up
- */
+*/
 float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end) {
     float depth = start;
     for (int i = 0; i < MAX_MARCHING_STEPS; i++) {
@@ -81,7 +82,7 @@ float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end
     fieldOfView: vertical field of view in degrees
     size: resolution of the output image
     fragCoord: the x,y coordinate of the pixel in the output image
- */
+*/
 vec3 rayDirection(float fieldOfView, vec2 size, vec2 fragCoord) {
     vec2 xy = fragCoord - size / 2.0;
     float z = size.y / tan(radians(fieldOfView) / 2.0);
@@ -118,18 +119,36 @@ float softshadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end
     return res;
 }
 
+// s is a scale variable determining the darkening effects of the occlusion
+float ambientOcclusion(vec3 point, vec3 normal, float step, float samples, float s) {
+    float ao = 0.0f;
+    float dist;
+    for (float i = 1.0f; i <= samples; i += 1.0f) {
+        dist = step*i;  
+        ao = max( (dist - (sceneSDF(point + normal*dist))) / pow(2.0, i), ao); 
+        //ao += max( (dist - (sceneSDF(point + normal*dist))) / pow(2.0, i), 0.0); 
+        //ao += (dist - (sceneSDF(point + normal*dist))) / (dist*dist); 
+    }
+    return 1.0f - ao*s;
+    //return clamp(1.0f - ao*s, 0.0, 1.0);
+}
+
 // Lighting contribution of a direction light source via Phong illumination.
 vec4 PhongDirectionLight(vec3 ambientColor, vec3 diffuseColor, vec3 specularColor, float shininess, vec3 point, vec3 eye)
 {
     // направленный источник света
     const vec3 lightDirection = vec3(0.0f, -1.0f, 0.0f);
+    /*
     const vec3 ambientLightColor = vec3(0.5, 0.5, 0.5); // интенсивность фонового света
     const vec3 diffuseLightColor = vec3(0.5, 0.5, 0.5); // интенсивность рассеянного света
     const vec3 specularLightColor = vec3(0.5, 0.5, 0.5); // интенсивность зеркального света
-
+    */
+    const vec3 ambientLightColor = vec3(1.0, 1.0, 1.0); // интенсивность фонового света
+    const vec3 diffuseLightColor = vec3(1.0, 1.0, 1.0); // интенсивность рассеянного света
+    const vec3 specularLightColor = vec3(1.0, 1.0, 1.0); // интенсивность зеркального света
+    
     float shadow = 1.0;
      
-
     #ifdef FLAG_SHADOWS
         vec3 shadowRayOrigin = point + computeNormal(point)*0.01;
         vec3 shadowRayDir = normalize(vec3(-lightDirection)); 
@@ -152,8 +171,14 @@ vec4 PhongDirectionLight(vec3 ambientColor, vec3 diffuseColor, vec3 specularColo
     vec3 ambient = ambientLightColor*ambientColor;
     vec3 diffuse = diffuseLightColor*diffuseColor*max(dot(light_direction, outNormal), 0.0f)*shadow;
     vec3 specular = specularLightColor*specularColor*pow(max(dot(inEye, reflected_light), 0.0), shininess);
-    return clamp(vec4(ambient + diffuse + specular, 1.0), 0.0f, 1.0f);
-    //return vec4(ambient + diffuse + specular, 1.0);  
+    vec3 color = ambient + diffuse + specular;
+
+    #ifdef FLAG_AMBIENTOCCLUSION
+        float ao = ambientOcclusion(point, outNormal, 2.5, 3.0, 0.5);
+	    color *= ao;
+    #endif
+
+    return clamp(vec4(color, 1.0), 0.0f, 1.0f);;  
 }
 
 vec4 Lambert(vec3 color, vec3 dir_light, vec3 point) {
@@ -181,6 +206,13 @@ void main() {
     const vec3 diffuseColor = vec3(0.50754, 0.50754, 0.50754); // отражение рассеянного света материалом
     const vec3 specularColor = vec3(0.50827, 0.50827, 0.50827); // отражение зеркального света материалом
     const float shininess = 2.0; // показатель степени зеркального отражения
+
+    /*
+    const vec3 ambientColor = vec3(1.0, 1.0, 1.0); // отражение фонового света материалом
+    const vec3 diffuseColor = vec3(1.0, 1.0, 1.0); // отражение рассеянного света материалом
+    const vec3 specularColor = vec3(1.0, 1.0, 1.0); // отражение зеркального света материалом
+    const float shininess = 20.0; // показатель степени зеркального отражения
+    */
 
     /*
     const vec3 ambientColor = vec3(0.2, 0.2, 0.2); // отражение фонового света материалом
