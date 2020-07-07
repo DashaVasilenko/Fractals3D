@@ -2,10 +2,16 @@
 #include <string>
 //#include <fstream>
 //#include <streambuf>
+//#include "imgui.h"
+//#include "imgui_impl_glfw.h"
+//#include "imgui_impl_opengl3.h"
+//#include <stdio.h>
+
 #include "window.h"
 #include "renderer.h"
 #include "shaderProgram.h"
 #include "camera.h"
+#include "gui.h"
 
 int main() {
     Window window;
@@ -18,6 +24,9 @@ int main() {
  	renderer.SetWidth(window.GetWidth());
  	renderer.SetHeight(window.GetHeight());
  	renderer.Init();
+
+	Gui gui;
+	gui.Init(window.GetPointer());
 
 	std::map<GLenum, std::string> mapSources;
  	mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
@@ -66,12 +75,13 @@ int main() {
  	Camera camera;
  	double currentTime = 0.0;
  	double lastTime = 0.0; // Время вывода последнего кадра
-	//glm::mat4 view = camera.GetViewMatrix();
-	//std::cout << view[3].x << view[3].y << view[3].z << std::endl; 
-	//std::cout << std::rand() << std::endl;
-	
+
  	while (!glfwWindowShouldClose(window.GetPointer())) {
 		glfwPollEvents(); // проверяет события (ввод с клавиатуры, перемещение мыши) и вызывает функции обратного вызова(callback))
+
+		gui.Update();
+		
+/*
 		currentTime = glfwGetTime();
  		float deltaTime = currentTime - lastTime; // Время, прошедшее между последним и текущим кадром
  		lastTime = currentTime;
@@ -88,8 +98,11 @@ int main() {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO); 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
  		glfwSwapBuffers(window.GetPointer());
+*/
+        glfwSwapBuffers(window.GetPointer());
  	}
 
+	gui.Destroy();
 	program.Delete();
  	window.Destroy();
  	return 0;

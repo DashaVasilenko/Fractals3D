@@ -23,15 +23,22 @@ void Window::OnMouseMove(GLFWwindow* window, double xpos, double ypos) {
     InputSystem::firstMouseMove = false;  
 }
 
+static void glfw_error_callback(int error, const char* description)
+{
+    fprintf(stderr, "Glfw Error %d: %s\n", error, description);
+}
+
 int Window::Init() {
     // init GLFW
+    glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
         exit(EXIT_FAILURE);
 
  	// Window creation + GL context
  	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); 
  	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); 
- 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); 
+ 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); 
  	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE); // выключение возможности изменения размера окна
 
     // Mac OS build fix
@@ -43,17 +50,16 @@ int Window::Init() {
         exit(EXIT_FAILURE);
     }
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // скрыть курсор мыши  
+    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // скрыть курсор мыши  
     glfwSetCursorPosCallback(window, OnMouseMove);
     glfwSetKeyCallback(window, OnKeyPressed); // передача функции для клавиатуры в GLFW
     // context
  	glfwMakeContextCurrent(window);
+    glfwSwapInterval(1); // Enable vsync
 
-    #ifndef __APPLE__
-        // Glew init
- 	    glewExperimental = true; 
- 	    if (glewInit() != GLEW_OK) { glfwTerminate(); return -1; }
-    #endif
+    // Glew init
+ 	glewExperimental = true; 
+ 	if (glewInit() != GLEW_OK) { glfwTerminate(); return -1; }
 
     return 0;
  }

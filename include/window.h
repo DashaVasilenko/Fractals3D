@@ -1,16 +1,13 @@
 #ifndef __WINDOW__
 #define __WINDOW__
 
+#include <GL/glew.h>
+#define GLEW_STATIC
+
+
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#ifndef __APPLE__
-    #include <GL/glew.h>
-    #define GLEW_STATIC
-#else
-    #define GL_SILENCE_DEPRECATION
-    #include <OpenGL/gl3.h>
-#endif
 
 #include <stdlib.h>
 #include <string>

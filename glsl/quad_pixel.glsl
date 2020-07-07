@@ -7,9 +7,9 @@
 in mat4 viewMatrix;
 out vec4 outColor;
 
-uniform vec2 iResolution;
+uniform vec2 iResolution; 
 
-uniform float Time;
+uniform float Time; 
 
 const int MAX_MARCHING_STEPS = 255;
 const float MIN_DIST = 0.0;
@@ -38,30 +38,74 @@ float differenceSDF(float distA, float distB) {
     return max(distA, -distB);
 }
 
+float sierpinskiTriangle(vec3 pos) {
+    float t = Time;
 /*
-float sierpinskiTriangle(vec3 z)
-{
-    float Iterations = 30;
-    float Scale = 3.0f;
+    const int FRACTAL_ITERATIONS = 16;
+    float scale = 1.8+cos(Time)*0.18;
+	float offset = 1.5;
+	float x1,y1,z1;
+	for(int n=0; n< FRACTAL_ITERATIONS; n++)
+	{
+        pos.xy = (pos.x+pos.y < 0.0) ? -pos.yx : pos.xy;
+		pos.xz = (pos.x+pos.z < 0.0) ? -pos.zx : pos.xz;
+		pos.zy = (pos.z+pos.y < 0.0) ? -pos.yz : pos.zy;
+       
+		pos = scale*pos-offset*(scale-1.0);
+	}
+ 
+	return length(pos) * pow(scale, -float(FRACTAL_ITERATIONS));
+*/
 
-	vec3 a1 = vec3(1,1,1);
-	vec3 a2 = vec3(-1,-1,1);
-	vec3 a3 = vec3(1,-1,-1);
-	vec3 a4 = vec3(-1,1,-1);
+    const vec3 v1 = vec3(-1.0f, -1.0f, -1.0f);
+    const vec3 v2 = vec3(1.0f, 1.0f, -1.0f);
+    const vec3 v3 = vec3(1.0f, -1.0f, 1.0f);
+    const vec3 v4 = vec3(-1.0f, 1.0f, 1.0f);
+    const int maxit = 15;
+    const float scale = 2.0;
+
+    for (int i = 0; i < maxit; ++i) {
+        float d = distance(pos, v1);
+        vec3 c = v1;
+        
+        float t = distance(pos, v2);
+        if (t < d) { c = v2; d = t; }
+        
+        t = distance(pos, v3);
+        if (t < d) { c = v3; d = t; }
+        
+        t = distance(pos, v4);
+        if (t < d) { c = v4; d = t; }
+        
+        pos = (pos - c)*scale;
+    }
+    return length(pos) * pow(scale, float(-maxit)); 
+    // return length(p) * pow(scale, float(-maxit)) - pixsize; // let the leaves be one pixel in size
+
+/*
+    int Iterations = 30;
+    float Scale = 3.0f;
+    float t = Time;
+
+	vec3 a1 = vec3(1.0f, 1.0f, 1.0f);
+	vec3 a2 = vec3(-1.0f, -1.0f, 1.0f);
+	vec3 a3 = vec3(1.0f, -1.0f, -1.0f);
+	vec3 a4 = vec3(-1.0f, 1.0f, -1.0f);
 	vec3 c;
-	float n = 0;
+	int n = 0;
 	float dist, d;
 	while (n < Iterations) {
-		c = a1; dist = length(z-a1);
-	    d = length(z-a2); if (d < dist) { c = a2; dist=d; }
-		d = length(z-a3); if (d < dist) { c = a3; dist=d; }
-		d = length(z-a4); if (d < dist) { c = a4; dist=d; }
-		z = Scale*z-c*(Scale-1.0);
+		c = a1; dist = length(z - a1);
+	    d = length(z - a2); if (d < dist) { c = a2; dist = d; }
+		d = length(z - a3); if (d < dist) { c = a3; dist = d; }
+		d = length(z - a4); if (d < dist) { c = a4; dist = d; }
+		z = Scale*z - c*(Scale - 1.0);
 		n++;
 	}
-	return length(z) * pow(Scale, -n);
-}
+	return length(z)*pow(Scale, -n);
 */
+}
+
 
 float mandelbulbFractal(vec3 pos) {
     int Iterations = 8;
@@ -73,33 +117,29 @@ float mandelbulbFractal(vec3 pos) {
 	float r = 0.0;
 	for (int i = 0; i < Iterations ; i++) {
 		r = length(z);
-		if (r>Bailout) break;
+		if (r > Bailout) break;
 		
 		// convert to polar coordinates
 		float theta = acos(z.z/r);
 		float phi = atan(z.y,z.x);
-		dr =  pow( r, Power-1.0)*Power*dr + 1.0;
+		dr =  pow(r, Power - 1.0)*Power*dr + 1.0;
 		
 		// scale and rotate the point
-		float zr = pow( r,Power);
+		float zr = pow(r, Power);
 		theta = theta*Power;
 		phi = phi*Power;
 		
 		// convert back to cartesian coordinates
 		z = zr*vec3(sin(theta)*cos(phi), sin(phi)*sin(theta), cos(theta));
-		z+=pos;
+		z += pos;
 	}
 	return 0.5*log(r)*r/dr;
 }
 
+
 // Absolute value of the return value indicates the distance to the surface. 
 // Sign indicates whether the point is inside or outside the surface, negative indicating inside.
 float sceneSDF(vec3 point) {
-    //float sphereDist = sphereSDF(point / 1.2) * 1.2;
-    //float cubeDist = cubeSDF(point);
-    //return intersectSDF(cubeDist, sphereDist);
-    //return sphereSDF(point, 1.0);
-
 /*
     float t = sphereSDF(point-vec3(3,-2.5,10), 2.5);
     t = unionSDF(t, sphereSDF(point-vec3(-3, -2.5, 10), 2.5));
@@ -108,9 +148,8 @@ float sceneSDF(vec3 point) {
     return t;
 */
 
-    point.x = mod(point.x, 2.0f) - 1.0f;
-    point.z = mod(point.z, 2.0f) - 1.0f;
-    //return mod(point, 5.0f)- /2.0;
+    //point.x = mod(point.x, 2.0f) - 1.0f;
+    //point.z = mod(point.z, 2.0f) - 1.0f;
     return mandelbulbFractal(point);
 
     //return sierpinskiTriangle(point);
@@ -170,14 +209,13 @@ float softShadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end
 { 
     float res = 1.0;
     float ph = 1e20;
-    for( float t=start; t<end; )
-    {
+    for(float t=start; t<end; ) {
         float h = sceneSDF(shadowRayOrigin + shadowRayDir*t);
         if( h<0.001 )
             return 0.0;
         float y = h*h/(2.0*ph);
-        float d = sqrt(h*h-y*y);
-        res = min( res, w*d/max(0.0,t-y) );
+        float d = sqrt(h*h - y*y);
+        res = min(res, w*d/max(0.0, t - y) );
         ph = h;
         t += h;
     }
@@ -265,7 +303,7 @@ void main() {
 		return;
     }
 
-    vec3 point = eye + dist * dir; // The closest point on the surface to the eyepoint along the view ray
+    vec3 point = eye + dist*dir; // The closest point on the surface to the eyepoint along the view ray
 
     const vec3 ambientColor = vec3(0.19225, 0.19225, 0.19225); // отражение фонового света материалом
     const vec3 diffuseColor = vec3(0.50754, 0.50754, 0.50754); // отражение рассеянного света материалом

@@ -7,7 +7,12 @@ find_package (glfw3 REQUIRED)
 
 find_package (GLEW REQUIRED STATIC)
 
-add_executable(main src/main.cpp src/window.cpp src/renderer.cpp src/shaderProgram.cpp src/camera.cpp src/inputSystem.cpp)
-target_include_directories(main PUBLIC include)
+file(GLOB Sources
+    "src/*.cpp"
+    "imgui/*.cpp"
+)
 
-target_link_libraries(main ${GLEW_LIBRARY} ${OPENGL_LIBRARIES} glfw)
+add_executable(main ${Sources} )
+target_include_directories(main PUBLIC include imgui)
+
+target_link_libraries(main glew ${OPENGL_LIBRARIES} glfw)
