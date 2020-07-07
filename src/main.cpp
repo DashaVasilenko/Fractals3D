@@ -1,17 +1,13 @@
 #include <iostream>
 #include <string>
-//#include <fstream>
-//#include <streambuf>
-//#include "imgui.h"
-//#include "imgui_impl_glfw.h"
-//#include "imgui_impl_opengl3.h"
-//#include <stdio.h>
 
 #include "window.h"
 #include "renderer.h"
 #include "shaderProgram.h"
 #include "camera.h"
 #include "gui.h"
+#include "texture.h"
+#include "framebuffer.h"
 
 int main() {
     Window window;
@@ -25,9 +21,6 @@ int main() {
  	renderer.SetHeight(window.GetHeight());
  	renderer.Init();
 
-	Gui gui;
-	gui.Init(window.GetPointer());
-
 	std::map<GLenum, std::string> mapSources;
  	mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
  	mapSources[GL_FRAGMENT_SHADER] = "glsl/quad_pixel.glsl";
@@ -37,12 +30,19 @@ int main() {
  	program.Compile();
  	program.Link();
 
-	GLfloat vertices[] = {
+	/*GLfloat vertices[] = {
     -1.0f,  1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
      1.0f,  1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
      1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
 	-1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f
-	};  
+	};  */
+
+	GLfloat vertices[] = {
+    -1.0f,  1.0f, 0.0f, 1.0f, 0.0f,
+     1.0f,  1.0f, 0.0f, 0.0f, 0.0f,
+     1.0f, -1.0f, 0.0f, 1.0f, 1.0f,
+	-1.0f, -1.0f, 0.0f, 0.0f, 1.0f	
+	}; 
 
 	GLuint indices[] = {
 		0, 1, 2,
@@ -63,13 +63,20 @@ int main() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO); 
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
+	FrameBuffer FBO;
+	FBO.BufferInit(1080, 768);
+
+	Gui gui;
+	gui.Init(window.GetPointer(), &FBO);
+
 	// сообщаем OpenGL как он должен интерпретировать вершинные данные
  	// (какой аргумент шейдера мы хотим настроить(layout (location = 0)), размер аргумента в шейдере, тип данных,
  	//  необходимость нормализовать входные данные, расстояние между наборами данных, смещение начала данных в буфере)
- 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
+ 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
  	glEnableVertexAttribArray(0); // включаем атрибуты, т.е. передаем вершинному атрибуту позицию аргумента
- 	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat)) );
- 	//glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT,GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1); 
  
 	// в рендерер
  	Camera camera;
@@ -79,13 +86,13 @@ int main() {
  	while (!glfwWindowShouldClose(window.GetPointer())) {
 		glfwPollEvents(); // проверяет события (ввод с клавиатуры, перемещение мыши) и вызывает функции обратного вызова(callback))
 
-		gui.Update();
-		
-/*
+
 		currentTime = glfwGetTime();
  		float deltaTime = currentTime - lastTime; // Время, прошедшее между последним и текущим кадром
  		lastTime = currentTime;
 		camera.Update(deltaTime);
+
+		FBO.Bind();
 		glm::mat4 view = camera.GetViewMatrix();
 
 		renderer.Update();
@@ -97,9 +104,15 @@ int main() {
  		glBindVertexArray(VAO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO); 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
+		FBO.Unbind();
+
+
+		gui.Update();
+
+		
  		glfwSwapBuffers(window.GetPointer());
-*/
-        glfwSwapBuffers(window.GetPointer());
+
+        //glfwSwapBuffers(window.GetPointer());
  	}
 
 	gui.Destroy();

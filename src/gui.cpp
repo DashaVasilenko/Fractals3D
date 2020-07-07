@@ -1,8 +1,9 @@
 #include "gui.h"
 #include "window.h"
 
-void Gui::Init(GLFWwindow* window) {
+void Gui::Init(GLFWwindow* window, FrameBuffer* fbo) {
     this->window = window;
+    this->fbo = fbo;
     // Setup ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -61,6 +62,11 @@ void Gui::Update() {
                 show_another_window = false;
             ImGui::End();
         }
+
+        ImGui::Begin("Test");
+        ImGui::Image((ImTextureID)fbo->GetTexDescriptor(), ImVec2(fbo->GetWidth(), fbo->GetHeight()), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::End();
+
 
 		// Rendering
         ImGui::Render();
