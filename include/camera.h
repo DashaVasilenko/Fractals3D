@@ -11,9 +11,11 @@ public:
     Camera(const glm::vec3& = glm::vec3(0.0f, 0.0f, 3.0f) );
     void Update(const float&);
     glm::mat4 GetViewMatrix();
+    float GetFieldOfView() { return fieldOfView; }
+
 private:
     void UpdatePosition(const float&);
-    void UpdateVectors();
+    void UpdateVectors(const float&);
 
     glm::vec3 up;
     glm::vec3 right;
@@ -22,10 +24,16 @@ private:
     float pitch = 0.0f; // тангаж (наклон вверх вниз)
     //float roll = 0.0f; // крен
     float yaw = -90.0f; // рыскание (поворот влево вправо)
+    float fieldOfView = 45.0f;
 
     glm::vec3 position;
+    float phi;
+    float theta;
+    float r;
+
+    //float speed = 5.0f;
     float speed = 5.0f;
-    float mouse_sense = 0.1f;
+    float mouse_sense = 0.5f;
 };
 
 #endif /* End of __CAMERA__ */

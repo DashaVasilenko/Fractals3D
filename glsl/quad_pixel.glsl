@@ -8,7 +8,7 @@ in mat4 viewMatrix;
 out vec4 outColor;
 
 uniform vec2 iResolution; 
-
+uniform float fieldOfView;
 uniform float Time; 
 
 const int MAX_MARCHING_STEPS = 255;
@@ -140,6 +140,13 @@ float mandelbulbFractal(vec3 pos) {
 // Absolute value of the return value indicates the distance to the surface. 
 // Sign indicates whether the point is inside or outside the surface, negative indicating inside.
 float sceneSDF(vec3 point) {
+    float time = Time;
+
+    float t = sphereSDF(point - vec3(-3, 0, 0), 2.5);
+    t = unionSDF(t, sphereSDF(point-vec3(3, 0, 0), 2.5));
+    t = unionSDF(t, sphereSDF(point-vec3(0, 0, 10), 2.5));
+    t = unionSDF(t, planeSDF(point, vec4(0, 1, 0, 5.5)));
+    return t;
 /*
     float t = sphereSDF(point-vec3(3,-2.5,10), 2.5);
     t = unionSDF(t, sphereSDF(point-vec3(-3, -2.5, 10), 2.5));
@@ -150,7 +157,7 @@ float sceneSDF(vec3 point) {
 
     //point.x = mod(point.x, 2.0f) - 1.0f;
     //point.z = mod(point.z, 2.0f) - 1.0f;
-    return mandelbulbFractal(point);
+    //return mandelbulbFractal(point);
 
     //return sierpinskiTriangle(point);
 }
@@ -293,7 +300,7 @@ vec4 Lambert(vec3 color, vec3 dir_light, vec3 point) {
 
 void main() {
     vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
-    vec3 dir = rayDirection(45.0, iResolution, pixelCoord);
+    vec3 dir = rayDirection(fieldOfView, iResolution, pixelCoord);
     vec3 eye = viewMatrix[3].xyz;
     float dist = shortestDistanceToSurface(eye, dir, MIN_DIST, MAX_DIST);
     

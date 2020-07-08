@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+//#include "stb_image_write.h"
 
 #include "window.h"
 #include "renderer.h"
@@ -29,13 +30,6 @@ int main() {
  	program.Init(mapSources);
  	program.Compile();
  	program.Link();
-
-	/*GLfloat vertices[] = {
-    -1.0f,  1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-     1.0f,  1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-     1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-	-1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f
-	};  */
 
 	GLfloat vertices[] = {
     -1.0f,  1.0f, 0.0f, 1.0f, 0.0f,
@@ -73,12 +67,10 @@ int main() {
  	// (какой аргумент шейдера мы хотим настроить(layout (location = 0)), размер аргумента в шейдере, тип данных,
  	//  необходимость нормализовать входные данные, расстояние между наборами данных, смещение начала данных в буфере)
  	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
  	glEnableVertexAttribArray(0); // включаем атрибуты, т.е. передаем вершинному атрибуту позицию аргумента
 	glVertexAttribPointer(1, 2, GL_FLOAT,GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(1); 
- 
-	// в рендерер
+	glEnableVertexAttribArray(1); 	
+
  	Camera camera;
  	double currentTime = 0.0;
  	double lastTime = 0.0; // Время вывода последнего кадра
@@ -86,36 +78,31 @@ int main() {
  	while (!glfwWindowShouldClose(window.GetPointer())) {
 		glfwPollEvents(); // проверяет события (ввод с клавиатуры, перемещение мыши) и вызывает функции обратного вызова(callback))
 
-
 		currentTime = glfwGetTime();
  		float deltaTime = currentTime - lastTime; // Время, прошедшее между последним и текущим кадром
  		lastTime = currentTime;
 		camera.Update(deltaTime);
 
-		FBO.Bind();
+		//FBO.Bind();
 		glm::mat4 view = camera.GetViewMatrix();
-
+		float fov = camera.GetFieldOfView();
 		renderer.Update();
 		program.Run();
 		program.SetUniform("iResolution", glm::vec2(window.GetWidth(), window.GetHeight()));
+		program.SetUniform("fieldOfView", fov);
 		program.SetUniform("View", view);
 		program.SetUniform("Time", glfwGetTime());
-
  		glBindVertexArray(VAO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO); 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
-		FBO.Unbind();
+		//FBO.Unbind();
 
+		//gui.Update();
 
-		gui.Update();
-
-		
  		glfwSwapBuffers(window.GetPointer());
-
-        //glfwSwapBuffers(window.GetPointer());
  	}
 
-	gui.Destroy();
+ 	gui.Destroy();
 	program.Delete();
  	window.Destroy();
  	return 0;

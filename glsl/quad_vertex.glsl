@@ -9,8 +9,6 @@ out vec3 color;
 out mat4 viewMatrix;
 
 void main() {
-    //color = inColor;
-    //gl_Position = vec4(position, 1.0f);
     viewMatrix = View;
     gl_Position = vec4(position, 1.0f);
 }

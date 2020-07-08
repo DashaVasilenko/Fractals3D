@@ -29,8 +29,6 @@ class RenderTexture : public Texture {
 public:
     void CreateAttachment(GLenum slot) const;
     void Init(int width, int height, GLuint internalformat, GLenum format, GLenum type, GLint param);
-    void InitDepthMap(int width, int height);
-    void InitBrightMapGauss(int width, int height);
 };
 
 #endif /* End of __TEXTURE__ */

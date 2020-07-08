@@ -1,3 +1,6 @@
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+
 #include "gui.h"
 #include "window.h"
 
@@ -67,6 +70,28 @@ void Gui::Update() {
         ImGui::Image((ImTextureID)fbo->GetTexDescriptor(), ImVec2(fbo->GetWidth(), fbo->GetHeight()), ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::End();
 
+        ImGui::Begin("Save image as");
+        if (ImGui::Button("Save")) {
+            //fbo->Bind();
+            unsigned char* imageData = (unsigned char*)malloc((int)(1080*768*(3)));
+		    glReadPixels(0, 0, 1080, 768, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+            unsigned char* imageData2 = (unsigned char*)malloc((int)(1080*768*(3)));
+            int k = 0;
+            for (int i = 768; i > 0; i--) {
+                for (int j = 0; j < 1080*3; j++) {
+                    imageData2[k] = imageData[i*1080*3 + j];
+                    k++;
+                }
+            }
+
+		    // stbi_write_png("stbpng.png", width, height, CHANNEL_NUM, pixels, width * CHANNEL_NUM);
+		    stbi_write_png("stbpng.png", 1080, 768, 3, imageData2, 1080 * 3);
+		    free(imageData);
+            free(imageData2);
+            //fbo->Unbind();
+        }
+
+		ImGui::End();
 
 		// Rendering
         ImGui::Render();

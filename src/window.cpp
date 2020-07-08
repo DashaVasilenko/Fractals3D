@@ -1,3 +1,5 @@
+#include <glm/glm.hpp>
+
 #include "window.h"
 #include "inputSystem.h"
 
@@ -12,15 +14,36 @@ void Window::OnKeyPressed(GLFWwindow* window, int key, int scancode, int action,
 }
 
 void Window::OnMouseMove(GLFWwindow* window, double xpos, double ypos) {
-    if (InputSystem::firstMouseMove) {
+    if (InputSystem::mouse[RightButton]) {
+        if (InputSystem::firstMouseMove) {
+            InputSystem::lastCursPosX = xpos;
+            InputSystem::lastCursPosY = ypos;
+        }
+        InputSystem::deltaCursPosX = xpos - InputSystem::lastCursPosX;
+        InputSystem::deltaCursPosY = InputSystem::lastCursPosY - ypos;
         InputSystem::lastCursPosX = xpos;
         InputSystem::lastCursPosY = ypos;
+        InputSystem::firstMouseMove = false;
     }
-    InputSystem::deltaCursPosX = xpos - InputSystem::lastCursPosX;
-    InputSystem::deltaCursPosY = InputSystem::lastCursPosY - ypos;
-    InputSystem::lastCursPosX = xpos;
-    InputSystem::lastCursPosY = ypos;
-    InputSystem::firstMouseMove = false;  
+    else {
+        InputSystem::firstMouseMove = true;
+    }
+}
+
+void Window::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+    if (action == GLFW_PRESS) {
+        InputSystem::mouse[button] = true;
+    }
+    else if (action == GLFW_RELEASE) {
+        InputSystem::mouse[button] = false;
+    }
+}
+
+void Window::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset) { 
+    InputSystem::scrollOffsetX = xoffset;
+    InputSystem::scrollOffsetY = yoffset;
+    //InputSystem::fieldOfView -= yoffset;
+    //InputSystem::fieldOfView = glm::clamp(InputSystem::fieldOfView, 1.0f, 45.0f);
 }
 
 static void glfw_error_callback(int error, const char* description)
@@ -53,6 +76,9 @@ int Window::Init() {
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // скрыть курсор мыши  
     glfwSetCursorPosCallback(window, OnMouseMove);
     glfwSetKeyCallback(window, OnKeyPressed); // передача функции для клавиатуры в GLFW
+    glfwSetMouseButtonCallback(window, MouseButtonCallback);
+    glfwSetScrollCallback(window, ScrollCallback);
+
     // context
  	glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
