@@ -36,4 +36,5 @@ void RenderTexture::Init(int width, int height, GLuint internalformat, GLenum fo
     GLCall(glTexImage2D(GL_TEXTURE_2D, 0, internalformat, width, height, 0, format, type, NULL));
     GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, param));
     GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, param));
+    Unbind();
 }

@@ -10,6 +10,7 @@ public:
     FrameBuffer();
     void BufferInit(int width, int  height);
     void Bind() const;
+    void Resize(int width, int height);
     void Unbind() const;
     GLuint GetDescriptor() { return descriptor; }
     GLuint GetTexDescriptor() { return tex_color_buf.GetDescriptor(); }

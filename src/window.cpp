@@ -54,6 +54,7 @@ void Window::WindowSizeCallback(GLFWwindow* window, int width, int height) {
     Window* myWindow = (Window*)glfwGetWindowUserPointer(window);
     myWindow->SetWidth(width);
     myWindow->SetHeight(height);
+    InputSystem::isWindowSizeChange = true;
 }
 
 int Window::Init() {

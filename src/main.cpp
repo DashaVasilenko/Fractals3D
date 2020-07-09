@@ -9,6 +9,7 @@
 #include "gui.h"
 #include "texture.h"
 #include "framebuffer.h"
+#include "inputSystem.h"
 
 int main() {
     Window window;
@@ -58,7 +59,7 @@ int main() {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	FrameBuffer FBO;
-	FBO.BufferInit(1080, 768);
+	FBO.BufferInit(window.GetWidth(), window.GetHeight());
 
 	Gui gui;
 	gui.Init(&window, &FBO);
@@ -78,6 +79,9 @@ int main() {
  	while (!glfwWindowShouldClose(window.GetPointer())) {
 		glfwPollEvents(); // проверяет события (ввод с клавиатуры, перемещение мыши) и вызывает функции обратного вызова(callback))
 
+		if (InputSystem::isWindowSizeChange) {
+			FBO.Resize(window.GetWidth(), window.GetHeight());
+		}
 		currentTime = glfwGetTime();
  		float deltaTime = currentTime - lastTime; // Время, прошедшее между последним и текущим кадром
  		lastTime = currentTime;

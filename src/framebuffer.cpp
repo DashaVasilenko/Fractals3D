@@ -30,6 +30,22 @@ void FrameBuffer::Bind() const {
     GLCall(glBindFramebuffer(GL_FRAMEBUFFER, descriptor));  // привязываем как текущий активный буфер кадра 
 }
 
+void FrameBuffer::Resize(int width, int height) {
+    // resize color attachment
+    glBindTexture(GL_TEXTURE_2D, tex_color_buf.GetDescriptor());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    // resize depth attachment
+    glBindRenderbuffer(GL_RENDERBUFFER, depth);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    // update internal dimensions
+    this->width = width;
+    this->height = height;
+}
+
 void FrameBuffer::Unbind() const {
     GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0)); // отвязываем буфера и возвращаем базовый кадровый буфер на место активного  
 }
