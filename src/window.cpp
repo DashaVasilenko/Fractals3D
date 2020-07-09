@@ -3,6 +3,10 @@
 #include "window.h"
 #include "inputSystem.h"
 
+void Window::ErrorCallback(int error, const char* description) {
+    fprintf(stderr, "Glfw Error %d: %s\n", error, description);
+}
+
 void Window::OnKeyPressed(GLFWwindow* window, int key, int scancode, int action, int mode) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GL_TRUE);
@@ -46,14 +50,15 @@ void Window::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset) 
     //InputSystem::fieldOfView = glm::clamp(InputSystem::fieldOfView, 1.0f, 45.0f);
 }
 
-static void glfw_error_callback(int error, const char* description)
-{
-    fprintf(stderr, "Glfw Error %d: %s\n", error, description);
+void Window::WindowSizeCallback(GLFWwindow* window, int width, int height) {
+    Window* myWindow = (Window*)glfwGetWindowUserPointer(window);
+    myWindow->SetWidth(width);
+    myWindow->SetHeight(height);
 }
 
 int Window::Init() {
     // init GLFW
-    glfwSetErrorCallback(glfw_error_callback);
+    glfwSetErrorCallback(ErrorCallback);
     if (!glfwInit())
         exit(EXIT_FAILURE);
 
@@ -62,7 +67,7 @@ int Window::Init() {
  	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); 
  	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); 
- 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE); // выключение возможности изменения размера окна
+ 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); // включение возможности изменения размера окна
 
     // Mac OS build fix
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // uncomment this statement to fix compilation on OS X
@@ -74,10 +79,12 @@ int Window::Init() {
     }
 
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // скрыть курсор мыши  
+    glfwSetWindowUserPointer(window, this);
     glfwSetCursorPosCallback(window, OnMouseMove);
     glfwSetKeyCallback(window, OnKeyPressed); // передача функции для клавиатуры в GLFW
     glfwSetMouseButtonCallback(window, MouseButtonCallback);
     glfwSetScrollCallback(window, ScrollCallback);
+    glfwSetWindowSizeCallback(window, WindowSizeCallback);
 
     // context
  	glfwMakeContextCurrent(window);

@@ -54,7 +54,6 @@ void Camera::UpdatePosition(const float& delta) {
     if (InputSystem::mouse[LeftButton]) {
         phi += InputSystem::deltaCursPosX*mouse_sense;
         theta += InputSystem::deltaCursPosY*mouse_sense;
-        printf("phi %f teta %f\n", phi, theta);
         r = glm::length(position);
         
         position.x = r * sin(glm::radians(theta)) * cos(glm::radians(phi));

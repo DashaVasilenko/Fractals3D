@@ -61,7 +61,7 @@ int main() {
 	FBO.BufferInit(1080, 768);
 
 	Gui gui;
-	gui.Init(window.GetPointer(), &FBO);
+	gui.Init(&window, &FBO);
 
 	// сообщаем OpenGL как он должен интерпретировать вершинные данные
  	// (какой аргумент шейдера мы хотим настроить(layout (location = 0)), размер аргумента в шейдере, тип данных,
@@ -83,7 +83,7 @@ int main() {
  		lastTime = currentTime;
 		camera.Update(deltaTime);
 
-		//FBO.Bind();
+		FBO.Bind();
 		glm::mat4 view = camera.GetViewMatrix();
 		float fov = camera.GetFieldOfView();
 		renderer.Update();
@@ -95,9 +95,9 @@ int main() {
  		glBindVertexArray(VAO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO); 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
-		//FBO.Unbind();
+		FBO.Unbind();
 
-		//gui.Update();
+		gui.Update();
 
  		glfwSwapBuffers(window.GetPointer());
  	}

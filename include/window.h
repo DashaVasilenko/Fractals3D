@@ -21,14 +21,18 @@ public:
     GLFWwindow* GetPointer() { return this->window; }
     int GetWidth() const { return this->width; }
     int GetHeight() const { return this->height; }
+    void GetSize(int* width, int* heigth) const { *width = this->width; *heigth = this->height; }
+
 
     int Init();
     void Destroy();
 
+    static void ErrorCallback(int error, const char* description);
     static void OnKeyPressed(GLFWwindow* window, int key, int scancode, int action, int mode);
     static void OnMouseMove(GLFWwindow* window, double xpos, double ypos);
     static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
     static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+    static void WindowSizeCallback(GLFWwindow* window, int width, int height);
 
 
 private:

@@ -4,9 +4,10 @@
 #include "gui.h"
 #include "window.h"
 
-void Gui::Init(GLFWwindow* window, FrameBuffer* fbo) {
+void Gui::Init(Window* window, FrameBuffer* fbo) {
     this->window = window;
     this->fbo = fbo;
+
     // Setup ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -19,7 +20,7 @@ void Gui::Init(GLFWwindow* window, FrameBuffer* fbo) {
 
 	// Setup Platform/Renderer bindings
 	const char* glsl_version =  "#version 330";
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplGlfw_InitForOpenGL(window->GetPointer(), true);
     ImGui_ImplOpenGL3_Init(glsl_version);     
 }
 
@@ -66,13 +67,144 @@ void Gui::Update() {
             ImGui::End();
         }
 
-        ImGui::Begin("Test");
-        ImGui::Image((ImTextureID)fbo->GetTexDescriptor(), ImVec2(fbo->GetWidth(), fbo->GetHeight()), ImVec2(0, 1), ImVec2(1, 0));
-		ImGui::End();
 
+
+        //---------------------------------------Menu----------------------------------------------------
+        if(ImGui::BeginMainMenuBar()) {
+            if (ImGui::BeginMenu("File")) {
+                if (ImGui::MenuItem("Open", "Ctrl+O")) {
+                //if (ImGui::MenuItem("Open", "Ctrl + O") || Input::GetKey(KeyCode::LeftCtrl)) {
+                    //m_FileExplorerLoadConfig.Open();
+                }
+                ImGui::Separator();
+
+                if (ImGui::MenuItem("New", "Ctrl+N")) {
+
+                }
+                ImGui::Separator();
+
+                if (ImGui::MenuItem("Save Parameters", "Ctrl+P")) {
+
+                }
+                if (ImGui::MenuItem("Load Parameters", "Ctrl+P")) {
+
+                }
+                ImGui::Separator();
+                
+                if (ImGui::MenuItem("Save", "Ctrl+S")) {
+                    //m_FileExplorerSaveConfig.Open();
+                }
+                if (ImGui::MenuItem("Save as..")) {
+                    //m_FileExplorerSaveConfig.Open();
+                }
+                ImGui::Separator();
+
+                //if (ImGui::MenuItem("Export..")) {
+                    //m_FileExplorerSaveConfig.Open();
+                //}
+                
+                if (ImGui::BeginMenu("Export..")) {
+                    if (ImGui::MenuItem("PNG")) {
+
+                    }
+                    if (ImGui::MenuItem("BMP")){
+
+                    }
+                    if (ImGui::MenuItem("JPEG")){
+
+                    }
+                    if (ImGui::MenuItem("TGA")){
+
+                    }
+                    if (ImGui::MenuItem("HDR")){
+
+                    }
+                    if (ImGui::MenuItem("OBJ")){
+
+                    }
+                    ImGui::EndMenu();
+                    //m_FileExplorerSaveConfig.Open();
+                }
+                ImGui::Separator();
+
+                if (ImGui::MenuItem("Exit", "Alt+F4")) {
+                    //window.Close();
+                }
+                
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("Edit")) {
+                if (ImGui::MenuItem("Undo", "Ctrl+Z")) {
+                    
+                }
+                
+                if (ImGui::MenuItem("Redo", "Ctrl+Shift+Z")) {
+                    
+                }
+                ImGui::Separator();
+
+                if (ImGui::MenuItem("Copy", "Ctrl+C")) {
+                    
+                }
+                if (ImGui::MenuItem("Paste", "Ctrl+V")) {
+                    
+                }
+                ImGui::Separator();
+
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("About")) {
+                ImGui::Text("Fractals");
+                ImGui::Separator();
+                ImGui::Text("Was created as a part of PV097 Visual creativity informatics course");
+                ImGui::Text("By Daria Vasilenko");
+                
+                ImGui::EndMenu();
+            }
+
+            /*
+            if (ImGui::BeginMenu("Render")) {
+                if (ImGui::MenuItem("Render Image", "F5")) {
+                    m_RenderSettingsVisible = true;
+                    s32 width;
+                    s32 height;
+                    window.GetSize(&width, &height);
+                    ImGui::SetNextWindowPos(ImVec2(width*0.5f, height*0.5f));
+                }
+                ImGui::EndMenu();
+            }
+            */
+            ImGui::EndMainMenuBar();
+        }
+        //-----------------------------------------------------------------------------------------------
+
+        //-------------------------------------------- Preview ------------------------------------------
+        ImGui::SetNextWindowPos(ImVec2(0, 18));
+        int width, height;
+        window->GetSize(&width, &height);
+        ImVec2 previewSize = ImVec2((float)width*2/3, (float)(height - 168));
+	    ImGui::SetNextWindowSize(previewSize);
+
+        ImGuiWindowFlags previewWindowFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus ;
+        ImGui::Begin("Test", NULL, previewWindowFlags);
+        //ImGui::Begin("Test", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus);
+        //ImGui::Image((ImTextureID)fbo->GetTexDescriptor(), ImVec2(fbo->GetWidth(), fbo->GetHeight()), ImVec2(0, 1), ImVec2(1, 0));
+
+        float offset = 0.5f*(previewSize.y - previewSize.x * 10 / 16);
+        ImGui::SetCursorPos(ImVec2(0.0f, offset));
+        ImGui::Image((ImTextureID)fbo->GetTexDescriptor(), ImVec2(previewSize.x, previewSize.x*10/16), ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+
+		ImGui::End();
+        //-----------------------------------------------------------------------------------------------
+
+
+
+        //-------------------------------------------- Save image ---------------------------------------
         ImGui::Begin("Save image as");
         if (ImGui::Button("Save")) {
-            //fbo->Bind();
+            fbo->Bind();
             unsigned char* imageData = (unsigned char*)malloc((int)(1080*768*(3)));
 		    glReadPixels(0, 0, 1080, 768, GL_RGB, GL_UNSIGNED_BYTE, imageData);
             unsigned char* imageData2 = (unsigned char*)malloc((int)(1080*768*(3)));
@@ -83,20 +215,20 @@ void Gui::Update() {
                     k++;
                 }
             }
-
 		    // stbi_write_png("stbpng.png", width, height, CHANNEL_NUM, pixels, width * CHANNEL_NUM);
 		    stbi_write_png("stbpng.png", 1080, 768, 3, imageData2, 1080 * 3);
 		    free(imageData);
             free(imageData2);
-            //fbo->Unbind();
+            fbo->Unbind();
         }
-
 		ImGui::End();
+        //-----------------------------------------------------------------------------------------------
+
 
 		// Rendering
         ImGui::Render();
         int display_w, display_h;
-        glfwGetFramebufferSize(window, &display_w, &display_h);
+        glfwGetFramebufferSize(window->GetPointer(), &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);

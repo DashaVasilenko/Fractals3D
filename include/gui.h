@@ -5,16 +5,18 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
+
 #include "framebuffer.h"
+#include "window.h"
 
 class Gui {
 public:
-    void Init(GLFWwindow* window, FrameBuffer* fbo);
+    void Init(Window* window, FrameBuffer* fbo);
     void Update();
     void Destroy();
 
 private:
-    GLFWwindow* window;
+    Window* window;
     FrameBuffer* fbo;
     bool show_demo_window = true;
     bool show_another_window = false;
