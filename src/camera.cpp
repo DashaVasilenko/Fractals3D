@@ -12,17 +12,9 @@ Camera::Camera(const glm::vec3& position) {
     right = glm::vec3(1.0f, 0.0f, 0.0f);
     front = glm::vec3(0.0f, 0.0f, -1.0f);
 
-    //r = 3.0f;
-    //phi = 0.0f;
-    //theta = 0.0f;
-
-    //this->position.x = r * sin(glm::radians(theta)) * cos(glm::radians(phi));
-    //this->position.y = r * cos(glm::radians(theta));
-    //this->position.z = r * sin(glm::radians(phi)) * sin(glm::radians(theta));
-
-    //phi = atan(position.z/position.x);
-    //theta = atan(sqrt(position.x*position.x + position.z*position.z)/position.y);
-    //r = glm::length(position);
+    phi = glm::degrees(atan(position.z/position.x));
+    theta = glm::degrees(atan(sqrt(position.x*position.x + position.z*position.z)/position.y));
+    r = glm::length(position);
 }
 
 glm::mat4 Camera::GetViewMatrix() {
@@ -59,20 +51,15 @@ void Camera::UpdatePosition(const float& delta) {
     position += front*delta*speed*(float)InputSystem::scrollOffsetY;
     InputSystem::scrollOffsetY = 0.0;
 
-    if (InputSystem::mouse[RightButton]) {
+    if (InputSystem::mouse[LeftButton]) {
         phi += InputSystem::deltaCursPosX*mouse_sense;
         theta += InputSystem::deltaCursPosY*mouse_sense;
         printf("phi %f teta %f\n", phi, theta);
         r = glm::length(position);
-        // Calculate the camera position using the distance and angles
-        //position.x += -r * sin(glm::radians(phi)) * cos(glm::radians(theta));
-        //position.y += -r * sin(glm::radians(theta));
-        //position.z += -r * cos(glm::radians(phi)) * cos(glm::radians(theta));
         
         position.x = r * sin(glm::radians(theta)) * cos(glm::radians(phi));
         position.y = r * cos(glm::radians(theta));
         position.z = r * sin(glm::radians(phi)) * sin(glm::radians(theta));
-
     }
     InputSystem::deltaCursPosX = 0.0f;
     InputSystem::deltaCursPosY = 0.0f;

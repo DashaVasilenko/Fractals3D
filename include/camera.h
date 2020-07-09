@@ -31,7 +31,6 @@ private:
     float theta;
     float r;
 
-    //float speed = 5.0f;
     float speed = 5.0f;
     float mouse_sense = 0.5f;
 };

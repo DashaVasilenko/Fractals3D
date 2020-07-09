@@ -14,7 +14,7 @@ void Window::OnKeyPressed(GLFWwindow* window, int key, int scancode, int action,
 }
 
 void Window::OnMouseMove(GLFWwindow* window, double xpos, double ypos) {
-    if (InputSystem::mouse[RightButton]) {
+    if (InputSystem::mouse[LeftButton]) {
         if (InputSystem::firstMouseMove) {
             InputSystem::lastCursPosX = xpos;
             InputSystem::lastCursPosY = ypos;
