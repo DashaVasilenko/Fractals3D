@@ -21,7 +21,12 @@ void Gui::Init(Window* window, FrameBuffer* fbo) {
 	// Setup Platform/Renderer bindings
 	const char* glsl_version =  "#version 330";
     ImGui_ImplGlfw_InitForOpenGL(window->GetPointer(), true);
-    ImGui_ImplOpenGL3_Init(glsl_version);     
+    ImGui_ImplOpenGL3_Init(glsl_version);    
+
+    fileBrowserSaveImage.SetTitle("Save image as..");
+    std::vector<const char*> image_filter = { ".png", ".jpg", ".jpeg", ".bmp", ".tga", ".hdr", ".obj" };
+    fileBrowserSaveImage.SetTypeFilters(image_filter);
+ 
 }
 
 void Gui::MenuBar() {
@@ -60,6 +65,10 @@ void Gui::MenuBar() {
                 
                 if (ImGui::BeginMenu("Export..")) {
                     if (ImGui::MenuItem("PNG")) {
+                        isExportPNG = true;
+                        //fileBrowserSaveImage.Open();
+
+                    /*
                         fbo->Bind();
                         unsigned char* imageData = (unsigned char*)malloc((int)(1080*768*(3)));
 		                glReadPixels(0, 0, 1080, 768, GL_RGB, GL_UNSIGNED_BYTE, imageData);
@@ -76,11 +85,15 @@ void Gui::MenuBar() {
 		                free(imageData);
                         free(imageData2);
                         fbo->Unbind();
+                    */
                     }
                     if (ImGui::MenuItem("BMP")){
                         
                     }
                     if (ImGui::MenuItem("JPEG")){
+
+                    }
+                    if (ImGui::MenuItem("JPG")){
 
                     }
                     if (ImGui::MenuItem("TGA")){
@@ -93,7 +106,6 @@ void Gui::MenuBar() {
 
                     }
                     ImGui::EndMenu();
-                    //m_FileExplorerSaveConfig.Open();
                 }
                 ImGui::Separator();
 
@@ -130,7 +142,6 @@ void Gui::MenuBar() {
                 ImGui::Separator();
                 ImGui::Text("Was created as a part of PV097 Visual creativity informatics course");
                 ImGui::Text("By Daria Vasilenko");
-                
                 ImGui::EndMenu();
             }
 
@@ -156,12 +167,9 @@ void Gui::Preview() {
     window->GetSize(&width, &height);
     ImVec2 previewSize = ImVec2((float)width*2/3, (float)(height - 168));
 	ImGui::SetNextWindowSize(previewSize);
-    ImGuiWindowFlags previewWindowFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus;
+    ImGuiWindowFlags previewWindowFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoScrollWithMouse ;
     ImGui::Begin("Test", NULL, previewWindowFlags);
-    //ImGui::Image((ImTextureID)fbo->GetTexDescriptor(), ImVec2(fbo->GetWidth(), fbo->GetHeight()), ImVec2(0, 1), ImVec2(1, 0));
-    float offset = 0.5f*(previewSize.y - previewSize.x * 10 / 16);
-    ImGui::SetCursorPos(ImVec2(0.0f, offset));
-    ImGui::Image((ImTextureID)fbo->GetTexDescriptor(), ImVec2(previewSize.x, previewSize.x * 10 / 16), ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+    ImGui::Image((ImTextureID)fbo->GetTexDescriptor(), ImVec2(previewSize.x, previewSize.y), ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
 	ImGui::End();
 }
 
@@ -171,7 +179,7 @@ void Gui::Update() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-/*
+
 		// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
         if (show_demo_window)
             ImGui::ShowDemoWindow(&show_demo_window);
@@ -208,10 +216,66 @@ void Gui::Update() {
                 show_another_window = false;
             ImGui::End();
         }
-*/
 
         MenuBar();
         Preview();
+
+
+        if (isExportPNG) {
+            ImGui::Begin("Export PNG", &isExportPNG, ImGuiWindowFlags_NoCollapse); 
+            int width, height;
+            window->GetSize(&width, &height);
+            ImGui::SetNextWindowPos(ImVec2(0.25f*width, 0.25f*height));
+            ImVec2 windowSize = ImVec2(0.75f*width, 0.75f*height);
+	        ImGui::SetNextWindowSize(windowSize);
+
+            if (ImGui::Button("Path:")) {
+                fileBrowserSaveImage.Open();
+            }
+            ImGui::SameLine();
+            ImGui::Text((output_path + output_name_png).c_str());
+
+            ImGui::Text("Width:");
+            ImGui::SetNextItemWidth(200);
+            ImGui::SameLine();
+            ImGui::DragInt("##width", &output_width, 1.0, 120, 8640);
+            ImGui::SameLine();
+            ImGui::Text("(120..8640)");
+            ImGui::SameLine();
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 50.0f);
+            ImGui::Text("Height:");
+            ImGui::SetNextItemWidth(200);
+            ImGui::SameLine();
+            ImGui::DragInt("##height", &output_height, 1.0, 120, 8640);
+            ImGui::SameLine();
+            ImGui::Text("(120..8640)");
+ 
+            if (ImGui::Button("Close Me"))
+                isExportPNG = false;
+            ImGui::End();
+        }
+
+//---------------------------------Save as PNG---------------------------------------------
+        fileBrowserSaveImage.Display();
+        if(fileBrowserSaveImage.HasSelected())
+        {
+            output_path = fileBrowserSaveImage.GetSelected().parent_path().u8string() + "/";
+            output_name_png = fileBrowserSaveImage.GetSelected().filename().u8string();
+            if (isExportPNG) {
+                int i = output_name_png.length();
+                bool flag = true;
+                if (i < 4) flag = false;
+                if (flag && output_name_png.compare(output_name_png.length() - 4, 4, ".png") != 0)
+                    flag = false;
+                if (!flag)
+                    output_name_png = output_name_png + ".png";
+
+            }
+            fileBrowserSaveImage.ClearSelected();
+            fileBrowserSaveImage.Close();
+        }
+//-----------------------------------------------------------------------------------------
+
 
 		// Rendering
         ImGui::Render();

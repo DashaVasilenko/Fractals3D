@@ -48,6 +48,7 @@ void Camera::UpdatePosition(const float& delta) {
         position += -up*delta*speed;
     }
 */
+    
     position += front*delta*speed*(float)InputSystem::scrollOffsetY;
     InputSystem::scrollOffsetY = 0.0;
 

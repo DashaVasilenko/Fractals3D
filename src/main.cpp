@@ -82,6 +82,7 @@ int main() {
 		if (InputSystem::isWindowSizeChange) {
 			FBO.Resize(window.GetWidth(), window.GetHeight());
 		}
+		
 		currentTime = glfwGetTime();
  		float deltaTime = currentTime - lastTime; // Время, прошедшее между последним и текущим кадром
  		lastTime = currentTime;

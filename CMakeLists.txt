@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
 project(Fractals1)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -g")
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g")
 
 find_package (OpenGL REQUIRED)
 find_package (glfw3 REQUIRED)
@@ -15,4 +17,4 @@ file(GLOB Sources
 add_executable(main ${Sources} )
 target_include_directories(main PUBLIC include imgui)
 
-target_link_libraries(main glew ${OPENGL_LIBRARIES} glfw)
+target_link_libraries(main GLEW::GLEW ${OPENGL_LIBRARIES} glfw)
