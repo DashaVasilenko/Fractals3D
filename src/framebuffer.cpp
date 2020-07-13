@@ -1,5 +1,6 @@
 #include "framebuffer.h"
 #include <iostream>
+#include "inputSystem.h"
 
 FrameBuffer::FrameBuffer() {
     GLCall(glGenFramebuffers(1, &descriptor)); // создаем буфер FBO (frame buffer objects) 1 - кол-во буферов
@@ -44,6 +45,7 @@ void FrameBuffer::Resize(int width, int height) {
     // update internal dimensions
     this->width = width;
     this->height = height;
+    InputSystem::isWindowSizeChange = false;
 }
 
 void FrameBuffer::Unbind() const {

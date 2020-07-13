@@ -7,18 +7,24 @@
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
 
+#include "renderer.h"
 #include "framebuffer.h"
 #include "window.h"
+#include "camera.h"
+
 
 class Gui {
 public:
-    void Init(Window* window, FrameBuffer* fbo);
+    //void Init(Window* window, FrameBuffer* fbo, Camera* camera);
+    void Init(Window* window, Renderer* renderer);
     void Update();
     void Destroy();
 
 private:
+    Renderer* renderer;
     Window* window;
     FrameBuffer* fbo;
+    Camera* camera;
     bool show_demo_window = true;
     bool show_another_window = false;
     bool isExportPNG = false;
@@ -34,8 +40,8 @@ private:
     std::string output_name_hdr = "image.hdr";
     std::string output_name_obj = "image.obj";
 
-    int output_width = 1080;
-    int output_height = 1920;
+    int output_width = 1920;
+    int output_height = 1080;
     int output_quality = 100;
 
     void MenuBar();

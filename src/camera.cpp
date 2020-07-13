@@ -22,9 +22,9 @@ glm::mat4 Camera::GetViewMatrix() {
     //return glm::lookAt(position, position + front, up);
 }
 
-void Camera::Update(const float& delta) {
-    UpdatePosition(delta);
-    UpdateVectors(delta);
+void Camera::Update() {
+    UpdatePosition(deltaTime);
+    UpdateVectors(deltaTime);
 }
 
 void Camera::UpdatePosition(const float& delta) {

@@ -2,11 +2,16 @@
 #include "stb_image_write.h"
 
 #include "gui.h"
-#include "window.h"
+//#include "window.h"
 
-void Gui::Init(Window* window, FrameBuffer* fbo) {
+void Gui::Init(Window* window, Renderer* renderer) {
     this->window = window;
-    this->fbo = fbo;
+    this->renderer = renderer;
+    this->fbo = renderer->GetFBO();
+    this->camera = renderer->GetCamera();
+
+    //this->fbo = fbo;
+    //this->camera = camera;
 
     // Setup ImGui context
     IMGUI_CHECKVERSION();
@@ -169,6 +174,9 @@ void Gui::Preview() {
 	ImGui::SetNextWindowSize(previewSize);
     ImGuiWindowFlags previewWindowFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoScrollWithMouse ;
     ImGui::Begin("Test", NULL, previewWindowFlags);
+    if (ImGui::IsWindowHovered()) {
+        camera->Update();
+    }
     ImGui::Image((ImTextureID)fbo->GetTexDescriptor(), ImVec2(previewSize.x, previewSize.y), ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
 	ImGui::End();
 }
@@ -249,8 +257,52 @@ void Gui::Update() {
             ImGui::DragInt("##height", &output_height, 1.0, 120, 8640);
             ImGui::SameLine();
             ImGui::Text("(120..8640)");
- 
-            if (ImGui::Button("Close Me"))
+
+            if (ImGui::Button("Save")) {
+                fbo->Bind();
+                unsigned char* imageData = (unsigned char*)malloc((int)(1080*768*(3)));
+		        glReadPixels(0, 0, 1080, 768, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+                unsigned char* imageData2 = (unsigned char*)malloc((int)(1080*768*(3)));
+                int k = 0;
+                for (int i = 768; i > 0; i--) {
+                    for (int j = 0; j < 1080*3; j++) {
+                        imageData2[k] = imageData[i*1080*3 + j];
+                        k++;
+                    }
+                }
+		        // stbi_write_png("stbpng.png", width, height, CHANNEL_NUM, pixels, width * CHANNEL_NUM);
+		        stbi_write_png("stbpng.png", 1080, 768, 3, imageData2, 1080 * 3);
+		        free(imageData);
+                free(imageData2);
+                fbo->Unbind();
+
+                /*
+                int height, width;
+                height = fbo->GetHeight();
+                width = fbo->GetWidth();
+                fbo->Resize(output_width, output_height);
+                fbo->Bind();
+
+                unsigned char* imageData = (unsigned char*)malloc((int)(output_width*output_height*(3)));
+		        glReadPixels(0, 0, output_width, output_height, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+                unsigned char* imageData2 = (unsigned char*)malloc((int)(output_width*output_height*(3)));
+                int k = 0;
+                for (int i = output_height; i > 0; i--) {
+                    for (int j = 0; j < output_width*3; j++) {
+                        imageData2[k] = imageData[i*1080*3 + j];
+                        k++;
+                    }
+                }
+		        // stbi_write_png("stbpng.png", width, height, CHANNEL_NUM, pixels, width * CHANNEL_NUM);
+		        stbi_write_png("stbpng.png", output_width, output_height, 3, imageData2, output_width * 3);
+		        free(imageData);
+                free(imageData2);
+                fbo->Unbind();
+                fbo->Resize(width, height);
+                */
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Cancel"))
                 isExportPNG = false;
             ImGui::End();
         }

@@ -16,6 +16,8 @@ public:
     GLuint GetTexDescriptor() { return tex_color_buf.GetDescriptor(); }
     int GetWidth() { return width; }
     int GetHeight() { return height; }
+    void SetWidth(int w) { width = w; }
+    void SetHeight(int h) { height = h; }
     ~FrameBuffer();
     
 protected:
