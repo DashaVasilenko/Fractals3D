@@ -20,19 +20,29 @@ public:
     void Destroy();
 
 private:
+    enum ExportType {
+        Png,
+        Bmp,
+        Jpg,
+    };
+
     Renderer* renderer;
     Window* window;
     FrameBuffer* fbo;
     Camera* camera;
     bool show_demo_window = true;
     bool show_another_window = false;
-    bool isExportPNG = false;
+
+    ExportType currentExportType = ExportType::Png;
+
+    bool exportWindowFlag = false;
+    /*bool isExportPNG = false;
     bool isExportBMP = false;
     bool isExportJPEG = false;
     bool isExportJPG = false;
     bool isExportTGA = false;
     bool isExportHDR = false;
-    bool isExportOBJ = false;
+    bool isExportOBJ = false;*/
 
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
