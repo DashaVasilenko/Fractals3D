@@ -15,7 +15,6 @@
 
 class Gui {
 public:
-    //void Init(Window* window, FrameBuffer* fbo, Camera* camera);
     void Init(Window* window, Renderer* renderer);
     void Update();
     void Destroy();
@@ -28,6 +27,13 @@ private:
     bool show_demo_window = true;
     bool show_another_window = false;
     bool isExportPNG = false;
+    bool isExportBMP = false;
+    bool isExportJPEG = false;
+    bool isExportJPG = false;
+    bool isExportTGA = false;
+    bool isExportHDR = false;
+    bool isExportOBJ = false;
+
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     ImGui::FileBrowser fileBrowserSaveImage = ImGui::FileBrowser(ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
@@ -46,6 +52,9 @@ private:
 
     void MenuBar();
     void Preview();
+    void ExportAsPNG();
+
+    void FileBrowserPNG();
 };
 
 #endif /* End of __GUI__ */

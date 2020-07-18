@@ -4,14 +4,49 @@
 #include "gui.h"
 //#include "window.h"
 
+bool MyDragInt(const char *label, int *v, float v_speed = (1.0F), int v_min = 0, int v_max = 0) {
+    float v_backup = *v;
+    if (!ImGui::DragInt(label, v, v_speed, v_min, v_max))
+        return false;
+    *v = glm::clamp(*v, v_min, v_max);
+    return v_backup != *v;
+}
+
+void Gui::FileBrowserPNG() {
+    fileBrowserSaveImage.Display();
+    if(fileBrowserSaveImage.HasSelected())
+    {
+        output_path = fileBrowserSaveImage.GetSelected().parent_path().u8string() + "/";
+        if (isExportPNG) {
+            output_name_png = fileBrowserSaveImage.GetSelected().filename().u8string();
+            int i = output_name_png.length();
+            bool flag = true;
+            if (i < 4) flag = false;
+            if (flag && output_name_png.compare(output_name_png.length() - 4, 4, ".png") != 0)
+                flag = false;
+            if (!flag)
+                output_name_png = output_name_png + ".png";
+        }
+        else if (isExportBMP) {
+            output_name_bmp = fileBrowserSaveImage.GetSelected().filename().u8string();
+            int i = output_name_bmp.length();
+            bool flag = true;
+            if (i < 4) flag = false;
+            if (flag && output_name_bmp.compare(output_name_bmp.length() - 4, 4, ".bmp") != 0)
+                flag = false;
+            if (!flag)
+                output_name_bmp = output_name_bmp + ".bmp";
+        }
+        fileBrowserSaveImage.ClearSelected();
+        fileBrowserSaveImage.Close();
+    }
+}
+
 void Gui::Init(Window* window, Renderer* renderer) {
     this->window = window;
     this->renderer = renderer;
     this->fbo = renderer->GetFBO();
     this->camera = renderer->GetCamera();
-
-    //this->fbo = fbo;
-    //this->camera = camera;
 
     // Setup ImGui context
     IMGUI_CHECKVERSION();
@@ -93,6 +128,7 @@ void Gui::MenuBar() {
                     */
                     }
                     if (ImGui::MenuItem("BMP")){
+                        isExportBMP = true;
                         
                     }
                     if (ImGui::MenuItem("JPEG")){
@@ -181,6 +217,89 @@ void Gui::Preview() {
 	ImGui::End();
 }
 
+void Gui::ExportAsPNG() {
+    if (isExportPNG || isExportBMP) {
+        if (isExportPNG) {
+            ImGui::Begin("Export PNG", &isExportPNG, ImGuiWindowFlags_NoCollapse); 
+        }
+        else if (isExportBMP) {
+            ImGui::Begin("Export BMP", &isExportBMP, ImGuiWindowFlags_NoCollapse); 
+        }
+        //ImGui::Begin("Export PNG", &isExportPNG, ImGuiWindowFlags_NoCollapse); 
+        int width, height;
+        window->GetSize(&width, &height);
+        ImGui::SetNextWindowPos(ImVec2(0.25f*width, 0.25f*height));
+        ImVec2 windowSize = ImVec2(0.75f*width, 0.75f*height);
+	    ImGui::SetNextWindowSize(windowSize);
+
+        if (ImGui::Button("File name:")) {
+            fileBrowserSaveImage.Open();
+        }
+
+        ImGui::SameLine();
+        if (isExportPNG) {
+            ImGui::Text((output_path + output_name_png).c_str());
+        }
+        else if (isExportBMP) {
+            ImGui::Text((output_path + output_name_bmp).c_str());
+        }
+        ImGui::Text("Width:");
+        ImGui::SetNextItemWidth(200);
+        ImGui::SameLine();
+        MyDragInt("##width", &output_width, 1.0, 120, 8640);
+        ImGui::SameLine();
+        ImGui::Text("(120..8640)");
+
+        ImGui::SameLine();
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 50.0f);
+        ImGui::Text("Height:");
+        ImGui::SetNextItemWidth(200);
+        ImGui::SameLine();
+        MyDragInt("##height", &output_height, 1.0, 120, 8640);
+        ImGui::SameLine();
+        ImGui::Text("(120..8640)");
+
+        if (ImGui::Button("Save")) {
+            int fbo_height, fbo_width;
+            fbo_height = fbo->GetHeight();
+            fbo_width = fbo->GetWidth();
+            fbo->Resize(output_width, output_height);
+            //fbo->Bind();
+            renderer->Render(output_width, output_height);
+            fbo->Bind();
+            unsigned char* imageData = (unsigned char*)malloc((int)(output_width*output_height*(3)));
+	        glReadPixels(0, 0, output_width, output_height, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+            unsigned char* imageData2 = (unsigned char*)malloc((int)(output_width*output_height*(3)));
+            int k = 0;
+            for (int i = output_height; i > 0; i--) {
+                for (int j = 0; j < output_width*3; j++) {
+                    imageData2[k] = imageData[i*output_width*3 + j];
+                    k++;
+                }
+            }
+            if (isExportPNG) {
+                stbi_write_png((output_path + output_name_png).c_str(), output_width, output_height, 3, imageData2, output_width * 3);
+                isExportPNG = false;  
+            }
+            else if (isExportBMP) {
+                stbi_write_png((output_path + output_name_bmp).c_str(), output_width, output_height, 3, imageData2, output_width * 3);
+                isExportBMP = false;
+            }
+	        free(imageData);
+            free(imageData2);
+            fbo->Unbind();
+            fbo->Resize(fbo_width, fbo_height);
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel")) {
+            isExportPNG = false;
+            isExportBMP = false;
+        }
+        ImGui::End();
+    }
+}
+
 
 void Gui::Update() {
     // Start the Dear ImGui frame
@@ -227,107 +346,9 @@ void Gui::Update() {
 
         MenuBar();
         Preview();
-
-
-        if (isExportPNG) {
-            ImGui::Begin("Export PNG", &isExportPNG, ImGuiWindowFlags_NoCollapse); 
-            int width, height;
-            window->GetSize(&width, &height);
-            ImGui::SetNextWindowPos(ImVec2(0.25f*width, 0.25f*height));
-            ImVec2 windowSize = ImVec2(0.75f*width, 0.75f*height);
-	        ImGui::SetNextWindowSize(windowSize);
-
-            if (ImGui::Button("Path:")) {
-                fileBrowserSaveImage.Open();
-            }
-            ImGui::SameLine();
-            ImGui::Text((output_path + output_name_png).c_str());
-
-            ImGui::Text("Width:");
-            ImGui::SetNextItemWidth(200);
-            ImGui::SameLine();
-            ImGui::DragInt("##width", &output_width, 1.0, 120, 8640);
-            ImGui::SameLine();
-            ImGui::Text("(120..8640)");
-            ImGui::SameLine();
-            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 50.0f);
-            ImGui::Text("Height:");
-            ImGui::SetNextItemWidth(200);
-            ImGui::SameLine();
-            ImGui::DragInt("##height", &output_height, 1.0, 120, 8640);
-            ImGui::SameLine();
-            ImGui::Text("(120..8640)");
-
-            if (ImGui::Button("Save")) {
-                fbo->Bind();
-                unsigned char* imageData = (unsigned char*)malloc((int)(1080*768*(3)));
-		        glReadPixels(0, 0, 1080, 768, GL_RGB, GL_UNSIGNED_BYTE, imageData);
-                unsigned char* imageData2 = (unsigned char*)malloc((int)(1080*768*(3)));
-                int k = 0;
-                for (int i = 768; i > 0; i--) {
-                    for (int j = 0; j < 1080*3; j++) {
-                        imageData2[k] = imageData[i*1080*3 + j];
-                        k++;
-                    }
-                }
-		        // stbi_write_png("stbpng.png", width, height, CHANNEL_NUM, pixels, width * CHANNEL_NUM);
-		        stbi_write_png("stbpng.png", 1080, 768, 3, imageData2, 1080 * 3);
-		        free(imageData);
-                free(imageData2);
-                fbo->Unbind();
-
-                /*
-                int height, width;
-                height = fbo->GetHeight();
-                width = fbo->GetWidth();
-                fbo->Resize(output_width, output_height);
-                fbo->Bind();
-
-                unsigned char* imageData = (unsigned char*)malloc((int)(output_width*output_height*(3)));
-		        glReadPixels(0, 0, output_width, output_height, GL_RGB, GL_UNSIGNED_BYTE, imageData);
-                unsigned char* imageData2 = (unsigned char*)malloc((int)(output_width*output_height*(3)));
-                int k = 0;
-                for (int i = output_height; i > 0; i--) {
-                    for (int j = 0; j < output_width*3; j++) {
-                        imageData2[k] = imageData[i*1080*3 + j];
-                        k++;
-                    }
-                }
-		        // stbi_write_png("stbpng.png", width, height, CHANNEL_NUM, pixels, width * CHANNEL_NUM);
-		        stbi_write_png("stbpng.png", output_width, output_height, 3, imageData2, output_width * 3);
-		        free(imageData);
-                free(imageData2);
-                fbo->Unbind();
-                fbo->Resize(width, height);
-                */
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Cancel"))
-                isExportPNG = false;
-            ImGui::End();
-        }
-
-//---------------------------------Save as PNG---------------------------------------------
-        fileBrowserSaveImage.Display();
-        if(fileBrowserSaveImage.HasSelected())
-        {
-            output_path = fileBrowserSaveImage.GetSelected().parent_path().u8string() + "/";
-            output_name_png = fileBrowserSaveImage.GetSelected().filename().u8string();
-            if (isExportPNG) {
-                int i = output_name_png.length();
-                bool flag = true;
-                if (i < 4) flag = false;
-                if (flag && output_name_png.compare(output_name_png.length() - 4, 4, ".png") != 0)
-                    flag = false;
-                if (!flag)
-                    output_name_png = output_name_png + ".png";
-
-            }
-            fileBrowserSaveImage.ClearSelected();
-            fileBrowserSaveImage.Close();
-        }
-//-----------------------------------------------------------------------------------------
-
+        ExportAsPNG();
+        
+        FileBrowserPNG();
 
 		// Rendering
         ImGui::Render();

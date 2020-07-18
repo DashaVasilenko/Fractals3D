@@ -35,19 +35,5 @@ private:
     Camera* camera;
 
 };
-
-/*
-const GLfloat Renderer::vertices[20] = {
-    -1.0f,  1.0f, 0.0f, 1.0f, 0.0f,
-     1.0f,  1.0f, 0.0f, 0.0f, 0.0f,
-     1.0f, -1.0f, 0.0f, 1.0f, 1.0f,
-	-1.0f, -1.0f, 0.0f, 0.0f, 1.0f	
-	}; 
- 
-const GLuint Renderer::indices[6] = {
-	                	0, 1, 2,
-	                	0, 2, 3
-	                };
-*/
  
 #endif /* End of __RENDERER__ */ 

@@ -45,10 +45,11 @@ void Renderer::Init() {
 }
 
 void Renderer::Render(int width, int height) {
+	glViewport(0, 0, width, height);
 	if (InputSystem::isWindowSizeChange) {
 		FBO.Resize(width, height);
-		//this->width = width;
-		//this->height = height;
+		this->width = width;
+		this->height = height;
 	}
 	
 	FBO.Bind();
