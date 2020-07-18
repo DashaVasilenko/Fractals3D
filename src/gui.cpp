@@ -2,7 +2,6 @@
 #include "stb_image_write.h"
 
 #include "gui.h"
-//#include "window.h"
 
 bool MyDragInt(const char *label, int *v, float v_speed = (1.0F), int v_min = 0, int v_max = 0) {
     float v_backup = *v;
@@ -12,30 +11,27 @@ bool MyDragInt(const char *label, int *v, float v_speed = (1.0F), int v_min = 0,
     return v_backup != *v;
 }
 
-void Gui::FileBrowserPNG() {
+void Gui::FileBrowserExport() {
     fileBrowserSaveImage.Display();
     if(fileBrowserSaveImage.HasSelected())
     {
         output_path = fileBrowserSaveImage.GetSelected().parent_path().u8string() + "/";
+        output_name = fileBrowserSaveImage.GetSelected().filename().u8string();
+        int i = output_name.length();
+        bool flag = true;
         if (isExportPNG) {
-            output_name_png = fileBrowserSaveImage.GetSelected().filename().u8string();
-            int i = output_name_png.length();
-            bool flag = true;
             if (i < 4) flag = false;
-            if (flag && output_name_png.compare(output_name_png.length() - 4, 4, ".png") != 0)
+            if (flag && output_name.compare(output_name.length() - 4, 4, ".png") != 0)
                 flag = false;
             if (!flag)
-                output_name_png = output_name_png + ".png";
+                output_name = output_name + ".png";
         }
         else if (isExportBMP) {
-            output_name_bmp = fileBrowserSaveImage.GetSelected().filename().u8string();
-            int i = output_name_bmp.length();
-            bool flag = true;
             if (i < 4) flag = false;
-            if (flag && output_name_bmp.compare(output_name_bmp.length() - 4, 4, ".bmp") != 0)
+            if (flag && output_name.compare(output_name.length() - 4, 4, ".bmp") != 0)
                 flag = false;
             if (!flag)
-                output_name_bmp = output_name_bmp + ".bmp";
+                output_name = output_name + ".bmp";
         }
         fileBrowserSaveImage.ClearSelected();
         fileBrowserSaveImage.Close();
@@ -106,30 +102,11 @@ void Gui::MenuBar() {
                 if (ImGui::BeginMenu("Export..")) {
                     if (ImGui::MenuItem("PNG")) {
                         isExportPNG = true;
-                        //fileBrowserSaveImage.Open();
-
-                    /*
-                        fbo->Bind();
-                        unsigned char* imageData = (unsigned char*)malloc((int)(1080*768*(3)));
-		                glReadPixels(0, 0, 1080, 768, GL_RGB, GL_UNSIGNED_BYTE, imageData);
-                        unsigned char* imageData2 = (unsigned char*)malloc((int)(1080*768*(3)));
-                        int k = 0;
-                        for (int i = 768; i > 0; i--) {
-                            for (int j = 0; j < 1080*3; j++) {
-                                imageData2[k] = imageData[i*1080*3 + j];
-                                k++;
-                            }
-                        }
-		                // stbi_write_png("stbpng.png", width, height, CHANNEL_NUM, pixels, width * CHANNEL_NUM);
-		                stbi_write_png("stbpng.png", 1080, 768, 3, imageData2, 1080 * 3);
-		                free(imageData);
-                        free(imageData2);
-                        fbo->Unbind();
-                    */
+                        output_name = "image.png";
                     }
                     if (ImGui::MenuItem("BMP")){
                         isExportBMP = true;
-                        
+                        output_name = "image.bmp";
                     }
                     if (ImGui::MenuItem("JPEG")){
 
@@ -217,7 +194,7 @@ void Gui::Preview() {
 	ImGui::End();
 }
 
-void Gui::ExportAsPNG() {
+void Gui::ExportAs() {
     if (isExportPNG || isExportBMP) {
         if (isExportPNG) {
             ImGui::Begin("Export PNG", &isExportPNG, ImGuiWindowFlags_NoCollapse); 
@@ -225,7 +202,6 @@ void Gui::ExportAsPNG() {
         else if (isExportBMP) {
             ImGui::Begin("Export BMP", &isExportBMP, ImGuiWindowFlags_NoCollapse); 
         }
-        //ImGui::Begin("Export PNG", &isExportPNG, ImGuiWindowFlags_NoCollapse); 
         int width, height;
         window->GetSize(&width, &height);
         ImGui::SetNextWindowPos(ImVec2(0.25f*width, 0.25f*height));
@@ -237,12 +213,8 @@ void Gui::ExportAsPNG() {
         }
 
         ImGui::SameLine();
-        if (isExportPNG) {
-            ImGui::Text((output_path + output_name_png).c_str());
-        }
-        else if (isExportBMP) {
-            ImGui::Text((output_path + output_name_bmp).c_str());
-        }
+        ImGui::Text((output_path + output_name).c_str());
+
         ImGui::Text("Width:");
         ImGui::SetNextItemWidth(200);
         ImGui::SameLine();
@@ -264,7 +236,6 @@ void Gui::ExportAsPNG() {
             fbo_height = fbo->GetHeight();
             fbo_width = fbo->GetWidth();
             fbo->Resize(output_width, output_height);
-            //fbo->Bind();
             renderer->Render(output_width, output_height);
             fbo->Bind();
             unsigned char* imageData = (unsigned char*)malloc((int)(output_width*output_height*(3)));
@@ -278,11 +249,11 @@ void Gui::ExportAsPNG() {
                 }
             }
             if (isExportPNG) {
-                stbi_write_png((output_path + output_name_png).c_str(), output_width, output_height, 3, imageData2, output_width * 3);
+                stbi_write_png((output_path + output_name).c_str(), output_width, output_height, 3, imageData2, output_width * 3);
                 isExportPNG = false;  
             }
             else if (isExportBMP) {
-                stbi_write_png((output_path + output_name_bmp).c_str(), output_width, output_height, 3, imageData2, output_width * 3);
+                stbi_write_png((output_path + output_name).c_str(), output_width, output_height, 3, imageData2, output_width * 3);
                 isExportBMP = false;
             }
 	        free(imageData);
@@ -346,9 +317,9 @@ void Gui::Update() {
 
         MenuBar();
         Preview();
-        ExportAsPNG();
+        ExportAs();
         
-        FileBrowserPNG();
+        FileBrowserExport();
 
 		// Rendering
         ImGui::Render();

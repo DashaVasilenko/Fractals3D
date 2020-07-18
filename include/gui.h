@@ -38,12 +38,7 @@ private:
 
     ImGui::FileBrowser fileBrowserSaveImage = ImGui::FileBrowser(ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
     std::string output_path = std::filesystem::current_path().u8string() + "/";
-    std::string output_name_png = "image.png";
-    std::string output_name_bmp = "image.bmp";
-    std::string output_name_jpeg = "image.jpeg";
-    std::string output_name_jpg = "image.jpg";
-    std::string output_name_tga = "image.tga";
-    std::string output_name_hdr = "image.hdr";
+    std::string output_name = "image";
     std::string output_name_obj = "image.obj";
 
     int output_width = 1920;
@@ -52,9 +47,9 @@ private:
 
     void MenuBar();
     void Preview();
-    void ExportAsPNG();
+    void ExportAs();
 
-    void FileBrowserPNG();
+    void FileBrowserExport();
 };
 
 #endif /* End of __GUI__ */
