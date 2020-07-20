@@ -2,6 +2,7 @@
 #include "stb_image_write.h"
 
 #include "gui.h"
+#include "inputSystem.h"
 
 bool MyDragInt(const char *label, int *v, float v_speed = (1.0F), int v_min = 0, int v_max = 0) {
     float v_backup = *v;
@@ -44,37 +45,16 @@ void Gui::FileBrowserExport() {
                     output_name = output_name + ".jpg";
                 break;
             }
+            case ExportType::Tga: {
+                if (i < 4) flag = false;
+                if (flag && output_name.compare(output_name.length() - 4, 4, ".tga") != 0)
+                    flag = false;
+                if (!flag)
+                    output_name = output_name + ".tga";
+                break;
+            }
         }
-/*
-        if (isExportPNG) {
-            if (i < 4) flag = false;
-            if (flag && output_name.compare(output_name.length() - 4, 4, ".png") != 0)
-                flag = false;
-            if (!flag)
-                output_name = output_name + ".png";
-        }
-        else if (isExportBMP) {
-            if (i < 4) flag = false;
-            if (flag && output_name.compare(output_name.length() - 4, 4, ".bmp") != 0)
-                flag = false;
-            if (!flag)
-                output_name = output_name + ".bmp";
-        }
-        else if (isExportJPEG) {
-            if (i < 5) flag = false;
-            if (flag && output_name.compare(output_name.length() - 5, 5, ".jpeg") != 0)
-                flag = false;
-            if (!flag)
-                output_name = output_name + ".jpeg";
-        }
-        else if (isExportJPG) {
-            if (i < 4) flag = false;
-            if (flag && output_name.compare(output_name.length() - 4, 4, ".jpg") != 0)
-                flag = false;
-            if (!flag)
-                output_name = output_name + ".jpg";
-        }
-*/
+
         fileBrowserSaveImage.ClearSelected();
         fileBrowserSaveImage.Close();
     }
@@ -109,117 +89,105 @@ void Gui::Init(Window* window, Renderer* renderer) {
 
 void Gui::MenuBar() {
     if(ImGui::BeginMainMenuBar()) {
-            if (ImGui::BeginMenu("File")) {
-                if (ImGui::MenuItem("Open", "Ctrl+O")) {
-                //if (ImGui::MenuItem("Open", "Ctrl + O") || Input::GetKey(KeyCode::LeftCtrl)) {
-                    //m_FileExplorerLoadConfig.Open();
-                }
-                ImGui::Separator();
-
-                if (ImGui::MenuItem("New", "Ctrl+N")) {
-
-                }
-                ImGui::Separator();
-
-                if (ImGui::MenuItem("Save Parameters", "Ctrl+P")) {
-
-                }
-                if (ImGui::MenuItem("Load Parameters", "Ctrl+P")) {
-
-                }
-                ImGui::Separator();
-                
-                if (ImGui::MenuItem("Save", "Ctrl+S")) {
-                    //m_FileExplorerSaveConfig.Open();
-                }
-                if (ImGui::MenuItem("Save as..")) {
-                    //m_FileExplorerSaveConfig.Open();
-                }
-                ImGui::Separator();
-
-                //if (ImGui::MenuItem("Export..")) {
-                    //m_FileExplorerSaveConfig.Open();
-                //}
-                
-                if (ImGui::BeginMenu("Export..")) {
-                    if (ImGui::MenuItem("PNG")) {
-                        currentExportType = ExportType::Png;
-                        exportWindowFlag = true;
-                        output_name = "image.png";
-                    }
-                    if (ImGui::MenuItem("BMP")){
-                        currentExportType = ExportType::Bmp;
-                        exportWindowFlag = true;
-                        output_name = "image.bmp";
-                    }
-                    if (ImGui::MenuItem("JPG")){
-                        currentExportType = ExportType::Jpg;
-                        exportWindowFlag = true;
-                        output_name = "image.jpg";
-                    }
-                    if (ImGui::MenuItem("TGA")){
-
-                    }
-                    if (ImGui::MenuItem("HDR")){
-
-                    }
-                    if (ImGui::MenuItem("OBJ")){
-
-                    }
-                    ImGui::EndMenu();
-                }
-                ImGui::Separator();
-
-                if (ImGui::MenuItem("Exit", "Alt+F4")) {
-                    //window.Close();
-                }
-                
-                ImGui::EndMenu();
+        if (ImGui::BeginMenu("File")) {
+            if (ImGui::MenuItem("Open", "Ctrl+O")) {
+            //if (ImGui::MenuItem("Open", "Ctrl + O") || Input::GetKey(KeyCode::LeftCtrl)) {
+                //m_FileExplorerLoadConfig.Open();
             }
-
-            if (ImGui::BeginMenu("Edit")) {
-                if (ImGui::MenuItem("Undo", "Ctrl+Z")) {
-                    
-                }
-                
-                if (ImGui::MenuItem("Redo", "Ctrl+Shift+Z")) {
-                    
-                }
-                ImGui::Separator();
-
-                if (ImGui::MenuItem("Copy", "Ctrl+C")) {
-                    
-                }
-                if (ImGui::MenuItem("Paste", "Ctrl+V")) {
-                    
-                }
-                ImGui::Separator();
-
-                ImGui::EndMenu();
+            ImGui::Separator();
+            if (ImGui::MenuItem("New", "Ctrl+N")) {
             }
-
-            if (ImGui::BeginMenu("About")) {
-                ImGui::Text("Fractals");
-                ImGui::Separator();
-                ImGui::Text("Was created as a part of PV097 Visual creativity informatics course");
-                ImGui::Text("By Daria Vasilenko");
-                ImGui::EndMenu();
+            ImGui::Separator();
+            if (ImGui::MenuItem("Save Parameters", "Ctrl+P")) {
             }
-
-            /*
-            if (ImGui::BeginMenu("Render")) {
-                if (ImGui::MenuItem("Render Image", "F5")) {
-                    m_RenderSettingsVisible = true;
-                    s32 width;
-                    s32 height;
-                    window.GetSize(&width, &height);
-                    ImGui::SetNextWindowPos(ImVec2(width*0.5f, height*0.5f));
+            if (ImGui::MenuItem("Load Parameters", "Ctrl+Shift+P")) {
+            }
+            ImGui::Separator();
+            
+            if (ImGui::MenuItem("Save", "Ctrl+S")) {
+                //m_FileExplorerSaveConfig.Open();
+            }
+            if (ImGui::MenuItem("Save as..")) {
+                //m_FileExplorerSaveConfig.Open();
+            }
+            ImGui::Separator();
+            //if (ImGui::MenuItem("Export..")) {
+                //m_FileExplorerSaveConfig.Open();
+            //}
+            
+            if (ImGui::BeginMenu("Export..")) {
+                if (ImGui::MenuItem("PNG")) {
+                    currentExportType = ExportType::Png;
+                    exportWindowFlag = true;
+                    output_name = "image.png";
+                }
+                if (ImGui::MenuItem("BMP")){
+                    currentExportType = ExportType::Bmp;
+                    exportWindowFlag = true;
+                    output_name = "image.bmp";
+                }
+                if (ImGui::MenuItem("JPG")){
+                    currentExportType = ExportType::Jpg;
+                    exportWindowFlag = true;
+                    output_name = "image.jpg";
+                }
+                if (ImGui::MenuItem("TGA")){
+                    currentExportType = ExportType::Tga;
+                    exportWindowFlag = true;
+                    output_name = "image.tga";
+                }
+                if (ImGui::MenuItem("OBJ")){
                 }
                 ImGui::EndMenu();
             }
-            */
-            ImGui::EndMainMenuBar();
+            ImGui::Separator();
+            if (ImGui::MenuItem("Exit", "Alt+F4")) {
+                window->Close();
+            }
+            
+            ImGui::EndMenu();
         }
+
+        if (ImGui::BeginMenu("Edit")) {
+            if (ImGui::MenuItem("Undo", "Ctrl+Z")) {
+                
+            }
+            
+            if (ImGui::MenuItem("Redo", "Ctrl+Shift+Z")) {
+                
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Copy", "Ctrl+C")) {
+                
+            }
+            if (ImGui::MenuItem("Paste", "Ctrl+V")) {
+                
+            }
+            ImGui::Separator();
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("About")) {
+            ImGui::Text("Fractals");
+            ImGui::Separator();
+            ImGui::Text("Was created as a part of PV097 Visual creativity informatics course");
+            ImGui::Text("By Daria Vasilenko");
+            ImGui::EndMenu();
+        }
+        /*
+        if (ImGui::BeginMenu("Render")) {
+            if (ImGui::MenuItem("Render Image", "F5")) {
+                m_RenderSettingsVisible = true;
+                s32 width;
+                s32 height;
+                window.GetSize(&width, &height);
+                ImGui::SetNextWindowPos(ImVec2(width*0.5f, height*0.5f));
+            }
+            ImGui::EndMenu();
+        }
+        */
+        ImGui::EndMainMenuBar();
+    }
 }
 
 void Gui::Preview() {
@@ -254,23 +222,14 @@ void Gui::ExportAs() {
             name = "JPG";
             break;
         }
+        case ExportType::Tga: {
+            name = "TGA";
+            break;
+        }
     }
     if (exportWindowFlag) {
-        ImGui::Begin(("Export " + name).c_str(), &exportWindowFlag, ImGuiWindowFlags_NoCollapse);
-
-    /*if (isExportPNG || isExportBMP || isExportJPEG ||isExportJPG) {
-        if (isExportPNG) {
-            ImGui::Begin("Export PNG", &isExportPNG, ImGuiWindowFlags_NoCollapse); 
-        }
-        else if (isExportBMP) {
-            ImGui::Begin("Export BMP", &isExportBMP, ImGuiWindowFlags_NoCollapse); 
-        }
-        else if (isExportJPEG) {
-            ImGui::Begin("Export JPEG", &isExportJPEG, ImGuiWindowFlags_NoCollapse); 
-        }
-        else if (isExportJPG) {
-            ImGui::Begin("Export JPG", &isExportJPG, ImGuiWindowFlags_NoCollapse); 
-        }*/
+        ImGuiWindowFlags exportWindowFlags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse;
+        ImGui::Begin(("Export " + name).c_str(), &exportWindowFlag, exportWindowFlags);
         int width, height;
         window->GetSize(&width, &height);
         ImGui::SetNextWindowPos(ImVec2(0.25f*width, 0.25f*height));
@@ -307,16 +266,7 @@ void Gui::ExportAs() {
             ImGui::SameLine();
             ImGui::Text("(1..100)");
         }
-/*
-        if (isExportJPEG || isExportJPG) {
-            ImGui::Text("Quality:");
-            ImGui::SetNextItemWidth(200);
-            ImGui::SameLine();
-            MyDragInt("##quality", &output_quality, 1, 1, 100);
-            ImGui::SameLine();
-            ImGui::Text("(1..100)");
-        }
-*/
+
         if (ImGui::Button("Save")) {
             int fbo_height, fbo_width;
             fbo_height = fbo->GetHeight();
@@ -345,28 +295,16 @@ void Gui::ExportAs() {
                     break;
                 }
                 case ExportType::Jpg: {
-                    if (!stbi_write_jpg((output_path + output_name).c_str(), output_width, output_height, 3, imageData2, output_quality)) {
-                        //printf("Error writing!\n");
-                    }
+                    stbi_write_jpg((output_path + output_name).c_str(), output_width, output_height, 3, imageData2, output_quality);
                     break;
                 }
-
+                case ExportType::Tga: {
+                    stbi_write_tga((output_path + output_name).c_str(), output_width, output_height, 3, imageData2);
+                    break;
+                }
             }
             exportWindowFlag = false;
 
-            /*if (isExportPNG) {
-                stbi_write_png((output_path + output_name).c_str(), output_width, output_height, 3, imageData2, output_width * 3);
-                isExportPNG = false;  
-            }
-            else if (isExportBMP) {
-                stbi_write_bmp((output_path + output_name).c_str(), output_width, output_height, 3, imageData2);
-                isExportBMP = false;
-            }
-            else if (isExportJPEG || isExportJPG) {
-                stbi_write_jpg((output_path + output_name).c_str(), output_width, output_height, 3, imageData2, output_quality);
-                isExportJPEG = false;
-                isExportJPG = false;
-            }*/
 	        free(imageData);
             free(imageData2);
             fbo->Unbind();
@@ -376,12 +314,6 @@ void Gui::ExportAs() {
         ImGui::SameLine();
         if (ImGui::Button("Cancel")) {
             exportWindowFlag = false;
-            /*
-            isExportPNG = false;
-            isExportBMP = false;
-            isExportJPEG = false;
-            isExportJPG = false;
-            */
         }
         ImGui::End();
     }
@@ -393,6 +325,11 @@ void Gui::Update() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        
+        if ( (InputSystem::keys[GLFW_KEY_LEFT_ALT] || InputSystem::keys[GLFW_KEY_RIGHT_ALT]) && InputSystem::keys[GLFW_KEY_F4]) {
+            window->Close();
+        }
+        
 
 		// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
         if (show_demo_window)

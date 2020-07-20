@@ -32,7 +32,7 @@ int main() {
  		float deltaTime = currentTime - lastTime; // Время, прошедшее между последним и текущим кадром
  		lastTime = currentTime;
 		camera.SetDeltaTime(deltaTime); 
-
+		
 		renderer.Render(window.GetWidth(), window.GetHeight());
 		gui.Update();
 

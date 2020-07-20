@@ -24,6 +24,8 @@ private:
         Png,
         Bmp,
         Jpg,
+        Tga,
+        //Obj,
     };
 
     Renderer* renderer;
@@ -36,13 +38,6 @@ private:
     ExportType currentExportType = ExportType::Png;
 
     bool exportWindowFlag = false;
-    /*bool isExportPNG = false;
-    bool isExportBMP = false;
-    bool isExportJPEG = false;
-    bool isExportJPG = false;
-    bool isExportTGA = false;
-    bool isExportHDR = false;
-    bool isExportOBJ = false;*/
 
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
