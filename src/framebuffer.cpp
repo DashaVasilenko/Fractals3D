@@ -1,5 +1,6 @@
-#include "framebuffer.h"
 #include <iostream>
+
+#include "framebuffer.h"
 #include "inputSystem.h"
 
 FrameBuffer::FrameBuffer() {
@@ -33,14 +34,14 @@ void FrameBuffer::Bind() const {
 
 void FrameBuffer::Resize(int width, int height) {
     // resize color attachment
-    glBindTexture(GL_TEXTURE_2D, tex_color_buf.GetDescriptor());
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    GLCall(glBindTexture(GL_TEXTURE_2D, tex_color_buf.GetDescriptor()));
+    GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL));
+    GLCall(glBindTexture(GL_TEXTURE_2D, 0));
 
     // resize depth attachment
-    glBindRenderbuffer(GL_RENDERBUFFER, depth);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    GLCall(glBindRenderbuffer(GL_RENDERBUFFER, depth));
+    GLCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height));
+    GLCall(glBindRenderbuffer(GL_RENDERBUFFER, 0));
 
     // update internal dimensions
     this->width = width;

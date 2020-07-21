@@ -13,6 +13,7 @@ public:
     void SetActiveCamera(Camera* camera) { this->camera = camera; }
     FrameBuffer* GetFBO() { return &FBO; }
     Camera* GetCamera() { return camera; }
+    ShaderProgram* GetShaderProgram() { return &program; }
     void Init();
     void Update();
     void Render(int width, int height);

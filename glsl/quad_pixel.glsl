@@ -1,5 +1,6 @@
-#version 330
+//#version 330
 
+//#define COLOR
 //#define FLAG_SHADOWS
 //#define FLAG_SOFT_SHADOWS
 #define FLAG_AMBIENTOCCLUSION
@@ -9,7 +10,7 @@ out vec4 outColor;
 
 uniform vec2 iResolution; 
 uniform float fieldOfView;
-uniform float Time; 
+uniform float Time;
 
 const int MAX_MARCHING_STEPS = 255;
 const float MIN_DIST = 0.0;
@@ -312,16 +313,30 @@ void main() {
 
     vec3 point = eye + dist*dir; // The closest point on the surface to the eyepoint along the view ray
 
-    const vec3 ambientColor = vec3(0.19225, 0.19225, 0.19225); // отражение фонового света материалом
-    const vec3 diffuseColor = vec3(0.50754, 0.50754, 0.50754); // отражение рассеянного света материалом
-    const vec3 specularColor = vec3(0.50827, 0.50827, 0.50827); // отражение зеркального света материалом
-    const float shininess = 2.0; // показатель степени зеркального отражения
-
     /*
     const vec3 ambientColor = vec3(1.0, 1.0, 1.0); // отражение фонового света материалом
     const vec3 diffuseColor = vec3(1.0, 1.0, 1.0); // отражение рассеянного света материалом
     const vec3 specularColor = vec3(1.0, 1.0, 1.0); // отражение зеркального света материалом
     const float shininess = 20.0; // показатель степени зеркального отражения
+    */
+
+    vec3 ambientColor = vec3(1.0, 1.0, 1.0); // отражение фонового света материалом
+    vec3 diffuseColor = vec3(1.0, 1.0, 1.0); // отражение рассеянного света материалом
+    vec3 specularColor = vec3(1.0, 1.0, 1.0); // отражение зеркального света материалом
+    float shininess = 20.0; // показатель степени зеркального отражения
+    
+    #ifdef COLOR
+        ambientColor = vec3(0.19225, 0.19225, 0.19225); // отражение фонового света материалом
+        diffuseColor = vec3(0.50754, 0.50754, 0.50754); // отражение рассеянного света материалом
+        specularColor = vec3(0.50827, 0.50827, 0.50827); // отражение зеркального света материалом
+        shininess = 2.0; // показатель степени зеркального отражения
+    #endif
+
+    /*
+    const vec3 ambientColor = vec3(0.19225, 0.19225, 0.19225); // отражение фонового света материалом
+    const vec3 diffuseColor = vec3(0.50754, 0.50754, 0.50754); // отражение рассеянного света материалом
+    const vec3 specularColor = vec3(0.50827, 0.50827, 0.50827); // отражение зеркального света материалом
+    const float shininess = 2.0; // показатель степени зеркального отражения
     */
 
     /*

@@ -3,6 +3,7 @@
 
 #include "gui.h"
 #include "inputSystem.h"
+#include "errors.h"
 
 bool MyDragInt(const char *label, int *v, float v_speed = (1.0F), int v_min = 0, int v_max = 0) {
     float v_backup = *v;
@@ -205,6 +206,22 @@ void Gui::Preview() {
 	ImGui::End();
 }
 
+void Gui::Parameters() {
+    ImGui::Begin("Parameters");                          
+
+    //ImGui::Text("This is some useful text.");
+    parameters_window_color_previous_state = parameters_window_color;
+    ImGui::Checkbox("Color", &parameters_window_color);
+
+    if (parameters_window_color != parameters_window_color_previous_state) {
+        ShaderProgram* program = renderer->GetShaderProgram(); 
+        program->SetColor(parameters_window_color);
+        program->Load();
+    }
+
+    ImGui::End();
+}
+
 
 
 void Gui::ExportAs() {
@@ -275,7 +292,7 @@ void Gui::ExportAs() {
             renderer->Render(output_width, output_height);
             fbo->Bind();
             unsigned char* imageData = (unsigned char*)malloc(output_width*output_height*3);
-	        glReadPixels(0, 0, output_width, output_height, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+	        GLCall(glReadPixels(0, 0, output_width, output_height, GL_RGB, GL_UNSIGNED_BYTE, imageData));
             unsigned char* imageData2 = (unsigned char*)malloc(output_width*output_height*3);
             int k = 0;
             for (int i = output_height - 1; i > 0; i--) {
@@ -370,6 +387,7 @@ void Gui::Update() {
 
         MenuBar();
         Preview();
+        Parameters();
         ExportAs();
         
         FileBrowserExport();
@@ -377,10 +395,10 @@ void Gui::Update() {
 		// Rendering
         ImGui::Render();
         int display_w, display_h;
-        glfwGetFramebufferSize(window->GetPointer(), &display_w, &display_h);
-        glViewport(0, 0, display_w, display_h);
-        glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-        glClear(GL_COLOR_BUFFER_BIT);
+        GLCall(glfwGetFramebufferSize(window->GetPointer(), &display_w, &display_h));
+        GLCall(glViewport(0, 0, display_w, display_h));
+        GLCall(glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w));
+        GLCall(glClear(GL_COLOR_BUFFER_BIT));
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 

@@ -35,6 +35,9 @@ private:
     bool show_demo_window = true;
     bool show_another_window = false;
 
+    bool parameters_window_color_previous_state = false;
+    bool parameters_window_color = false;
+
     ExportType currentExportType = ExportType::Png;
 
     bool exportWindowFlag = false;
@@ -52,6 +55,7 @@ private:
 
     void MenuBar();
     void Preview();
+    void Parameters();
     void ExportAs();
 
     void FileBrowserExport();
