@@ -11,6 +11,7 @@
 #include "framebuffer.h"
 #include "window.h"
 #include "camera.h"
+#include "types.h"
 
 
 class Gui {
@@ -45,6 +46,7 @@ private:
     bool ambient_occlusion_previous_state = false;
 
     ExportType currentExportType = ExportType::Png;
+    FractalType currentFractalType = FractalType::Test;
 
     bool exportWindowFlag = false;
 

@@ -256,8 +256,36 @@ void Gui::MainParameters() {
     if (ambient_occlusion) 
         shaderParameters |= 1 << 3;
 
+    if (ImGui::BeginMenu("Type of fractal:")) {
+        if (ImGui::MenuItem("Test")) {
+            currentFractalType = FractalType::Test;
+            flag = true;
+        }
+        if (ImGui::MenuItem("Mandelbulb Fractal")) {
+            currentFractalType = FractalType::Mandelbulb;
+            flag = true;
+        }
+            
+            
+        ImGui::EndMenu();
+    }
+
+    switch(currentFractalType) {
+        case FractalType::Test: {
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 150.0f);
+            ImGui::Text("Test");
+            break;
+        }
+        case FractalType::Mandelbulb: {
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 150.0f);
+            ImGui::Text("Mandelbulb fractal");
+            break;
+        }
+    }
+    
     if (flag) {
         program->SetShaderParameters(shaderParameters);
+        program->SetFractalType(currentFractalType);
         program->Load();
     }
 

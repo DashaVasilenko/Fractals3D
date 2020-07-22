@@ -19,6 +19,7 @@ void Renderer::Init() {
 	mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
  	mapSources[GL_FRAGMENT_SHADER] = "glsl/quad_pixel.glsl";
 	program.Init(mapSources);
+	program.Load();
  	program.Compile();
  	program.Link();
 	program.DeleteShaders();

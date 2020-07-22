@@ -20,6 +20,20 @@ void ShaderProgram::Load() {
         defines += "#define FLAG_SOFT_SHADOWS" + std::string("\n");
     if (shader_parameters & ShaderParametersType::AO) 
         defines += "#define FLAG_AMBIENTOCCLUSION" + std::string("\n");
+
+
+    switch(currentFractalType) {
+        case FractalType::Test: {
+            defines += "#define TEST" + std::string("\n");
+            break;
+        }
+        case FractalType::Mandelbulb: {
+            defines += "#define MANDELBULB" + std::string("\n");
+            break;
+        }
+    }
+
+    std::cout << currentFractalType << std::endl;
     
     Compile();
     Link();

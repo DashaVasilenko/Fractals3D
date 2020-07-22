@@ -5,6 +5,9 @@
 //#define FLAG_SOFT_SHADOWS
 //#define FLAG_AMBIENTOCCLUSION
 
+//#define TEST
+//#define MANDELBULB
+
 in mat4 viewMatrix;
 out vec4 outColor;
 
@@ -111,7 +114,8 @@ float sierpinskiTriangle(vec3 pos) {
 float mandelbulbFractal(vec3 pos) {
     int Iterations = 8;
     float Bailout = 10.0f;
-    float Power = 9.0*sin(Time / 50.0f);
+    float Power = 9.0;
+    //float Power = 9.0*sin(Time / 50.0f);
 
 	vec3 z = pos;
 	float dr = 1.0;
@@ -143,11 +147,13 @@ float mandelbulbFractal(vec3 pos) {
 float sceneSDF(vec3 point) {
     float time = Time;
 
-    float t = sphereSDF(point - vec3(-3, 0, 0), 2.5);
-    t = unionSDF(t, sphereSDF(point-vec3(3, 0, 0), 2.5));
-    t = unionSDF(t, sphereSDF(point-vec3(0, 0, 10), 2.5));
-    t = unionSDF(t, planeSDF(point, vec4(0, 1, 0, 5.5)));
-    return t;
+    #ifdef TEST
+        float t = sphereSDF(point - vec3(-3, 0, 0), 2.5);
+        t = unionSDF(t, sphereSDF(point-vec3(3, 0, 0), 2.5));
+        t = unionSDF(t, sphereSDF(point-vec3(0, 0, 10), 2.5));
+        t = unionSDF(t, planeSDF(point, vec4(0, 1, 0, 5.5)));
+        return t;
+    #endif
 /*
     float t = sphereSDF(point-vec3(3,-2.5,10), 2.5);
     t = unionSDF(t, sphereSDF(point-vec3(-3, -2.5, 10), 2.5));
@@ -160,6 +166,11 @@ float sceneSDF(vec3 point) {
     //point.z = mod(point.z, 2.0f) - 1.0f;
     //return mandelbulbFractal(point);
 
+    #ifdef MANDELBULB
+        return mandelbulbFractal(point);
+    #endif
+
+    return 0;
     //return sierpinskiTriangle(point);
 }
 
