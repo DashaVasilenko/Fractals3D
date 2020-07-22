@@ -1,9 +1,9 @@
 //#version 330
 
 //#define COLOR
-//#define FLAG_SHADOWS
+//#define FLAG_HARD_SHADOWS
 //#define FLAG_SOFT_SHADOWS
-#define FLAG_AMBIENTOCCLUSION
+//#define FLAG_AMBIENTOCCLUSION
 
 in mat4 viewMatrix;
 out vec4 outColor;
@@ -260,7 +260,7 @@ vec4 PhongDirectionLight(vec3 ambientColor, vec3 diffuseColor, vec3 specularColo
     
     float shadow = 1.0;
      
-    #ifdef FLAG_SHADOWS
+    #ifdef FLAG_HARD_SHADOWS
         vec3 shadowRayOrigin = point + computeNormal(point)*0.01;
         vec3 shadowRayDir = normalize(vec3(-lightDirection)); 
         float dist = shortestDistanceToSurface(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST);

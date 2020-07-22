@@ -9,27 +9,21 @@ void ShaderProgram::Init(const std::map<GLenum, std::string>& mapSources) {
 }
 
 void ShaderProgram::Load() {
-    //bool flag = false;
-
     // разбираемся с дефайнами до компиляции
+    defines = "";
     if (color) 
         defines = "#define COLOR" + std::string("\n");
-    else
-        defines = "\n";
-    /*
-    auto it = shaderData.find("defines");
-    if (it != shaderData.end()) {
-        for (json::iterator iter = it->begin(); iter != it->end(); ++iter) {
-            defines_source += "#define " + iter->get<std::string>() + std::string("\n");
-        }
-    }
-    */
-
-    //if (flag) {
-        Compile();
-        Link();
-        DeleteShaders();
-    //}
+    
+    if (shader_parameters & ShaderParametersType::HardShadows)
+        defines += "#define FLAG_HARD_SHADOWS" + std::string("\n");
+    if (shader_parameters & ShaderParametersType::SoftShadows)
+        defines += "#define FLAG_SOFT_SHADOWS" + std::string("\n");
+    if (shader_parameters & ShaderParametersType::AO) 
+        defines += "#define FLAG_AMBIENTOCCLUSION" + std::string("\n");
+    
+    Compile();
+    Link();
+    DeleteShaders();
 }
 
 void ShaderProgram::Compile() {
@@ -44,18 +38,9 @@ void ShaderProgram::Compile() {
         mapShaders[element.first] = glCreateShader(element.first);
         GLuint& shader_descriptor = mapShaders[element.first];
 
-
         const char *sources[3] = { version.c_str(), defines.c_str(), source_cpp.c_str() };
-        //const char *sources[3] = { version.c_str(), "#define COLOR\n", source_cpp.c_str() };
 	    GLCall(glShaderSource(shader_descriptor, 3, sources, NULL));  
 	    GLCall(glCompileShader(shader_descriptor)); // компилируем шейдер
-
-/*
- 	    const char* source =  source_cpp.c_str();
- 	    // привязываем исходный код шейдера к объекту шейдера (шейдер, кол-во строк, текст шейдера, NULL)
- 	    GLCall(glShaderSource(shader_descriptor, 1, &source, NULL));  
- 	    GLCall(glCompileShader(shader_descriptor)); // компилируем шейдер
-*/
 
  	    // проверка на ошибки при сборке шейдера
  	    GLint success;
@@ -117,7 +102,6 @@ void ShaderProgram::Delete() {
     //for (auto& element: mapShaders) {
  	//    GLCall(glDeleteShader(element.second));
     //}
-    //DeleteShaders();
     GLCall(glDeleteProgram(descriptor));
 }
 

@@ -1,6 +1,8 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
+//#include <iostream>
+
 #include "gui.h"
 #include "inputSystem.h"
 #include "errors.h"
@@ -192,7 +194,7 @@ void Gui::MenuBar() {
 }
 
 void Gui::Preview() {
-    ImGui::SetNextWindowPos(ImVec2(0, 18));
+    ImGui::SetNextWindowPos(ImVec2(0.0f, 18.0f));
     int width, height;
     window->GetSize(&width, &height);
     ImVec2 previewSize = ImVec2((float)width*2/3, (float)(height - 168));
@@ -206,16 +208,56 @@ void Gui::Preview() {
 	ImGui::End();
 }
 
-void Gui::Parameters() {
-    ImGui::Begin("Parameters");                          
+void Gui::MainParameters() {
+    int width, height;
+    window->GetSize(&width, &height);
+    ImGui::SetNextWindowPos(ImVec2((float)width*2/3, 18.0f));
+    ImVec2 parametersSize = ImVec2((float)width*1/3, (float)(height*1/3));
+	ImGui::SetNextWindowSize(parametersSize);
+    ImGuiWindowFlags parametersWindowFlags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse ;
+    
+    ImGui::Begin("Parameters", NULL, parametersWindowFlags); 
+    ShaderProgram* program = renderer->GetShaderProgram(); 
+    uint32_t shaderParameters = 0; 
+    bool flag = false;
 
-    //ImGui::Text("This is some useful text.");
-    parameters_window_color_previous_state = parameters_window_color;
-    ImGui::Checkbox("Color", &parameters_window_color);
+    main_parameters_window_color_previous_state = main_parameters_window_color;
+    ImGui::Checkbox("Color", &main_parameters_window_color);
+    if (main_parameters_window_color != main_parameters_window_color_previous_state) {
+        flag = true;
+        program->SetColor(main_parameters_window_color);
+    }
 
-    if (parameters_window_color != parameters_window_color_previous_state) {
-        ShaderProgram* program = renderer->GetShaderProgram(); 
-        program->SetColor(parameters_window_color);
+    hard_shadows_previous_state = hard_shadows;
+    ImGui::Checkbox("Hard shadows", &hard_shadows);
+    if (hard_shadows != hard_shadows_previous_state) {
+        flag = true;
+    }
+    if (hard_shadows) {
+        shaderParameters = 1 << 1;
+        soft_shadows = false;
+    }
+
+    soft_shadows_previous_state = soft_shadows;
+    ImGui::Checkbox("Soft shadows", &soft_shadows);
+    if (soft_shadows != soft_shadows_previous_state) {
+        flag = true;
+    }
+    if (soft_shadows) {
+        shaderParameters = 1 << 2;
+        hard_shadows = false;
+    }
+
+    ambient_occlusion_previous_state = ambient_occlusion;
+    ImGui::Checkbox("Ambient occlusion", &ambient_occlusion);
+    if (ambient_occlusion != ambient_occlusion_previous_state) {
+        flag = true;
+    }
+    if (ambient_occlusion) 
+        shaderParameters |= 1 << 3;
+
+    if (flag) {
+        program->SetShaderParameters(shaderParameters);
         program->Load();
     }
 
@@ -387,7 +429,7 @@ void Gui::Update() {
 
         MenuBar();
         Preview();
-        Parameters();
+        MainParameters();
         ExportAs();
         
         FileBrowserExport();

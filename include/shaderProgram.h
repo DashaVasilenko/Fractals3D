@@ -1,6 +1,8 @@
 #ifndef __SHADER_PROGRAM__
 #define __SHADER_PROGRAM__
 
+#include <stdio.h>
+
 #include "window.h"
 #include <map>
 #include <glm/glm.hpp>
@@ -17,8 +19,11 @@ public:
     void Run();
     void DeleteShaders();
     void Delete();
-    void SetColor(bool c) { color = c; }
     //~ShaderProgram();
+
+
+    void SetColor(bool c) { color = c; }
+    void SetShaderParameters(uint32_t c) { shader_parameters = c; }
 
     void SetUniform(const char* name, const glm::vec2&);
     void SetUniform(const char* name, const glm::mat4&);
@@ -31,7 +36,14 @@ private:
     std::map<GLenum, GLuint> mapShaders;
     GLuint descriptor;
 
+    enum ShaderParametersType {
+        HardShadows = 1 << 1,
+        SoftShadows = 1 << 2,
+        AO = 1 << 3,
+    };
+
     bool color = false;
+    uint32_t shader_parameters = 0;
 };
 
 #endif /* End of __SHADERPROGRAM__ */
