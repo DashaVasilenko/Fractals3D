@@ -44,6 +44,20 @@ void Renderer::Init() {
  	GLCall(glEnableVertexAttribArray(0)); // включаем атрибуты, т.е. передаем вершинному атрибуту позицию аргумента
 	GLCall(glVertexAttribPointer(1, 2, GL_FLOAT,GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat))));
 	GLCall(glEnableVertexAttribArray(1)); 
+
+	std::array<std::string, 6> fileNames = { "textures/skybox1/front.tga",
+ 											 "textures/skybox1/back.tga",
+ 											 "textures/skybox1/up.tga",
+
+ 											 "textures/skybox1/down.tga",
+ 											 "textures/skybox1/right.tga",
+ 											 "textures/skybox1/left.tga"
+ 											 };
+
+ 	skyBox.Load(fileNames);
+
+	program.Run();
+	program.SetUniform("skyBox", 0);
 }
 
 void Renderer::Render(int width, int height) {
@@ -58,7 +72,11 @@ void Renderer::Render(int width, int height) {
 	glm::mat4 view = camera->GetViewMatrix();
 	float fov = camera->GetFieldOfView();
 	Update();
+
 	program.Run();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skyBox.GetDescriptor());
+
 	program.SetUniform("View", view);
 	program.SetUniform("iResolution", glm::vec2(width, height));
 	program.SetUniform("fieldOfView", fov);

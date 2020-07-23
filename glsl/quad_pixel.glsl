@@ -16,6 +16,9 @@ uniform float fieldOfView;
 
 uniform float Time;
 
+uniform samplerCube skyBox; // сэмплер для кубической карты
+
+
 #ifdef MANDELBULB
     uniform int Iterations = 8;
     uniform float Bailout = 10.0f;
@@ -327,7 +330,8 @@ void main() {
     
     // Didn't hit anything
     if (dist > MAX_DIST - EPSILON) {
-        outColor = vec4(vec3(0.30, 0.36, 0.60) - (dir.y * 0.7), 1.0); // Skybox color
+        outColor = texture(skyBox, dir);
+        //outColor = vec4(vec3(0.30, 0.36, 0.60) - (dir.y * 0.7), 1.0); // Skybox color
 		return;
     }
 
@@ -366,7 +370,14 @@ void main() {
     const float shininess = 0.40; // показатель степени зеркального отражения
     */
 
+
+
     //outColor = Lambert(vec3(0.0, 1.0 , 0.0), vec3(0.0f, 1.0f, 1.0f), point);
     outColor = PhongDirectionLight(ambientColor, diffuseColor, specularColor, shininess, point, eye);
+    vec3 outNormal = computeNormal(point); // N
+    vec3 reflected_dir = reflect(dir, outNormal); //R
+    vec4 reflected_color = texture(skyBox, reflected_dir);
+    outColor = outColor*0.8 + reflected_color*0.2;
+
     //outColor = vec4(pow(outColor.xyz, vec3(1.0/2.2)), 1.0); // Gamma correction
 } 

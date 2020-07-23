@@ -5,6 +5,7 @@
 #include "shaderProgram.h"
 #include "camera.h"
 #include "framebuffer.h"
+#include "skybox.h"
 
 class Renderer {
 public:
@@ -48,6 +49,8 @@ private:
     GLuint VBO;
     GLuint IBO;
     FrameBuffer FBO;
+    SkyBox skyBox;
+
 
     Camera* camera;
 

@@ -6,6 +6,7 @@
 #include "camera.h"
 #include "gui.h"
 #include "fractalController.h"
+#include "skybox.h"
 
 int main() {
     Window window;
