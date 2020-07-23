@@ -27,6 +27,7 @@ public:
     void SetFractalType(FractalType c) { currentFractalType = c; }
 
     void SetUniform(const char* name, const glm::vec2&);
+    void SetUniform(const char* name, const glm::vec3&);
     void SetUniform(const char* name, const glm::mat4&);
     void SetUniform(const char* name, float value);
     void SetUniform(const char* name, int value);

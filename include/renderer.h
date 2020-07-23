@@ -33,6 +33,11 @@ private:
     int height;
 
     struct FractalsParameters {
+        glm::vec3 light_direction = { 0.0f, -1.0f, 0.0f };
+        glm::vec3 ambient_light_color = { 1.0, 1.0, 1.0 };
+        glm::vec3 diffuse_light_color = { 1.0, 1.0, 1.0 };
+        glm::vec3 specular_light_color = { 1.0, 1.0, 1.0 };
+
         int mandelbulb_iterations = 8;
         float mandelbulb_bailout = 10.0f;
         float mandelbulb_power = 9.0f;

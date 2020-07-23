@@ -128,6 +128,16 @@ void ShaderProgram::SetUniform(const char* name, const glm::vec2& vector) {
     // обработка ошибок!!!
 }
 
+void ShaderProgram::SetUniform(const char* name, const glm::vec3& vector) {
+    GLCall(GLint location = glGetUniformLocation(descriptor, name));
+    GLCall(glUniform3f(location, vector.x, vector.y, vector.z));
+    if (location == -1) {
+        std::cerr << "Uniform  " << std::string(name) + " " <<  location << " not found" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    // обработка ошибок!!!
+}
+
 void ShaderProgram::SetUniform(const char* name, const glm::mat4& matrix) {
     GLCall(GLint location = glGetUniformLocation(descriptor, name));
     GLCall(glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix)));

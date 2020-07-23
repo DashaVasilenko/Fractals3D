@@ -16,6 +16,11 @@ uniform float fieldOfView;
 
 uniform float Time;
 
+uniform vec3 lightDirection;
+uniform vec3 ambientLightColor; // интенсивность фонового света
+uniform vec3 diffuseLightColor; // интенсивность рассеянного света
+uniform vec3 specularLightColor; // интенсивность зеркального света
+
 uniform samplerCube skyBox; // сэмплер для кубической карты
 
 
@@ -159,13 +164,13 @@ float mandelbulbFractal(vec3 pos) {
 float sceneSDF(vec3 point) {
     float time = Time;
 
-    #ifdef TEST
-        float t = sphereSDF(point - vec3(-3, 0, 0), 2.5);
-        t = unionSDF(t, sphereSDF(point-vec3(3, 0, 0), 2.5));
-        t = unionSDF(t, sphereSDF(point-vec3(0, 0, 10), 2.5));
-        t = unionSDF(t, planeSDF(point, vec4(0, 1, 0, 5.5)));
-        return t;
-    #endif
+#ifdef TEST
+    float t = sphereSDF(point - vec3(-3, 0, 0), 2.5);
+    t = unionSDF(t, sphereSDF(point-vec3(3, 0, 0), 2.5));
+    t = unionSDF(t, sphereSDF(point-vec3(0, 0, 10), 2.5));
+    t = unionSDF(t, planeSDF(point, vec4(0, 1, 0, 5.5)));
+    return t;
+#endif
 /*
     float t = sphereSDF(point-vec3(3,-2.5,10), 2.5);
     t = unionSDF(t, sphereSDF(point-vec3(-3, -2.5, 10), 2.5));
@@ -178,9 +183,9 @@ float sceneSDF(vec3 point) {
     //point.z = mod(point.z, 2.0f) - 1.0f;
     //return mandelbulbFractal(point);
 
-    #ifdef MANDELBULB
-        return mandelbulbFractal(point);
-    #endif
+#ifdef MANDELBULB
+    return mandelbulbFractal(point);
+#endif
 
     return 0;
     //return sierpinskiTriangle(point);
@@ -269,33 +274,22 @@ float ambientOcclusion(vec3 point, vec3 normal, float step, float samples, float
 }
 
 // Lighting contribution of a direction light source via Phong illumination.
-vec4 PhongDirectionLight(vec3 ambientColor, vec3 diffuseColor, vec3 specularColor, float shininess, vec3 point, vec3 eye)
-{
-    const vec3 lightDirection = vec3(0.0f, -1.0f, 0.0f);
-    /*
-    const vec3 ambientLightColor = vec3(0.5, 0.5, 0.5); // интенсивность фонового света
-    const vec3 diffuseLightColor = vec3(0.5, 0.5, 0.5); // интенсивность рассеянного света
-    const vec3 specularLightColor = vec3(0.5, 0.5, 0.5); // интенсивность зеркального света
-    */
-    const vec3 ambientLightColor = vec3(1.0, 1.0, 1.0); // интенсивность фонового света
-    const vec3 diffuseLightColor = vec3(1.0, 1.0, 1.0); // интенсивность рассеянного света
-    const vec3 specularLightColor = vec3(1.0, 1.0, 1.0); // интенсивность зеркального света
-    
+vec4 PhongDirectionLight(vec3 ambientColor, vec3 diffuseColor, vec3 specularColor, float shininess, vec3 point, vec3 eye) {
     float shadow = 1.0;
      
-    #ifdef FLAG_HARD_SHADOWS
-        vec3 shadowRayOrigin = point + computeNormal(point)*0.01;
-        vec3 shadowRayDir = normalize(vec3(-lightDirection)); 
-        float dist = shortestDistanceToSurface(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST);
-        if (dist < MAX_DIST)
-            return vec4(0.0, 0.0, 0.0, 1.0);
-    #endif
+#ifdef FLAG_HARD_SHADOWS
+    vec3 shadowRayOrigin = point + computeNormal(point)*0.01;
+    vec3 shadowRayDir = normalize(vec3(-lightDirection)); 
+    float dist = shortestDistanceToSurface(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST);
+    if (dist < MAX_DIST)
+        return vec4(0.0, 0.0, 0.0, 1.0);
+#endif
 
-    #ifdef FLAG_SOFT_SHADOWS
-        vec3 shadowRayOrigin = point + computeNormal(point)*0.01;
-        vec3 shadowRayDir = normalize(vec3(-lightDirection));
-        shadow = softShadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, 3.0);
-    #endif
+#ifdef FLAG_SOFT_SHADOWS
+    vec3 shadowRayOrigin = point + computeNormal(point)*0.01;
+    vec3 shadowRayDir = normalize(vec3(-lightDirection));
+    shadow = softShadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, 3.0);
+#endif
 
     vec3 light_direction = normalize(vec3(-lightDirection)); // L для направленного
     vec3 inEye = normalize(eye - point); // V
@@ -307,12 +301,12 @@ vec4 PhongDirectionLight(vec3 ambientColor, vec3 diffuseColor, vec3 specularColo
     vec3 specular = specularLightColor*specularColor*pow(max(dot(inEye, reflected_light), 0.0), shininess);
     vec3 color = ambient + diffuse + specular;
 
-    #ifdef FLAG_AMBIENTOCCLUSION
-        float ao = ambientOcclusion(point, outNormal, 2.5, 3.0, 0.5);
-	    color *= ao;
-    #endif
+#ifdef FLAG_AMBIENTOCCLUSION
+    float ao = ambientOcclusion(point, outNormal, 2.5, 3.0, 0.5);
+    color *= ao;
+#endif
 
-    return clamp(vec4(color, 1.0), 0.0f, 1.0f);;  
+    return clamp(vec4(color, 1.0), 0.0f, 1.0f);
 }
 
 vec4 Lambert(vec3 color, vec3 dir_light, vec3 point) {
@@ -349,12 +343,12 @@ void main() {
     vec3 specularColor = vec3(1.0, 1.0, 1.0); // отражение зеркального света материалом
     float shininess = 20.0; // показатель степени зеркального отражения
     
-    #ifdef COLOR
-        ambientColor = vec3(0.19225, 0.19225, 0.19225); // отражение фонового света материалом
-        diffuseColor = vec3(0.50754, 0.50754, 0.50754); // отражение рассеянного света материалом
-        specularColor = vec3(0.50827, 0.50827, 0.50827); // отражение зеркального света материалом
-        shininess = 2.0; // показатель степени зеркального отражения
-    #endif
+#ifdef COLOR
+    ambientColor = vec3(0.19225, 0.19225, 0.19225); // отражение фонового света материалом
+    diffuseColor = vec3(0.50754, 0.50754, 0.50754); // отражение рассеянного света материалом
+    specularColor = vec3(0.50827, 0.50827, 0.50827); // отражение зеркального света материалом
+    shininess = 2.0; // показатель степени зеркального отражения
+#endif
 
     /*
     const vec3 ambientColor = vec3(0.19225, 0.19225, 0.19225); // отражение фонового света материалом

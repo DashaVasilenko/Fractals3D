@@ -291,6 +291,28 @@ void Gui::MainParameters() {
     if (ambient_occlusion) 
         shaderParameters |= 1 << 3;
 
+    ImGui::Separator();
+    ImGui::Text("Light parameters:");
+    ImGui::Separator();
+    //static float light_position[4] = { 0.10f, 0.20f, 0.30f, 0.44f };
+    if (ImGui::InputFloat3("Light direction", light_direction)) {
+        fractalController->SetLightDirection(glm::vec3(light_direction[0], light_direction[1], light_direction[2]));
+    }
+
+    if (ImGui::InputFloat3("Ambient color", ambient_light_color)) {
+        fractalController->SetAmbientLightColor(glm::vec3(ambient_light_color[0], ambient_light_color[1], ambient_light_color[2]));
+    }
+
+    if (ImGui::InputFloat3("Diffuse color", diffuse_light_color)) {
+        fractalController->SetDiffuseLightColor(glm::vec3(diffuse_light_color[0], diffuse_light_color[1], diffuse_light_color[2]));
+    }
+
+    if (ImGui::InputFloat3("Specular color", specular_light_color)) {
+        fractalController->SetSpecularLightColor(glm::vec3(specular_light_color[0], specular_light_color[1], specular_light_color[2]));
+    }
+    ImGui::Separator();
+
+
     if (ImGui::BeginMenu("Type of fractal:")) {
         if (ImGui::MenuItem("Test")) {
             currentFractalType = FractalType::Test;
@@ -302,8 +324,7 @@ void Gui::MainParameters() {
             fractalController->SetFractalType(currentFractalType);
             flag = true;
         }
-            
-            
+               
         ImGui::EndMenu();
     }
 

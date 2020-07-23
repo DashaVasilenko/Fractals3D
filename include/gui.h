@@ -37,6 +37,12 @@ private:
     bool show_demo_window = true;
     bool show_another_window = false;
 
+    //float light_position[4] = { 0.10f, 0.20f, 0.30f, 0.44f };
+    float light_direction[3] = { 0.0f, -1.0f, 0.0f };
+    float ambient_light_color[3] = { 1.0, 1.0, 1.0 };
+    float diffuse_light_color[3] = { 1.0, 1.0, 1.0 };
+    float specular_light_color[3] = { 1.0, 1.0, 1.0 };
+
     bool main_parameters_window_color = false;
     bool main_parameters_window_color_previous_state = false;
     bool hard_shadows = false;

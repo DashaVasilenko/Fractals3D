@@ -80,6 +80,10 @@ void Renderer::Render(int width, int height) {
 	program.SetUniform("View", view);
 	program.SetUniform("iResolution", glm::vec2(width, height));
 	program.SetUniform("fieldOfView", fov);
+	program.SetUniform("lightDirection", fractalsParameters.light_direction);
+	program.SetUniform("ambientLightColor", fractalsParameters.ambient_light_color);
+	program.SetUniform("diffuseLightColor", fractalsParameters.diffuse_light_color);
+	program.SetUniform("specularLightColor", fractalsParameters.specular_light_color);
 
 	switch(currentFractalType) {
         case FractalType::Test: {
