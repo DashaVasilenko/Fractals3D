@@ -21,7 +21,6 @@ void ShaderProgram::Load() {
     if (shader_parameters & ShaderParametersType::AO) 
         defines += "#define FLAG_AMBIENTOCCLUSION" + std::string("\n");
 
-
     switch(currentFractalType) {
         case FractalType::Test: {
             defines += "#define TEST" + std::string("\n");
@@ -142,6 +141,16 @@ void ShaderProgram::SetUniform(const char* name, const glm::mat4& matrix) {
 void ShaderProgram::SetUniform(const char* name, float value) {
     GLCall(GLint location = glGetUniformLocation(descriptor, name));
     GLCall(glUniform1f(location, value));
+    if (location == -1) {
+        std::cerr << "Uniform  " << std::string(name) + " " <<  location << " not found" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    // обработка ошибок!!!
+}
+
+void ShaderProgram::SetUniform(const char* name, int value) {
+    GLCall(GLint location = glGetUniformLocation(descriptor, name));
+    GLCall(glUniform1i(location, value));
     if (location == -1) {
         std::cerr << "Uniform  " << std::string(name) + " " <<  location << " not found" << std::endl;
         exit(EXIT_FAILURE);

@@ -5,6 +5,7 @@
 #include "renderer.h"
 #include "camera.h"
 #include "gui.h"
+#include "fractalController.h"
 
 int main() {
     Window window;
@@ -23,8 +24,11 @@ int main() {
  	double lastTime = 0.0; // Время вывода последнего кадра
 	renderer.SetActiveCamera(&camera);
 
+	FractalController fractalController;
+	fractalController.Init(&renderer);
+
 	Gui gui;
-	gui.Init(&window, &renderer);
+	gui.Init(&window, &fractalController);
 
  	while (!glfwWindowShouldClose(window.GetPointer())) {
 		glfwPollEvents(); // проверяет события (ввод с клавиатуры, перемещение мыши) и вызывает функции обратного вызова(callback))

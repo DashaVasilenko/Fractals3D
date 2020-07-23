@@ -12,11 +12,12 @@
 #include "window.h"
 #include "camera.h"
 #include "types.h"
+#include "fractalController.h"
 
 
 class Gui {
 public:
-    void Init(Window* window, Renderer* renderer);
+    void Init(Window* window, FractalController* fr);
     void Update();
     void Destroy();
 
@@ -29,7 +30,7 @@ private:
         //Obj,
     };
 
-    Renderer* renderer;
+    FractalController* fractalController;
     Window* window;
     FrameBuffer* fbo;
     Camera* camera;
@@ -62,17 +63,21 @@ private:
     int output_height = 1080;
     int output_quality = 100;
 
+    int mandelbulb_iterations = 8;
+    float mandelbulb_bailout = 10.0f;
+    float mandelbulb_power = 9.0f;
+
     void MenuBar();
     void Preview();
     void Stats();
     void MainParameters();
     void FractalParameters();
+    void ExportAs();
+    void FileBrowserExport();
 
     void Test();
     void Mandelbulb();
 
-    void ExportAs();
-    void FileBrowserExport();
 };
 
 #endif /* End of __GUI__ */

@@ -15,6 +15,14 @@ bool MyDragInt(const char *label, int *v, float v_speed = (1.0F), int v_min = 0,
     return v_backup != *v;
 }
 
+bool MyDragFloat(const char *label, float *v, float v_speed = (1.0F), float v_min = 0, float v_max = 0) {
+    float v_backup = *v;
+    if (!ImGui::DragFloat(label, v, v_speed, v_min, v_max))
+        return false;
+    *v = glm::clamp(*v, v_min, v_max);
+    return v_backup != *v;
+}
+
 void Gui::FileBrowserExport() {
     fileBrowserSaveImage.Display();
     if(fileBrowserSaveImage.HasSelected()) {
@@ -63,11 +71,11 @@ void Gui::FileBrowserExport() {
     }
 }
 
-void Gui::Init(Window* window, Renderer* renderer) {
+void Gui::Init(Window* window, FractalController* fr) {
     this->window = window;
-    this->renderer = renderer;
-    this->fbo = renderer->GetFBO();
-    this->camera = renderer->GetCamera();
+    this->fractalController = fr;
+    this->fbo = fractalController->GetFBO();
+    this->camera = fractalController->GetCamera();
 
     // Setup ImGui context
     IMGUI_CHECKVERSION();
@@ -243,7 +251,7 @@ void Gui::MainParameters() {
 	ImGui::SetNextWindowSize(parametersSize);
     
     ImGui::Begin("Parameters", NULL, parametersWindowFlags); 
-    ShaderProgram* program = renderer->GetShaderProgram(); 
+    ShaderProgram* program = fractalController->GetShaderProgram(); 
     uint32_t shaderParameters = 0; 
     bool flag = false;
 
@@ -251,6 +259,7 @@ void Gui::MainParameters() {
     ImGui::Checkbox("Color", &main_parameters_window_color);
     if (main_parameters_window_color != main_parameters_window_color_previous_state) {
         flag = true;
+        //fractalController->SetColor(main_parameters_window_color);
         program->SetColor(main_parameters_window_color);
     }
 
@@ -285,10 +294,12 @@ void Gui::MainParameters() {
     if (ImGui::BeginMenu("Type of fractal:")) {
         if (ImGui::MenuItem("Test")) {
             currentFractalType = FractalType::Test;
+            fractalController->SetFractalType(currentFractalType);
             flag = true;
         }
         if (ImGui::MenuItem("Mandelbulb Fractal")) {
             currentFractalType = FractalType::Mandelbulb;
+            fractalController->SetFractalType(currentFractalType);
             flag = true;
         }
             
@@ -311,8 +322,8 @@ void Gui::MainParameters() {
     
     if (flag) {
         program->SetShaderParameters(shaderParameters);
-        program->SetFractalType(currentFractalType);
-        program->Load();
+        fractalController->LoadShaderProgram();
+        //program->Load();
     }
 
     ImGui::End();
@@ -346,6 +357,33 @@ void Gui::Test() {
 
 void Gui::Mandelbulb() {
     ImGui::Begin("Mandelbulb parameters", NULL, parametersWindowFlags); 
+
+    ImGui::Text("Iterations:");
+    ImGui::SetNextItemWidth(200);
+    ImGui::SameLine();
+    if (MyDragInt("##mandelbulb_iterations", &mandelbulb_iterations, 1, 1, 15)) {
+        fractalController->SetMandelbulbIterations(mandelbulb_iterations);
+    }
+    ImGui::SameLine();
+    ImGui::Text("(1..15)");
+
+    ImGui::Text("Bailout:");
+    ImGui::SetNextItemWidth(200);
+    ImGui::SameLine();
+    if (MyDragFloat("##mandelbulb_bailout", &mandelbulb_bailout, 1, 1, 30)) {
+        fractalController->SetMandelbulbBailout(mandelbulb_bailout);
+    }
+    ImGui::SameLine();
+    ImGui::Text("(1..30)");
+
+    ImGui::Text("Power:");
+    ImGui::SetNextItemWidth(200);
+    ImGui::SameLine();
+    if (MyDragFloat("##mandelbulb_power", &mandelbulb_power, 1, 1, 30)) {
+        fractalController->SetMandelbulbPower(mandelbulb_power);
+    }
+    ImGui::SameLine();
+    ImGui::Text("(1..30)");
 
     ImGui::End();
 }
@@ -417,7 +455,7 @@ void Gui::ExportAs() {
             fbo_height = fbo->GetHeight();
             fbo_width = fbo->GetWidth();
             fbo->Resize(output_width, output_height);
-            renderer->Render(output_width, output_height);
+            fractalController->Render(output_width, output_height);
             fbo->Bind();
             unsigned char* imageData = (unsigned char*)malloc(output_width*output_height*3);
 	        GLCall(glReadPixels(0, 0, output_width, output_height, GL_RGB, GL_UNSIGNED_BYTE, imageData));

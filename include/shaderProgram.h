@@ -29,6 +29,10 @@ public:
     void SetUniform(const char* name, const glm::vec2&);
     void SetUniform(const char* name, const glm::mat4&);
     void SetUniform(const char* name, float value);
+    void SetUniform(const char* name, int value);
+
+
+    FractalType GetFractalType() { return currentFractalType; }
 
 private:
     std::string version = "#version 330 core\n";

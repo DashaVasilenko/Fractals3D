@@ -1,7 +1,6 @@
 #include "renderer.h"
 #include "inputSystem.h"
 
-
 const GLfloat Renderer::vertices[20] = {
     -1.0f,  1.0f, 0.0f, 1.0f, 0.0f,
      1.0f,  1.0f, 0.0f, 0.0f, 0.0f,
@@ -23,6 +22,7 @@ void Renderer::Init() {
  	program.Compile();
  	program.Link();
 	program.DeleteShaders();
+	currentFractalType = program.GetFractalType();
 
 	GLCall(glGenVertexArrays(1, &VAO));
  	GLCall(glBindVertexArray(VAO)); 
@@ -59,10 +59,29 @@ void Renderer::Render(int width, int height) {
 	float fov = camera->GetFieldOfView();
 	Update();
 	program.Run();
+	program.SetUniform("View", view);
 	program.SetUniform("iResolution", glm::vec2(width, height));
 	program.SetUniform("fieldOfView", fov);
-	program.SetUniform("View", view);
-	program.SetUniform("Time", glfwGetTime());
+
+	switch(currentFractalType) {
+        case FractalType::Test: {
+            
+            break;
+        }
+        case FractalType::Mandelbulb: {
+			program.SetUniform("Iterations", fractalsParameters.mandelbulb_iterations);
+			program.SetUniform("Bailout", fractalsParameters.mandelbulb_bailout);
+			program.SetUniform("Power", fractalsParameters.mandelbulb_power);
+            break;
+        }
+    }
+
+	//program.SetUniform("iResolution", glm::vec2(width, height));
+	//program.SetUniform("fieldOfView", fov);
+	//program.SetUniform("View", view);
+
+	program.SetUniform("Time", (float)glfwGetTime());
+
 	GLCall(glBindVertexArray(VAO));
 	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO)); 
 	GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL));

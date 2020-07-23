@@ -13,7 +13,14 @@ out vec4 outColor;
 
 uniform vec2 iResolution; 
 uniform float fieldOfView;
+
 uniform float Time;
+
+#ifdef MANDELBULB
+    uniform int Iterations = 8;
+    uniform float Bailout = 10.0f;
+    uniform float Power = 9.0;
+#endif
 
 const int MAX_MARCHING_STEPS = 255;
 const float MIN_DIST = 0.0;
@@ -110,11 +117,12 @@ float sierpinskiTriangle(vec3 pos) {
 */
 }
 
-
+#ifdef MANDELBULB
 float mandelbulbFractal(vec3 pos) {
-    int Iterations = 8;
-    float Bailout = 10.0f;
-    float Power = 9.0;
+    //int Iterations = 8;
+    //float Bailout = 10.0f;
+    //float Power = 9.0;
+
     //float Power = 9.0*sin(Time / 50.0f);
 
 	vec3 z = pos;
@@ -140,6 +148,7 @@ float mandelbulbFractal(vec3 pos) {
 	}
 	return 0.5*log(r)*r/dr;
 }
+#endif
 
 
 // Absolute value of the return value indicates the distance to the surface. 
