@@ -208,13 +208,39 @@ void Gui::Preview() {
 	ImGui::End();
 }
 
+void Gui::Stats() {
+    int width, height;
+    window->GetSize(&width, &height);
+    ImGui::SetNextWindowPos(ImVec2(0.0f, (float)(height - 150)));
+    ImVec2 parametersSize = ImVec2((float)width*2/3, 150.0f);
+	ImGui::SetNextWindowSize(parametersSize);
+
+    ImGui::Begin("Stats", NULL, parametersWindowFlags);                         
+
+    ImGui::Text("FPS: %f", ImGui::GetIO().Framerate);
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    ImGui::Separator();
+
+    switch(currentFractalType) {
+        case FractalType::Test: {
+            ImGui::Text("Current fractal type: Test");
+            break;
+        }
+        case FractalType::Mandelbulb: {
+            ImGui::Text("Current fractal type: Mandelbulb fractal");
+            break;
+        }
+    }
+
+    ImGui::End();
+}
+
 void Gui::MainParameters() {
     int width, height;
     window->GetSize(&width, &height);
     ImGui::SetNextWindowPos(ImVec2((float)width*2/3, 18.0f));
     ImVec2 parametersSize = ImVec2((float)width*1/3, (float)(height*1/3));
 	ImGui::SetNextWindowSize(parametersSize);
-    ImGuiWindowFlags parametersWindowFlags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse ;
     
     ImGui::Begin("Parameters", NULL, parametersWindowFlags); 
     ShaderProgram* program = renderer->GetShaderProgram(); 
@@ -288,6 +314,38 @@ void Gui::MainParameters() {
         program->SetFractalType(currentFractalType);
         program->Load();
     }
+
+    ImGui::End();
+}
+
+void Gui::FractalParameters() {
+    int width, height;
+    window->GetSize(&width, &height);
+    ImGui::SetNextWindowPos(ImVec2((float)width*2/3, (float)(height*1/3) + 18.0f));
+    ImVec2 parametersSize = ImVec2((float)width*1/3, (float)(height*2/3) - 18.0f);
+	ImGui::SetNextWindowSize(parametersSize);
+    
+    switch(currentFractalType) {
+        case FractalType::Test: {
+            Test();
+            break;
+        }
+        case FractalType::Mandelbulb: {
+             Mandelbulb();
+            break;
+        }
+    }
+    
+}
+
+void Gui::Test() {
+    ImGui::Begin("Test parameters", NULL, parametersWindowFlags); 
+
+    ImGui::End();
+}
+
+void Gui::Mandelbulb() {
+    ImGui::Begin("Mandelbulb parameters", NULL, parametersWindowFlags); 
 
     ImGui::End();
 }
@@ -457,7 +515,9 @@ void Gui::Update() {
 
         MenuBar();
         Preview();
+        Stats();
         MainParameters();
+        FractalParameters();
         ExportAs();
         
         FileBrowserExport();

@@ -49,6 +49,7 @@ private:
     FractalType currentFractalType = FractalType::Test;
 
     bool exportWindowFlag = false;
+    ImGuiWindowFlags parametersWindowFlags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse ;
 
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -63,9 +64,14 @@ private:
 
     void MenuBar();
     void Preview();
+    void Stats();
     void MainParameters();
-    void ExportAs();
+    void FractalParameters();
 
+    void Test();
+    void Mandelbulb();
+
+    void ExportAs();
     void FileBrowserExport();
 };
 
