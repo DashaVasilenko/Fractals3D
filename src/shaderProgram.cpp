@@ -11,8 +11,8 @@ void ShaderProgram::Init(const std::map<GLenum, std::string>& mapSources) {
 void ShaderProgram::Load() {
     // разбираемся с дефайнами до компиляции
     defines = "";
-    if (color) 
-        defines = "#define COLOR" + std::string("\n");
+    //if (color) 
+    //    defines = "#define COLOR" + std::string("\n");
     
     if (shader_parameters & ShaderParametersType::HardShadows)
         defines += "#define FLAG_HARD_SHADOWS" + std::string("\n");

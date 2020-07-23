@@ -1,6 +1,5 @@
 //#version 330
 
-//#define COLOR
 //#define FLAG_HARD_SHADOWS
 //#define FLAG_SOFT_SHADOWS
 //#define FLAG_AMBIENTOCCLUSION
@@ -13,6 +12,7 @@ out vec4 outColor;
 
 uniform vec2 iResolution; 
 uniform float fieldOfView;
+uniform samplerCube skyBox; // сэмплер для кубической карты
 
 uniform float Time;
 
@@ -21,8 +21,10 @@ uniform vec3 ambientLightColor; // интенсивность фонового �
 uniform vec3 diffuseLightColor; // интенсивность рассеянного света
 uniform vec3 specularLightColor; // интенсивность зеркального света
 
-uniform samplerCube skyBox; // сэмплер для кубической карты
-
+uniform vec3 ambientColor; // отражение фонового света материалом
+uniform vec3 diffuseColor; // отражение рассеянного света материалом
+uniform vec3 specularColor; // отражение зеркального света материалом
+uniform float shininess; // показатель степени зеркального отражения
 
 #ifdef MANDELBULB
     uniform int Iterations = 8;
@@ -331,47 +333,11 @@ void main() {
 
     vec3 point = eye + dist*dir; // The closest point on the surface to the eyepoint along the view ray
 
-    /*
-    const vec3 ambientColor = vec3(1.0, 1.0, 1.0); // отражение фонового света материалом
-    const vec3 diffuseColor = vec3(1.0, 1.0, 1.0); // отражение рассеянного света материалом
-    const vec3 specularColor = vec3(1.0, 1.0, 1.0); // отражение зеркального света материалом
-    const float shininess = 20.0; // показатель степени зеркального отражения
-    */
-
-    vec3 ambientColor = vec3(1.0, 1.0, 1.0); // отражение фонового света материалом
-    vec3 diffuseColor = vec3(1.0, 1.0, 1.0); // отражение рассеянного света материалом
-    vec3 specularColor = vec3(1.0, 1.0, 1.0); // отражение зеркального света материалом
-    float shininess = 20.0; // показатель степени зеркального отражения
-    
-#ifdef COLOR
-    ambientColor = vec3(0.19225, 0.19225, 0.19225); // отражение фонового света материалом
-    diffuseColor = vec3(0.50754, 0.50754, 0.50754); // отражение рассеянного света материалом
-    specularColor = vec3(0.50827, 0.50827, 0.50827); // отражение зеркального света материалом
-    shininess = 2.0; // показатель степени зеркального отражения
-#endif
-
-    /*
-    const vec3 ambientColor = vec3(0.19225, 0.19225, 0.19225); // отражение фонового света материалом
-    const vec3 diffuseColor = vec3(0.50754, 0.50754, 0.50754); // отражение рассеянного света материалом
-    const vec3 specularColor = vec3(0.50827, 0.50827, 0.50827); // отражение зеркального света материалом
-    const float shininess = 2.0; // показатель степени зеркального отражения
-    */
-
-    /*
-    const vec3 ambientColor = vec3(0.2, 0.2, 0.2); // отражение фонового света материалом
-    const vec3 diffuseColor = vec3(0.7, 0.2, 0.2); // отражение рассеянного света материалом
-    const vec3 specularColor = vec3(1.0, 1.0, 1.0); // отражение зеркального света материалом
-    const float shininess = 0.40; // показатель степени зеркального отражения
-    */
-
-
-
     //outColor = Lambert(vec3(0.0, 1.0 , 0.0), vec3(0.0f, 1.0f, 1.0f), point);
     outColor = PhongDirectionLight(ambientColor, diffuseColor, specularColor, shininess, point, eye);
     vec3 outNormal = computeNormal(point); // N
     vec3 reflected_dir = reflect(dir, outNormal); //R
     vec4 reflected_color = texture(skyBox, reflected_dir);
     outColor = outColor*0.8 + reflected_color*0.2;
-
     //outColor = vec4(pow(outColor.xyz, vec3(1.0/2.2)), 1.0); // Gamma correction
 } 

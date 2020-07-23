@@ -22,7 +22,7 @@ public:
     void Delete();
     //~ShaderProgram();
 
-    void SetColor(bool c) { color = c; }
+    //void SetColor(bool c) { color = c; }
     void SetShaderParameters(uint32_t c) { shader_parameters = c; }
     void SetFractalType(FractalType c) { currentFractalType = c; }
 
@@ -48,7 +48,7 @@ private:
         AO = 1 << 3,
     };
 
-    bool color = false;
+    //bool color = false;
     uint32_t shader_parameters = 0;
     FractalType currentFractalType = FractalType::Test;
 };

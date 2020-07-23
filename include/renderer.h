@@ -38,6 +38,11 @@ private:
         glm::vec3 diffuse_light_color = { 1.0, 1.0, 1.0 };
         glm::vec3 specular_light_color = { 1.0, 1.0, 1.0 };
 
+        glm::vec3 ambient_fractal_color = { 0.19225, 0.19225, 0.19225 };
+        glm::vec3 diffuse_fractal_color = { 0.50754, 0.50754, 0.50754 };
+        glm::vec3 specular_fractal_color = { 0.50827, 0.50827, 0.50827 };
+        float shininess = 2.0f;
+
         int mandelbulb_iterations = 8;
         float mandelbulb_bailout = 10.0f;
         float mandelbulb_power = 9.0f;

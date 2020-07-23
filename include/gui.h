@@ -37,20 +37,19 @@ private:
     bool show_demo_window = true;
     bool show_another_window = false;
 
-    //float light_position[4] = { 0.10f, 0.20f, 0.30f, 0.44f };
     float light_direction[3] = { 0.0f, -1.0f, 0.0f };
     float ambient_light_color[3] = { 1.0, 1.0, 1.0 };
     float diffuse_light_color[3] = { 1.0, 1.0, 1.0 };
     float specular_light_color[3] = { 1.0, 1.0, 1.0 };
 
-    bool main_parameters_window_color = false;
-    bool main_parameters_window_color_previous_state = false;
+    float ambient_fractal_color[3] = { 0.19225, 0.19225, 0.19225 };
+    float diffuse_fractal_color[3] = { 0.50754, 0.50754, 0.50754 };
+    float specular_fractal_color[3] = { 0.50827, 0.50827, 0.50827 };
+    float shininess = 20.0;
+
     bool hard_shadows = false;
-    bool hard_shadows_previous_state = false;
     bool soft_shadows = false;
-    bool soft_shadows_previous_state = false;
     bool ambient_occlusion = false;
-    bool ambient_occlusion_previous_state = false;
 
     ExportType currentExportType = ExportType::Png;
     FractalType currentFractalType = FractalType::Test;
@@ -77,6 +76,7 @@ private:
     void Preview();
     void Stats();
     void MainParameters();
+    void FractalColor();
     void FractalParameters();
     void ExportAs();
     void FileBrowserExport();
