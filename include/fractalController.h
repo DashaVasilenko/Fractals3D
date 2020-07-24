@@ -24,6 +24,8 @@ public:
     void SetDiffuseFractalColor(const glm::vec3& c) { renderer->fractalsParameters.diffuse_fractal_color = c; }
     void SetSpecularFractalColor(const glm::vec3& c) { renderer->fractalsParameters.specular_fractal_color = c; }
     void SetFractalShininess(float c) { renderer->fractalsParameters.shininess = c; }
+    void SetFractalReflect(float c) { renderer->fractalsParameters.reflection = c; }
+
 
     void SetFractalType(FractalType c) { program->SetFractalType(c); renderer->currentFractalType = c; }
     void SetMandelbulbIterations(const int c) { renderer->fractalsParameters.mandelbulb_iterations = c;  }

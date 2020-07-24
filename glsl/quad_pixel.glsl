@@ -25,6 +25,7 @@ uniform vec3 ambientColor; // отражение фонового света м�
 uniform vec3 diffuseColor; // отражение рассеянного света материалом
 uniform vec3 specularColor; // отражение зеркального света материалом
 uniform float shininess; // показатель степени зеркального отражения
+uniform float reflection;
 
 #ifdef MANDELBULB
     uniform int Iterations = 8;
@@ -338,6 +339,6 @@ void main() {
     vec3 outNormal = computeNormal(point); // N
     vec3 reflected_dir = reflect(dir, outNormal); //R
     vec4 reflected_color = texture(skyBox, reflected_dir);
-    outColor = outColor*0.8 + reflected_color*0.2;
+    outColor = outColor*(1.0 - reflection) + reflected_color*reflection;
     //outColor = vec4(pow(outColor.xyz, vec3(1.0/2.2)), 1.0); // Gamma correction
 } 

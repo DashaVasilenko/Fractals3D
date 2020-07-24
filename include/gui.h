@@ -46,6 +46,7 @@ private:
     float diffuse_fractal_color[3] = { 0.50754, 0.50754, 0.50754 };
     float specular_fractal_color[3] = { 0.50827, 0.50827, 0.50827 };
     float shininess = 20.0;
+    float reflection = 0.2;
 
     bool hard_shadows = false;
     bool soft_shadows = false;

@@ -369,6 +369,9 @@ void Gui::FractalColor() {
     if (MyDragFloat("Shininess", &shininess, 1, 0, 100)) {
         fractalController->SetFractalShininess(shininess);
     }
+    if (MyDragFloat("Reflection", &reflection, 0.1, 0, 1)) {
+        fractalController->SetFractalReflect(reflection);
+    }
     ImGui::Separator();
 }
 

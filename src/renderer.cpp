@@ -90,6 +90,7 @@ void Renderer::Render(int width, int height) {
 	program.SetUniform("diffuseColor", fractalsParameters.diffuse_fractal_color);
 	program.SetUniform("specularColor", fractalsParameters.specular_fractal_color);
 	program.SetUniform("shininess", fractalsParameters.shininess);
+	program.SetUniform("reflection", fractalsParameters.reflection);
 
 	switch(currentFractalType) {
         case FractalType::Test: {
