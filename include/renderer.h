@@ -17,6 +17,11 @@ public:
     FrameBuffer* GetFBO() { return &FBO; }
     Camera* GetCamera() { return camera; }
     ShaderProgram* GetShaderProgram() { return &program; }
+    SkyBox* GetSkybox() { return &skyBox; }
+    SkyBoxHDR* GetSkyboxHDR() { return &skyBoxHDR; }
+
+
+    void ConvertHdrMapToCubemap();
 
     void Init();
     void Update();
@@ -26,6 +31,9 @@ public:
     friend class FractalController;
 
 private:
+    static const GLfloat cube_vertices[192];
+	static const GLuint cube_indices[36];
+
     static const GLfloat vertices[20];
 	static const GLuint indices[6];
 
@@ -37,6 +45,11 @@ private:
         glm::vec3 ambient_light_color = { 1.0, 1.0, 1.0 };
         glm::vec3 diffuse_light_color = { 1.0, 1.0, 1.0 };
         glm::vec3 specular_light_color = { 1.0, 1.0, 1.0 };
+
+        BackgroundType background_type = BackgroundType::Skybox;
+        glm::vec3 background_color = { 0.30, 0.36, 0.60 };
+        SkyboxTexture skybox_texture = SkyboxTexture::Orbital;
+        SkyboxTextureHDR skybox_texture_hdr = SkyboxTextureHDR::WinterForest;
 
         glm::vec3 ambient_fractal_color = { 0.19225, 0.19225, 0.19225 };
         glm::vec3 diffuse_fractal_color = { 0.50754, 0.50754, 0.50754 };
@@ -53,18 +66,23 @@ private:
 
     FractalType currentFractalType = FractalType::Test;
 
-
     std::map<GLenum, std::string> mapSources;
     ShaderProgram program;
     GLuint VAO;
     GLuint VBO;
     GLuint IBO;
     FrameBuffer FBO;
-    SkyBox skyBox;
 
+    std::map<GLenum, std::string> cubeMapSources;
+    ShaderProgram cubeProgram;
+    GLuint cubeVAO;
+    GLuint cubeVBO;
+    GLuint cubeIBO;
+
+    SkyBox skyBox;
+    SkyBoxHDR skyBoxHDR;
 
     Camera* camera;
-
 };
  
 #endif /* End of __RENDERER__ */ 

@@ -247,7 +247,7 @@ void Gui::MainParameters() {
     int width, height;
     window->GetSize(&width, &height);
     ImGui::SetNextWindowPos(ImVec2((float)width*2/3, 18.0f));
-    ImVec2 parametersSize = ImVec2((float)width*1/3, (float)(height*1/3));
+    ImVec2 parametersSize = ImVec2((float)width*1/3, (float)(height*2/3));
 	ImGui::SetNextWindowSize(parametersSize);
     
     ImGui::Begin("Parameters", NULL, parametersWindowFlags); 
@@ -295,6 +295,42 @@ void Gui::MainParameters() {
     if (ImGui::ColorEdit3("Specular color", specular_light_color)) {
         fractalController->SetSpecularLightColor(glm::vec3(specular_light_color[0], specular_light_color[1], specular_light_color[2]));
     }
+
+
+    ImGui::Separator();
+    ImGui::Text("Background parameters:");
+    ImGui::Separator();
+    if (ImGui::Combo("", &current_background_type, background_types, IM_ARRAYSIZE(background_types))) {
+        flag = true;
+        if (current_background_type == 0) {
+            fractalController->SetBackgroundType(BackgroundType::Solid);
+        }
+        else if (current_background_type == 1) {
+            fractalController->SetBackgroundType(BackgroundType::Skybox);
+        }
+        else if (current_background_type == 2) {
+            fractalController->SetBackgroundType(BackgroundType::SkyboxHDR);
+        }
+    }
+    if (current_background_type == 0) {
+        if (ImGui::ColorEdit3("Color", background_color)) {
+            fractalController->SetBackgroundColor(glm::vec3(background_color[0], background_color[1], background_color[2]));
+        }
+    }
+    if (current_background_type == 1) {
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 50.0f);
+        if (ImGui::Combo("Texture", &current_skybox_texture, skybox_texture, IM_ARRAYSIZE(skybox_texture))) {
+            fractalController->SetSkyboxTexture(static_cast<SkyboxTexture>(current_skybox_texture));
+        }
+        
+    }
+    if (current_background_type == 2) {
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 50.0f);
+        if (ImGui::Combo("HDR Texture", &current_skybox_texture_hdr, skybox_texture_hdr, IM_ARRAYSIZE(skybox_texture_hdr))) {
+            fractalController->SetSkyboxTextureHDR(static_cast<SkyboxTextureHDR>(current_skybox_texture_hdr));
+        }
+        
+    }
     ImGui::Separator();
 
     if (ImGui::BeginMenu("Type of fractal:")) {
@@ -336,8 +372,8 @@ void Gui::MainParameters() {
 void Gui::FractalParameters() {
     int width, height;
     window->GetSize(&width, &height);
-    ImGui::SetNextWindowPos(ImVec2((float)width*2/3, (float)(height*1/3) + 18.0f));
-    ImVec2 parametersSize = ImVec2((float)width*1/3, (float)(height*2/3) - 18.0f);
+    ImGui::SetNextWindowPos(ImVec2((float)width*2/3, (float)(height*2/3) + 18.0f));
+    ImVec2 parametersSize = ImVec2((float)width*1/3, (float)(height*1/3) - 18.0f);
 	ImGui::SetNextWindowSize(parametersSize);
     
     switch(currentFractalType) {

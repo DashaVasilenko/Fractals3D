@@ -11,8 +11,6 @@ void ShaderProgram::Init(const std::map<GLenum, std::string>& mapSources) {
 void ShaderProgram::Load() {
     // разбираемся с дефайнами до компиляции
     defines = "";
-    //if (color) 
-    //    defines = "#define COLOR" + std::string("\n");
     
     if (shader_parameters & ShaderParametersType::HardShadows)
         defines += "#define FLAG_HARD_SHADOWS" + std::string("\n");
@@ -32,7 +30,22 @@ void ShaderProgram::Load() {
         }
     }
 
-    std::cout << currentFractalType << std::endl;
+    switch(currentBackgroundType) {
+        case BackgroundType::Solid: {
+            defines += "#define SOLID_BACKGROUND" + std::string("\n");
+            break;
+        }
+        case BackgroundType::Skybox: {
+            defines += "#define SKYBOX_BACKGROUND" + std::string("\n");
+            break;
+        }
+        case BackgroundType::SkyboxHDR: {
+            defines += "#define SKYBOX_BACKGROUND" + std::string("\n");
+            break;
+        }
+    }
+    //std::cout << currentBackgroundType << std::endl;
+    //std::cout << currentFractalType << std::endl;
     
     Compile();
     Link();

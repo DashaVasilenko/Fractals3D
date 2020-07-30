@@ -22,9 +22,9 @@ public:
     void Delete();
     //~ShaderProgram();
 
-    //void SetColor(bool c) { color = c; }
     void SetShaderParameters(uint32_t c) { shader_parameters = c; }
     void SetFractalType(FractalType c) { currentFractalType = c; }
+    void SetBackgroundType(BackgroundType c) { currentBackgroundType = c; }
 
     void SetUniform(const char* name, const glm::vec2&);
     void SetUniform(const char* name, const glm::vec3&);
@@ -48,9 +48,9 @@ private:
         AO = 1 << 3,
     };
 
-    //bool color = false;
     uint32_t shader_parameters = 0;
     FractalType currentFractalType = FractalType::Test;
+    BackgroundType currentBackgroundType = BackgroundType::Skybox;
 };
 
 #endif /* End of __SHADERPROGRAM__ */

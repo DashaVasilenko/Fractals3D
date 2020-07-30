@@ -25,7 +25,7 @@ private:
     float pitch = 0.0f; // тангаж (наклон вверх вниз)
     //float roll = 0.0f; // крен
     float yaw = -90.0f; // рыскание (поворот влево вправо)
-    float fieldOfView = 45.0f;
+    float fieldOfView = 90.0f;
 
     glm::vec3 position;
     float phi;

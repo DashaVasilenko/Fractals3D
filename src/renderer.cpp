@@ -13,6 +13,79 @@ const GLuint Renderer::indices[6] = {
 	                	0, 2, 3
 	                };
 
+const GLfloat Renderer::cube_vertices[192] = {  // back face
+            									-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left 0
+            									 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right 1
+            									 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f, // bottom-right 2        
+            									-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f, // top-left 3
+            									// front face
+            									-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left 4
+            									 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 1.0f, 0.0f, // bottom-right 5
+            									 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right 6
+            									-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 0.0f, 1.0f, // top-left 7
+            									// left face
+            									-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right 8
+            									-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-left 9
+            									-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left 10
+            									-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-right 11
+            									// right face
+            									 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left 12
+            									 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right 13
+            									 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-right 14    
+             									 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-left 15    
+            									// bottom face
+            									-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right 16
+            									 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f, // top-left 17
+            									 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left 18
+             									-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f, // bottom-right 19
+             									// top face
+            									-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left 20
+            									 0.5f,  0.5f , 0.5f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right 21
+            									 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f, // top-right 22     
+             									-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left 23        
+};
+
+// кубик индексы вершин для треугольников
+const GLuint Renderer::cube_indices[36] = { 0, 1, 2,    // back face
+											1, 0, 3,    // back face
+											4, 5, 6,    // front face
+											6, 7, 4,    // front face
+											8, 9, 10,   // left face
+											10, 11, 8,  // left face
+											12, 13, 14, // right face
+											13, 12, 15, // right face
+											16, 17, 18, // bottom face
+											18, 19, 16, // bottom face
+											20, 21, 22, // top face
+											21, 20, 23  // top face			
+};    
+
+void Renderer::ConvertHdrMapToCubemap() {
+	// convert HDR equirectangular environment map to cubemap equivalent
+    //--------------------------------------------------------------------------
+	cubeProgram.Run();
+	cubeProgram.SetUniform("equirectangularMap", 0);
+    cubeProgram.SetUniform("projection", skyBoxHDR.captureProjection);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, skyBoxHDR.GetDescriptor());
+
+    glViewport(0, 0, 1024, 1024); // configure the viewport to the capture dimensions.
+    glBindFramebuffer(GL_FRAMEBUFFER, skyBoxHDR.captureFBO);
+    for (unsigned int i = 0; i < 6; ++i)
+    {
+        cubeProgram.SetUniform("view", skyBoxHDR.captureViews[i]);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, skyBoxHDR.envCubemap, 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        //render cube
+		GLCall(glBindVertexArray(cubeVAO));
+		GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIBO)); 
+		GLCall(glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, NULL));
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//--------------------------------------------------------------------------
+}
+
 void Renderer::Init() {
 	GLCall(glViewport(0, 0, width, height));
 	mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
@@ -45,28 +118,63 @@ void Renderer::Init() {
 	GLCall(glVertexAttribPointer(1, 2, GL_FLOAT,GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat))));
 	GLCall(glEnableVertexAttribArray(1)); 
 
-	std::array<std::string, 6> fileNames = { "textures/skybox1/front.tga",
- 											 "textures/skybox1/back.tga",
- 											 "textures/skybox1/up.tga",
+	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
 
- 											 "textures/skybox1/down.tga",
- 											 "textures/skybox1/right.tga",
- 											 "textures/skybox1/left.tga"
- 											 };
+	// create shader program, vao, vbo, ibo for cubemap
+	//--------------------------------------------------------------------------
+	cubeMapSources[GL_VERTEX_SHADER] = "glsl/equirectangular_to_cubemap_vertex.glsl";
+ 	cubeMapSources[GL_FRAGMENT_SHADER] = "glsl/equirectangular_to_cubemap_pixel.glsl";
+	cubeProgram.Init(cubeMapSources);
+ 	cubeProgram.Compile();
+ 	cubeProgram.Link();
+	cubeProgram.DeleteShaders();
 
- 	skyBox.Load(fileNames);
+	GLCall(glGenVertexArrays(1, &cubeVAO));
+	GLCall(glBindVertexArray(cubeVAO));
+
+    GLCall(glGenBuffers(1, &cubeVBO));
+    GLCall(glBindBuffer(GL_ARRAY_BUFFER, cubeVBO));
+    GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW));
+    
+	GLCall(glGenBuffers(1, &cubeIBO));
+	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIBO)); 
+	GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_indices), cube_indices, GL_STATIC_DRAW));
+
+    GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0));
+	GLCall(glEnableVertexAttribArray(0));
+    GLCall(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat))));
+    GLCall(glEnableVertexAttribArray(1));
+	GLCall(glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat))));
+    GLCall(glEnableVertexAttribArray(2));
+
+	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
+	//--------------------------------------------------------------------------
+
 
 	program.Run();
 	program.SetUniform("skyBox", 0);
+ 	skyBox.Load(skyBox.orbital);
+
+	skyBoxHDR.LoadHDR(skyBoxHDR.winterForestHDR);
+	//skyBox.LoadHDR(skyBox.winterForestHDR);
+	ConvertHdrMapToCubemap();
+	
 }
 
 void Renderer::Render(int width, int height) {
 	GLCall(glViewport(0, 0, width, height));
+	glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL); // set depth function to less than AND equal for skybox depth trick.
+
+	//---------------------------change size of window--------------------------
 	if (InputSystem::isWindowSizeChange) {
 		FBO.Resize(width, height);
 		this->width = width;
 		this->height = height;
 	}
+	//--------------------------------------------------------------------------
 	
 	FBO.Bind();
 	glm::mat4 view = camera->GetViewMatrix();
@@ -74,24 +182,50 @@ void Renderer::Render(int width, int height) {
 	Update();
 
 	program.Run();
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, skyBox.GetDescriptor());
-
+	//-------------set general parameters and light parameters------------------ 
 	program.SetUniform("View", view);
 	program.SetUniform("iResolution", glm::vec2(width, height));
 	program.SetUniform("fieldOfView", fov);
+	program.SetUniform("Time", (float)glfwGetTime());
 
 	program.SetUniform("lightDirection", fractalsParameters.light_direction);
 	program.SetUniform("ambientLightColor", fractalsParameters.ambient_light_color);
 	program.SetUniform("diffuseLightColor", fractalsParameters.diffuse_light_color);
 	program.SetUniform("specularLightColor", fractalsParameters.specular_light_color);
+	//--------------------------------------------------------------------------
 
+	//-------------------------set background type------------------------------
+	switch(fractalsParameters.background_type) {
+        case BackgroundType::Solid: {
+			program.SetUniform("reflectedColor", fractalsParameters.background_color);
+            break;
+        }
+        case BackgroundType::Skybox: {
+			//program.Run();
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, skyBox.GetDescriptor());
+			//glBindTexture(GL_TEXTURE_CUBE_MAP, skyBox.envCubemap);
+            break;
+        }
+		case BackgroundType::SkyboxHDR: {
+			//program.Run();
+			glActiveTexture(GL_TEXTURE0);
+			//glBindTexture(GL_TEXTURE_CUBE_MAP, skyBox.GetDescriptor());
+			glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxHDR.envCubemap);
+            break;
+        }
+    }
+	//--------------------------------------------------------------------------
+	
+	//---------------------------set fractal color------------------------------
 	program.SetUniform("ambientColor", fractalsParameters.ambient_fractal_color);
 	program.SetUniform("diffuseColor", fractalsParameters.diffuse_fractal_color);
 	program.SetUniform("specularColor", fractalsParameters.specular_fractal_color);
 	program.SetUniform("shininess", fractalsParameters.shininess);
 	program.SetUniform("reflection", fractalsParameters.reflection);
+	//--------------------------------------------------------------------------
 
+	//-------------------------set fractal parameters---------------------------
 	switch(currentFractalType) {
         case FractalType::Test: {
             
@@ -104,16 +238,14 @@ void Renderer::Render(int width, int height) {
             break;
         }
     }
+	//--------------------------------------------------------------------------
 
-	//program.SetUniform("iResolution", glm::vec2(width, height));
-	//program.SetUniform("fieldOfView", fov);
-	//program.SetUniform("View", view);
-
-	program.SetUniform("Time", (float)glfwGetTime());
-
-	GLCall(glBindVertexArray(VAO));
+	//---------------------------draw fractal-----------------------------------
+	GLCall(glBindVertexArray(VAO)); 
 	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO)); 
 	GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL));
+	//--------------------------------------------------------------------------
+
 	FBO.Unbind();
 }
 

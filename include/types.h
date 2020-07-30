@@ -6,4 +6,20 @@ enum FractalType {
         Mandelbulb,
 };
 
+enum BackgroundType {
+        Solid,
+        Skybox,
+        SkyboxHDR,
+};
+
+enum SkyboxTexture {
+        Orbital,
+        Night,
+};
+
+enum SkyboxTextureHDR {
+        WinterForest,
+        Milkyway,
+};
+
 #endif

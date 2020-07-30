@@ -28,7 +28,8 @@ void Camera::Update() {
 }
 
 void Camera::UpdatePosition(const float& delta) {
-/*
+    //----------------------------old---------------------------------
+    /*
     if (InputSystem::keys[GLFW_KEY_W]) {
         position += front*delta*speed;
     }
@@ -47,7 +48,10 @@ void Camera::UpdatePosition(const float& delta) {
     if (InputSystem::keys[GLFW_KEY_LEFT_SHIFT]) {
         position += -up*delta*speed;
     }
-*/
+    */
+    //----------------------------------------------------------------
+
+
     
     position += front*delta*speed*(float)InputSystem::scrollOffsetY;
     InputSystem::scrollOffsetY = 0.0;
@@ -67,7 +71,9 @@ void Camera::UpdatePosition(const float& delta) {
 }
 
 void Camera::UpdateVectors(const float& delta) {
-/*
+
+    //----------------------------old---------------------------------
+    /*
     if (InputSystem::mouse[LeftButton]) {
         yaw += InputSystem::deltaCursPosX*mouse_sense;
         pitch += InputSystem::deltaCursPosY*mouse_sense;
@@ -87,7 +93,10 @@ void Camera::UpdateVectors(const float& delta) {
         InputSystem::deltaCursPosX = 0.0f;
         InputSystem::deltaCursPosY = 0.0f;
     }
-*/
+    */
+    //----------------------------------------------------------------
+
+
     front = glm::normalize(-position);
     right = glm::normalize(glm::cross(front, glm::vec3(0.0f, 1.0f, 0.0f)));
     up = glm::normalize(glm::cross(right, front));

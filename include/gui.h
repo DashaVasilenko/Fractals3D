@@ -52,6 +52,16 @@ private:
     bool soft_shadows = false;
     bool ambient_occlusion = false;
 
+    const char* background_types[3] = { "Solid color", "Texture", "HDRTexture" };
+    int current_background_type = 1; // If the selection isn't within 0..count, Combo won't display a preview
+    float background_color[3] = { 0.30, 0.36, 0.60 };
+
+    const char* skybox_texture[2] = { "Orbital", "Night" };
+    int current_skybox_texture = 0;
+
+    const char* skybox_texture_hdr[2] = { "WinterForest", "Milkyway" };
+    int current_skybox_texture_hdr = 0;
+
     ExportType currentExportType = ExportType::Png;
     FractalType currentFractalType = FractalType::Test;
 
