@@ -107,7 +107,7 @@ void SkyBoxHDR::LoadHDR(const std::string& fileName) {
 // reload the HDR environment map
 //
 void SkyBoxHDR::ReloadHDR(const std::string& fileName) {
-    std::cout << fileName.c_str() << std::endl;
+    //std::cout << fileName.c_str() << std::endl;
     stbi_set_flip_vertically_on_load(true);
     int width, height, nrComponents;
     float *data = stbi_loadf(fileName.c_str(), &width, &height, &nrComponents, 0);

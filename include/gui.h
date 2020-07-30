@@ -6,6 +6,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
+#include <array>
 
 #include "renderer.h"
 #include "framebuffer.h"
@@ -39,9 +40,9 @@ private:
     const char* background_types[3] = { "Solid color", "Texture", "HDRTexture" };
     int current_background_type = 1; // If the selection isn't within 0..count, Combo won't display a preview
     float background_color[3] = { 0.30, 0.36, 0.60 };
-    const char* skybox_texture[2] = { "Orbital", "Night" };
+    const char* skybox_texture[3] = { "Orbital", "Night", "Other" };
     int current_skybox_texture = 0;
-    const char* skybox_texture_hdr[3] = { "WinterForest", "Milkyway", "Other" };
+    const char* skybox_texture_hdr[3] = { "WinterForest", "Milkyway", "OtherHDR" };
     int current_skybox_texture_hdr = 0;
 
     // general fractal parameters
@@ -70,9 +71,23 @@ private:
 
     // setup new HDR skybox
     ImGui::FileBrowser fileBrowserSetupSkyboxHDR = ImGui::FileBrowser(ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
-    std::string skybox_hdr_path = std::filesystem::current_path().u8string() + "/";
+    std::string skybox_hdr_path = "/" + std::filesystem::current_path().u8string() + "/textures/Milkyway/Milkyway_small.hdr";
     std::string skybox_hdr_root = "";
     std::string skybox_hdr_name = "";
+
+    // setup new skybox (6 textures)
+    CubemapSide cubemapSide;
+    ImGui::FileBrowser fileBrowserSetupSkybox = ImGui::FileBrowser(ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
+    std::string path = "/" + std::filesystem::current_path().u8string();
+    std::array<std::string, 6> skybox_paths = { path + "/textures/error.jpg",
+                                                path + "/textures/error.jpg",
+                                                path + "/textures/error.jpg",
+                                                path + "/textures/error.jpg",
+                                                path + "/textures/error.jpg",
+                                                path + "/textures/error.jpg"    
+    };
+    std::array<std::string, 6> skybox_roots;
+    std::array<std::string, 6> skybox_names;
 
     // Other
     ImGuiWindowFlags parametersWindowFlags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse ;
@@ -93,6 +108,7 @@ private:
     void FractalParameters();
     void ExportAs();
     void FileBrowserExport();
+    void FileBrowserSetupSkybox();
     void FileBrowserSetupSkyboxHDR();
 
     void Test();

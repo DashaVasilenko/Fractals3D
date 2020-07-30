@@ -42,6 +42,11 @@ public:
         }
     }
 
+    void SetSkyboxTexture(std::array<std::string, 6>& paths) { 
+        renderer->fractalsParameters.skybox_texture = SkyboxTexture::Other;  // это возможно вообще надо удалить и в рендерере тоже
+        skybox->Reload(paths);
+    }
+
     void SetSkyboxTextureHDR(SkyboxTextureHDR skyboxTextureHDR) { 
         renderer->fractalsParameters.skybox_texture_hdr = skyboxTextureHDR; 
         switch(skyboxTextureHDR) {
@@ -59,8 +64,8 @@ public:
     }
 
     void SetSkyboxTextureHDR(std::string path) { 
-        std::cout << path.c_str() << std::endl;
-        renderer->fractalsParameters.skybox_texture_hdr = SkyboxTextureHDR::Other; 
+        //std::cout << path.c_str() << std::endl;
+        renderer->fractalsParameters.skybox_texture_hdr = SkyboxTextureHDR::OtherHDR; // это возможно вообще надо удалить и в рендерере тоже
         skyboxHDR->ReloadHDR(path);
         renderer->ConvertHdrMapToCubemap();        
     }
