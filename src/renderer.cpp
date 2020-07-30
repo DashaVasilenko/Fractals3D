@@ -1,17 +1,15 @@
 #include "renderer.h"
 #include "inputSystem.h"
 
-const GLfloat Renderer::vertices[20] = {
-    -1.0f,  1.0f, 0.0f, 1.0f, 0.0f,
-     1.0f,  1.0f, 0.0f, 0.0f, 0.0f,
-     1.0f, -1.0f, 0.0f, 1.0f, 1.0f,
-	-1.0f, -1.0f, 0.0f, 0.0f, 1.0f	
-	}; 
+const GLfloat Renderer::vertices[20] = {  -1.0f,  1.0f, 0.0f, 1.0f, 0.0f,
+    									   1.0f,  1.0f, 0.0f, 0.0f, 0.0f,
+    									   1.0f, -1.0f, 0.0f, 1.0f, 1.0f,
+										  -1.0f, -1.0f, 0.0f, 0.0f, 1.0f	
+}; 
  
-const GLuint Renderer::indices[6] = {
-	                	0, 1, 2,
-	                	0, 2, 3
-	                };
+const GLuint Renderer::indices[6] = {  0, 1, 2,
+	                				   0, 2, 3
+};
 
 const GLfloat Renderer::cube_vertices[192] = {  // back face
             									-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left 0
@@ -45,7 +43,6 @@ const GLfloat Renderer::cube_vertices[192] = {  // back face
              									-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left 23        
 };
 
-// кубик индексы вершин для треугольников
 const GLuint Renderer::cube_indices[36] = { 0, 1, 2,    // back face
 											1, 0, 3,    // back face
 											4, 5, 6,    // front face
@@ -60,30 +57,31 @@ const GLuint Renderer::cube_indices[36] = { 0, 1, 2,    // back face
 											21, 20, 23  // top face			
 };    
 
+//--------------------------------------------------------------------------
+// convert HDR equirectangular environment map to cubemap equivalent
+//
 void Renderer::ConvertHdrMapToCubemap() {
-	// convert HDR equirectangular environment map to cubemap equivalent
-    //--------------------------------------------------------------------------
 	cubeProgram.Run();
 	cubeProgram.SetUniform("equirectangularMap", 0);
-    cubeProgram.SetUniform("projection", skyBoxHDR.captureProjection);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, skyBoxHDR.GetDescriptor());
+    cubeProgram.SetUniform("projection", skyBoxHDR.GetProjection());
+    GLCall(glActiveTexture(GL_TEXTURE0));
+    GLCall(glBindTexture(GL_TEXTURE_2D, skyBoxHDR.GetDescriptor()));
 
-    glViewport(0, 0, 1024, 1024); // configure the viewport to the capture dimensions.
-    glBindFramebuffer(GL_FRAMEBUFFER, skyBoxHDR.captureFBO);
-    for (unsigned int i = 0; i < 6; ++i)
-    {
-        cubeProgram.SetUniform("view", skyBoxHDR.captureViews[i]);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, skyBoxHDR.envCubemap, 0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    GLCall(glViewport(0, 0, 1024, 1024)); // configure the viewport to the capture dimensions.
+    GLCall(glBindFramebuffer(GL_FRAMEBUFFER, skyBoxHDR.GetFBO()));
+
+	glm::mat4* views = skyBoxHDR.GetView();
+    for (unsigned int i = 0; i < 6; ++i) {
+		cubeProgram.SetUniform("view", views[i]);
+        GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, skyBoxHDR.GetCubemap(), 0));
+        GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
         //render cube
 		GLCall(glBindVertexArray(cubeVAO));
 		GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIBO)); 
 		GLCall(glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, NULL));
     }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//--------------------------------------------------------------------------
+    GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 }
 
 void Renderer::Init() {
@@ -121,8 +119,7 @@ void Renderer::Init() {
 	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
 
-	// create shader program, vao, vbo, ibo for cubemap
-	//--------------------------------------------------------------------------
+	//-------------create shader program, vao, vbo, ibo for cubemap-------------
 	cubeMapSources[GL_VERTEX_SHADER] = "glsl/equirectangular_to_cubemap_vertex.glsl";
  	cubeMapSources[GL_FRAGMENT_SHADER] = "glsl/equirectangular_to_cubemap_pixel.glsl";
 	cubeProgram.Init(cubeMapSources);
@@ -152,21 +149,17 @@ void Renderer::Init() {
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
 	//--------------------------------------------------------------------------
 
-
 	program.Run();
 	program.SetUniform("skyBox", 0);
  	skyBox.Load(skyBox.orbital);
-
 	skyBoxHDR.LoadHDR(skyBoxHDR.winterForestHDR);
-	//skyBox.LoadHDR(skyBox.winterForestHDR);
-	ConvertHdrMapToCubemap();
-	
+	ConvertHdrMapToCubemap();	
 }
 
 void Renderer::Render(int width, int height) {
 	GLCall(glViewport(0, 0, width, height));
-	glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL); // set depth function to less than AND equal for skybox depth trick.
+	GLCall(glEnable(GL_DEPTH_TEST));
+    GLCall(glDepthFunc(GL_LEQUAL)); // set depth function to less than AND equal for skybox depth trick.
 
 	//---------------------------change size of window--------------------------
 	if (InputSystem::isWindowSizeChange) {
@@ -201,17 +194,13 @@ void Renderer::Render(int width, int height) {
             break;
         }
         case BackgroundType::Skybox: {
-			//program.Run();
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, skyBox.GetDescriptor());
-			//glBindTexture(GL_TEXTURE_CUBE_MAP, skyBox.envCubemap);
+			GLCall(glActiveTexture(GL_TEXTURE0));
+			GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, skyBox.GetDescriptor()));
             break;
         }
 		case BackgroundType::SkyboxHDR: {
-			//program.Run();
-			glActiveTexture(GL_TEXTURE0);
-			//glBindTexture(GL_TEXTURE_CUBE_MAP, skyBox.GetDescriptor());
-			glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxHDR.envCubemap);
+			GLCall(glActiveTexture(GL_TEXTURE0));
+			GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxHDR.GetCubemap()));
             break;
         }
     }

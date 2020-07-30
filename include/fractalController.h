@@ -52,11 +52,17 @@ public:
             }
             case SkyboxTextureHDR::Milkyway: {
                 skyboxHDR->ReloadHDR(skyboxHDR->milkywayHDR);
-                std::cout << "Hey Controller!" << std::endl;
                 renderer->ConvertHdrMapToCubemap();
                 break;
             }
         }
+    }
+
+    void SetSkyboxTextureHDR(std::string path) { 
+        std::cout << path.c_str() << std::endl;
+        renderer->fractalsParameters.skybox_texture_hdr = SkyboxTextureHDR::Other; 
+        skyboxHDR->ReloadHDR(path);
+        renderer->ConvertHdrMapToCubemap();        
     }
 
     void SetAmbientFractalColor(const glm::vec3& c) { renderer->fractalsParameters.ambient_fractal_color = c; }

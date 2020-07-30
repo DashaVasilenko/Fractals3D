@@ -53,17 +53,17 @@ SkyBox::~SkyBox() {
 } 
 
 //-------------------------------------------------------------------------------------------------
-//
-//
+// initialization
+// setup framebuffer, load the HDR environment map, setup and attach cubemap
 void SkyBoxHDR::LoadHDR(const std::string& fileName) {
     // ----------------------------setup framebuffer----------------------------
-    GLCall(glGenFramebuffers(1, &captureFBO));
-    GLCall(glGenRenderbuffers(1, &captureRBO));
+    GLCall(glGenFramebuffers(1, &FBO));
+    GLCall(glGenRenderbuffers(1, &RBO));
 
-    GLCall(glBindFramebuffer(GL_FRAMEBUFFER, captureFBO));
-    GLCall(glBindRenderbuffer(GL_RENDERBUFFER, captureRBO));
+    GLCall(glBindFramebuffer(GL_FRAMEBUFFER, FBO));
+    GLCall(glBindRenderbuffer(GL_RENDERBUFFER, RBO));
     GLCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 1024, 1024));
-    GLCall(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO));
+    GLCall(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, RBO));
     //--------------------------------------------------------------------------
 
     //----------------------load the HDR environment map------------------------
@@ -80,11 +80,11 @@ void SkyBoxHDR::LoadHDR(const std::string& fileName) {
         GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
         GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
 
-        //stbi_image_free(data); раньше удалялось тут ???  скорее всего, надо и там, и там удалять
+        stbi_image_free(data); 
     }
     else {
         std::cout << "Failed to load HDR image." << std::endl;
-        stbi_image_free(data); // а тут наоборот не удалялось ???
+        stbi_image_free(data); 
     }  
     //--------------------------------------------------------------------------
 
@@ -103,14 +103,14 @@ void SkyBoxHDR::LoadHDR(const std::string& fileName) {
 
 }
 
+//-------------------------------------------------------------------------------------------------
+// reload the HDR environment map
+//
 void SkyBoxHDR::ReloadHDR(const std::string& fileName) {
-    //----------------------load the HDR environment map------------------------
     std::cout << fileName.c_str() << std::endl;
-    std::cout << "Hey!" << std::endl;
     stbi_set_flip_vertically_on_load(true);
     int width, height, nrComponents;
     float *data = stbi_loadf(fileName.c_str(), &width, &height, &nrComponents, 0);
-    std::cout << "Hey!" << std::endl;
     if (data) {
         GLCall(glBindTexture(GL_TEXTURE_2D, descriptor));
 
@@ -126,7 +126,6 @@ void SkyBoxHDR::ReloadHDR(const std::string& fileName) {
         std::cout << "Failed to load HDR image." << std::endl;
         stbi_image_free(data); 
     }  
-    //--------------------------------------------------------------------------
 }
 
 SkyBoxHDR::~SkyBoxHDR() {

@@ -7,8 +7,6 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-//#include <glm/gtx/quaternion.hpp>
-//#include <glm/gtc/type_ptr.hpp>
 
 #include "stb_image.h"
 #include "errors.h"
@@ -51,12 +49,21 @@ public:
     void ReloadHDR(const std::string& fileName);
 
     unsigned int GetDescriptor() { return descriptor; }
+	unsigned int GetFBO() { return FBO; }
+    unsigned int GetRBO() { return RBO; }
+    unsigned int GetCubemap() { return envCubemap; }
+	glm::mat4 GetProjection() { return projection; }
+	glm::mat4* GetView() { return views; }
+
     ~SkyBoxHDR();
 
-	// pbr: set up projection and view matrices for capturing data onto the 6 cubemap face directions
-    // ----------------------------------------------------------------------------------------------
-	glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
-    glm::mat4 captureViews[6] =
+	const std::string winterForestHDR = "textures/WinterForest/WinterForest_Ref.hdr";
+	const std::string milkywayHDR = "textures/Milkyway/Milkyway_small.hdr";
+
+private:
+	// projection and view matrices for capturing data onto the 6 cubemap face directions
+	glm::mat4 projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+	glm::mat4 views[6] =
     {
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
@@ -66,23 +73,11 @@ public:
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
     };
 
-	unsigned int captureFBO;
-    unsigned int captureRBO;
-	unsigned int envCubemap;
-
-	const std::string winterForestHDR = "textures/WinterForest/WinterForest_Ref.hdr";
-	const std::string milkywayHDR = "textures/Milkyway/Milkyway_small.hdr";
-
-
-private:
-	// pbr: set up projection and view matrices for capturing data onto the 6 cubemap face directions
-    // ----------------------------------------------------------------------------------------------
-
     unsigned int descriptor;
 
-	//unsigned int captureFBO;
-    //unsigned int captureRBO;
-	//unsigned int envCubemap;
+	unsigned int FBO;
+    unsigned int RBO;
+	unsigned int envCubemap;
 
 };
 

@@ -1,6 +1,14 @@
 #ifndef __TYPES__
 #define __TYPES__
 
+enum ExportType {
+        Png,
+        Bmp,
+        Jpg,
+        Tga,
+        //Obj,
+};
+
 enum FractalType {
         Test,
         Mandelbulb,
@@ -20,6 +28,7 @@ enum SkyboxTexture {
 enum SkyboxTextureHDR {
         WinterForest,
         Milkyway,
+        Other,
 };
 
 #endif

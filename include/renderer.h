@@ -20,7 +20,6 @@ public:
     SkyBox* GetSkybox() { return &skyBox; }
     SkyBoxHDR* GetSkyboxHDR() { return &skyBoxHDR; }
 
-
     void ConvertHdrMapToCubemap();
 
     void Init();
@@ -36,9 +35,6 @@ private:
 
     static const GLfloat vertices[20];
 	static const GLuint indices[6];
-
-    int width;
-    int height;
 
     struct FractalsParameters {
         glm::vec3 light_direction = { 0.0f, -1.0f, 0.0f };
@@ -65,6 +61,8 @@ private:
     FractalsParameters fractalsParameters;
 
     FractalType currentFractalType = FractalType::Test;
+    SkyBox skyBox;
+    SkyBoxHDR skyBoxHDR;
 
     std::map<GLenum, std::string> mapSources;
     ShaderProgram program;
@@ -79,10 +77,10 @@ private:
     GLuint cubeVBO;
     GLuint cubeIBO;
 
-    SkyBox skyBox;
-    SkyBoxHDR skyBoxHDR;
-
     Camera* camera;
+
+    int width;
+    int height;
 };
  
 #endif /* End of __RENDERER__ */ 

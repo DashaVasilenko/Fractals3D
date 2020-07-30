@@ -71,6 +71,18 @@ void Gui::FileBrowserExport() {
     }
 }
 
+void Gui::FileBrowserSetupSkyboxHDR() {
+    fileBrowserSetupSkyboxHDR.Display();
+    if(fileBrowserSetupSkyboxHDR.HasSelected()) {
+        skybox_hdr_path = fileBrowserSetupSkyboxHDR.GetSelected().relative_path().u8string();
+        skybox_hdr_root = fileBrowserSetupSkyboxHDR.GetSelected().root_path().u8string();
+        skybox_hdr_name = fileBrowserSetupSkyboxHDR.GetSelected().filename().u8string();
+
+        fileBrowserSetupSkyboxHDR.ClearSelected();
+        fileBrowserSetupSkyboxHDR.Close();
+    }
+}
+
 void Gui::Init(Window* window, FractalController* fr) {
     this->window = window;
     this->fractalController = fr;
@@ -93,6 +105,7 @@ void Gui::Init(Window* window, FractalController* fr) {
     ImGui_ImplOpenGL3_Init(glsl_version);    
 
     fileBrowserSaveImage.SetTitle("Save image as..");
+    fileBrowserSetupSkyboxHDR.SetTitle("Setup HDR skybox");
     //std::vector<const char*> image_filter = { ".png", ".jpg", ".jpeg", ".bmp", ".tga", ".hdr", ".obj" };
     //fileBrowserSaveImage.SetTypeFilters(image_filter);
  
@@ -255,28 +268,25 @@ void Gui::MainParameters() {
     uint32_t shaderParameters = 0; 
     bool flag = false;
 
-    if (ImGui::Checkbox("Hard shadows", &hard_shadows)) {
-        flag = true;
-    }
+    //--------------------------AO and shadows---------------------------
+    if (ImGui::Checkbox("Hard shadows", &hard_shadows)) { flag = true; }
     if (hard_shadows) {
         shaderParameters = 1 << 1;
         soft_shadows = false;
     }
 
-    if (ImGui::Checkbox("Soft shadows", &soft_shadows)) {
-        flag = true;
-    }
+    if (ImGui::Checkbox("Soft shadows", &soft_shadows)) { flag = true; }
     if (soft_shadows) {
         shaderParameters = 1 << 2;
         hard_shadows = false;
     }
 
-    if (ImGui::Checkbox("Ambient occlusion", &ambient_occlusion)) {
-        flag = true;
-    }
+    if (ImGui::Checkbox("Ambient occlusion", &ambient_occlusion)) { flag = true; }
     if (ambient_occlusion) 
         shaderParameters |= 1 << 3;
+    //-------------------------------------------------------------------
 
+    //--------------------------Light parameters-------------------------
     ImGui::Separator();
     ImGui::Text("Light parameters:");
     ImGui::Separator();
@@ -295,11 +305,12 @@ void Gui::MainParameters() {
     if (ImGui::ColorEdit3("Specular color", specular_light_color)) {
         fractalController->SetSpecularLightColor(glm::vec3(specular_light_color[0], specular_light_color[1], specular_light_color[2]));
     }
+    //-------------------------------------------------------------------
 
-
+    //---------------------Background parameters-------------------------
     ImGui::Separator();
     ImGui::Text("Background parameters:");
-    ImGui::Separator();
+    ImGui::SameLine();
     if (ImGui::Combo("", &current_background_type, background_types, IM_ARRAYSIZE(background_types))) {
         flag = true;
         if (current_background_type == 0) {
@@ -312,27 +323,44 @@ void Gui::MainParameters() {
             fractalController->SetBackgroundType(BackgroundType::SkyboxHDR);
         }
     }
+    ImGui::Separator();
     if (current_background_type == 0) {
         if (ImGui::ColorEdit3("Color", background_color)) {
             fractalController->SetBackgroundColor(glm::vec3(background_color[0], background_color[1], background_color[2]));
         }
     }
     if (current_background_type == 1) {
-        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 50.0f);
         if (ImGui::Combo("Texture", &current_skybox_texture, skybox_texture, IM_ARRAYSIZE(skybox_texture))) {
             fractalController->SetSkyboxTexture(static_cast<SkyboxTexture>(current_skybox_texture));
         }
         
     }
     if (current_background_type == 2) {
-        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 50.0f);
         if (ImGui::Combo("HDR Texture", &current_skybox_texture_hdr, skybox_texture_hdr, IM_ARRAYSIZE(skybox_texture_hdr))) {
-            fractalController->SetSkyboxTextureHDR(static_cast<SkyboxTextureHDR>(current_skybox_texture_hdr));
+            if (static_cast<SkyboxTextureHDR>(current_skybox_texture_hdr) != SkyboxTextureHDR::Other)
+                fractalController->SetSkyboxTextureHDR(static_cast<SkyboxTextureHDR>(current_skybox_texture_hdr));
         }
-        
-    }
-    ImGui::Separator();
 
+        if (static_cast<SkyboxTextureHDR>(current_skybox_texture_hdr) == SkyboxTextureHDR::Other) {
+            if (ImGui::Button("File name:")) {
+                fileBrowserSetupSkyboxHDR.Open();
+            }
+            ImGui::SameLine();
+            ImGui::Text((skybox_hdr_root + "..." + skybox_hdr_name).c_str());
+
+            if (ImGui::Button("Use")) {
+                fractalController->SetSkyboxTextureHDR("/" + skybox_hdr_path);
+            }
+        }
+
+    }
+    
+    
+    
+    //-------------------------------------------------------------------
+
+    //--------------------------Type of fractal--------------------------
+    ImGui::Separator();
     if (ImGui::BeginMenu("Type of fractal:")) {
         if (ImGui::MenuItem("Test")) {
             currentFractalType = FractalType::Test;
@@ -359,6 +387,7 @@ void Gui::MainParameters() {
             break;
         }
     }
+    //-------------------------------------------------------------------
     
     if (flag) {
         program->SetShaderParameters(shaderParameters);
@@ -438,8 +467,6 @@ void Gui::Mandelbulb() {
 
     ImGui::End();
 }
-
-
 
 void Gui::ExportAs() {
     std::string name; 
@@ -610,6 +637,7 @@ void Gui::Update() {
         ExportAs();
         
         FileBrowserExport();
+        FileBrowserSetupSkyboxHDR();
 
 		// Rendering
         ImGui::Render();
