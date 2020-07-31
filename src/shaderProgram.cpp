@@ -40,10 +40,14 @@ void ShaderProgram::Load() {
             break;
         }
         case BackgroundType::SkyboxHDR: {
-            defines += "#define SKYBOX_BACKGROUND" + std::string("\n");
+            defines += "#define SKYBOX_BACKGROUND_HDR" + std::string("\n");
+            //if (irradianceCubemap) 
+            //    defines += "#define IRRADIANCE_CUBEMAP" + std::string("\n");
             break;
         }
     }
+    if (irradianceCubemap) 
+        defines += "#define IRRADIANCE_CUBEMAP" + std::string("\n");
     //std::cout << currentBackgroundType << std::endl;
     //std::cout << currentFractalType << std::endl;
     

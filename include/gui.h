@@ -38,12 +38,13 @@ private:
 
     // background parameters
     const char* background_types[3] = { "Solid color", "Texture", "HDRTexture" };
-    int current_background_type = 1; // If the selection isn't within 0..count, Combo won't display a preview
+    int current_background_type = 2; // If the selection isn't within 0..count, Combo won't display a preview
     float background_color[3] = { 0.30, 0.36, 0.60 };
     const char* skybox_texture[3] = { "Orbital", "Night", "Other" };
     int current_skybox_texture = 0;
     const char* skybox_texture_hdr[3] = { "WinterForest", "Milkyway", "OtherHDR" };
     int current_skybox_texture_hdr = 0;
+    bool irradiance_cubemap = true;
 
     // general fractal parameters
     bool hard_shadows = false;

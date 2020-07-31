@@ -60,7 +60,7 @@ void SkyBoxHDR::LoadHDR(const std::string& fileName) {
     // ----------------------------setup framebuffer----------------------------
     GLCall(glGenFramebuffers(1, &FBO));
     GLCall(glGenRenderbuffers(1, &RBO));
-
+ 
     GLCall(glBindFramebuffer(GL_FRAMEBUFFER, FBO));
     GLCall(glBindRenderbuffer(GL_RENDERBUFFER, RBO));
     GLCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, size, size));

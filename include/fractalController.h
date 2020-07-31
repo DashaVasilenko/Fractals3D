@@ -67,6 +67,11 @@ public:
         }
     }
 
+    void SetIrradianceMap(bool irradianceMap) {
+        renderer->fractalsParameters.irradianceCubemap = irradianceMap;
+        program->SetIrradianceCubemap(irradianceMap);
+    }
+
     void SetSkyboxTextureHDR(std::string path) { 
         //std::cout << path.c_str() << std::endl;
         renderer->fractalsParameters.skybox_texture_hdr = SkyboxTextureHDR::OtherHDR; // это возможно вообще надо удалить и в рендерере тоже

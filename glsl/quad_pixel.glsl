@@ -13,8 +13,12 @@ out vec4 outColor;
 uniform vec2 iResolution; 
 uniform float fieldOfView;
 
-#ifdef SKYBOX_BACKGROUND
+#if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
     uniform samplerCube skyBox; // сэмплер для кубической карты
+#endif
+
+#if defined SKYBOX_BACKGROUND_HDR && defined IRRADIANCE_CUBEMAP
+//#ifdef IRRADIANCE_CUBEMAP
     uniform samplerCube irradianceMap; // освещенность из кубмапы
 #endif
 
@@ -318,7 +322,8 @@ vec4 PhongDirectionLight(vec3 ambientColor, vec3 diffuseColor, vec3 specularColo
     vec3 specular = specularLightColor*specularColor*pow(max(dot(inEye, reflected_light), 0.0), shininess);
     vec3 color = ambient + diffuse + specular;
 
-#ifdef SKYBOX_BACKGROUND
+#if defined SKYBOX_BACKGROUND_HDR && defined IRRADIANCE_CUBEMAP
+//#ifdef IRRADIANCE_CUBEMAP
     // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
     // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
     vec3 F0 = vec3(0.04); 
@@ -362,7 +367,7 @@ void main() {
     
     // Didn't hit anything
     if (dist > MAX_DIST - EPSILON) {
-#ifdef SKYBOX_BACKGROUND
+#if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
         outColor = texture(skyBox, dir);
 #endif
 
@@ -379,8 +384,7 @@ void main() {
     vec3 outNormal = computeNormal(point); // N
     vec3 reflected_dir = reflect(dir, outNormal); //R
 
-#ifdef SKYBOX_BACKGROUND
-//# if defined SKYBOX_BACKGROUND || SKYBOX_BACKGROUND_HDR
+#if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
     vec4 reflected_color = texture(skyBox, reflected_dir);
     outColor = outColor*(1.0 - reflection) + reflected_color*reflection;
 #endif

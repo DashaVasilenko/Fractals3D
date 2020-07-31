@@ -242,8 +242,11 @@ void Renderer::Render(int width, int height) {
 		case BackgroundType::SkyboxHDR: {
 			GLCall(glActiveTexture(GL_TEXTURE0));
 			GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxHDR.GetCubemap()));
-			GLCall(glActiveTexture(GL_TEXTURE1));
-			GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxHDR.GetIrradiance()));
+			//if (fractalsParameters.irradianceCubemap) {
+			//	program.SetUniform("irradianceMap", 1);
+				GLCall(glActiveTexture(GL_TEXTURE1));
+				GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxHDR.GetIrradiance()));
+			//}
             break;
         }
     }

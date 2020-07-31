@@ -25,6 +25,7 @@ public:
     void SetShaderParameters(uint32_t c) { shader_parameters = c; }
     void SetFractalType(FractalType c) { currentFractalType = c; }
     void SetBackgroundType(BackgroundType c) { currentBackgroundType = c; }
+    void SetIrradianceCubemap(bool c) { irradianceCubemap = c; }
 
     void SetUniform(const char* name, const glm::vec2&);
     void SetUniform(const char* name, const glm::vec3&);
@@ -50,7 +51,8 @@ private:
 
     uint32_t shader_parameters = 0;
     FractalType currentFractalType = FractalType::Test;
-    BackgroundType currentBackgroundType = BackgroundType::Skybox;
+    BackgroundType currentBackgroundType = BackgroundType::SkyboxHDR;
+    bool irradianceCubemap = true;
 };
 
 #endif /* End of __SHADERPROGRAM__ */

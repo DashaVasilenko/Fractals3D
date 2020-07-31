@@ -43,10 +43,11 @@ private:
         glm::vec3 diffuse_light_color = { 1.0, 1.0, 1.0 };
         glm::vec3 specular_light_color = { 1.0, 1.0, 1.0 };
 
-        BackgroundType background_type = BackgroundType::Skybox;
+        BackgroundType background_type = BackgroundType::SkyboxHDR;
         glm::vec3 background_color = { 0.30, 0.36, 0.60 };
         SkyboxTexture skybox_texture = SkyboxTexture::Orbital;
         SkyboxTextureHDR skybox_texture_hdr = SkyboxTextureHDR::WinterForest;
+        bool irradianceCubemap = true;
 
         glm::vec3 ambient_fractal_color = { 0.19225, 0.19225, 0.19225 };
         glm::vec3 diffuse_fractal_color = { 0.50754, 0.50754, 0.50754 };
