@@ -63,7 +63,7 @@ void SkyBoxHDR::LoadHDR(const std::string& fileName) {
 
     GLCall(glBindFramebuffer(GL_FRAMEBUFFER, FBO));
     GLCall(glBindRenderbuffer(GL_RENDERBUFFER, RBO));
-    GLCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 1024, 1024));
+    GLCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, size, size));
     GLCall(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, RBO));
     //--------------------------------------------------------------------------
 
@@ -93,7 +93,7 @@ void SkyBoxHDR::LoadHDR(const std::string& fileName) {
     GLCall(glGenTextures(1, &envCubemap));
     GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap));
     for (unsigned int i = 0; i < 6; ++i) {
-        GLCall(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 1024, 1024, 0, GL_RGB, GL_FLOAT, nullptr));
+        GLCall(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, size, size, 0, GL_RGB, GL_FLOAT, nullptr));
     }
     GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
     GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
@@ -111,7 +111,7 @@ void SkyBoxHDR::InitIrradianceCubemap() {
     GLCall(glGenTextures(1, &irradianceMap));
     GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap));
     for (unsigned int i = 0; i < 6; ++i) {
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 32, 32, 0, GL_RGB, GL_FLOAT, nullptr);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, irradianceMapSize, irradianceMapSize, 0, GL_RGB, GL_FLOAT, nullptr);
     }
     GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
     GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
@@ -121,7 +121,7 @@ void SkyBoxHDR::InitIrradianceCubemap() {
 
     GLCall(glBindFramebuffer(GL_FRAMEBUFFER, FBO));
     GLCall(glBindRenderbuffer(GL_RENDERBUFFER, RBO));
-    GLCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 32, 32));
+    GLCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, irradianceMapSize, irradianceMapSize));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -131,7 +131,7 @@ void SkyBoxHDR::ReloadHDR(const std::string& fileName) {
     // rescale FBO to environment cubemap scale
     GLCall(glBindFramebuffer(GL_FRAMEBUFFER, FBO));
     GLCall(glBindRenderbuffer(GL_RENDERBUFFER, RBO));
-    GLCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 1024, 1024));
+    GLCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, size, size));
     GLCall(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, RBO));
 
     //std::cout << fileName.c_str() << std::endl;
@@ -159,7 +159,7 @@ void SkyBoxHDR::ReloadIrradianceCubemap() {
     // rescale FBO to irradiance scale
     GLCall(glBindFramebuffer(GL_FRAMEBUFFER, FBO));
     GLCall(glBindRenderbuffer(GL_RENDERBUFFER, RBO));
-    GLCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 32, 32));
+    GLCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, irradianceMapSize, irradianceMapSize));
 }
 
 SkyBoxHDR::~SkyBoxHDR() {

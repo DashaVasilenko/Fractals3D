@@ -55,6 +55,8 @@ public:
 	unsigned int GetFBO() { return FBO; }
     unsigned int GetRBO() { return RBO; }
     unsigned int GetCubemap() { return envCubemap; }
+	unsigned int GetSize() { return size; }
+	unsigned int GetIrradianceMapSize() { return irradianceMapSize; }
 	glm::mat4 GetProjection() { return projection; }
 	glm::mat4* GetView() { return views; }
 
@@ -76,13 +78,15 @@ private:
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
     };
 
-    unsigned int descriptor;
-	unsigned int irradianceMap;
+	unsigned int size = 1024;
+	unsigned int irradianceMapSize = 32;
 
 	unsigned int FBO;
     unsigned int RBO;
 	unsigned int envCubemap;
 
+	unsigned int descriptor;
+	unsigned int irradianceMap;
 };
 
 #endif /* End of __SKYBOX__ */

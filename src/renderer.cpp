@@ -68,7 +68,7 @@ void Renderer::ConvertHdrMapToCubemap() {
     GLCall(glActiveTexture(GL_TEXTURE0));
     GLCall(glBindTexture(GL_TEXTURE_2D, skyBoxHDR.GetDescriptor()));
 
-    GLCall(glViewport(0, 0, 1024, 1024)); // configure the viewport to the capture dimensions.
+    GLCall(glViewport(0, 0, skyBoxHDR.GetSize(), skyBoxHDR.GetSize())); // configure the viewport to the capture dimensions.
     GLCall(glBindFramebuffer(GL_FRAMEBUFFER, skyBoxHDR.GetFBO()));
 
 	glm::mat4* views = skyBoxHDR.GetView();
@@ -96,7 +96,7 @@ void Renderer::CreateIrradianceCubeMap() {
     GLCall(glActiveTexture(GL_TEXTURE0));
 	GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxHDR.GetCubemap()));
 
-    GLCall(glViewport(0, 0, 32, 32)); // don't forget to configure the viewport to the capture dimensions.
+    GLCall(glViewport(0, 0, skyBoxHDR.GetIrradianceMapSize(), skyBoxHDR.GetIrradianceMapSize())); // don't forget to configure the viewport to the capture dimensions.
 	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, skyBoxHDR.GetFBO()));
 	glm::mat4* views = skyBoxHDR.GetView();
     for (unsigned int i = 0; i < 6; ++i) {
