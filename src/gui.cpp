@@ -84,14 +84,14 @@ void Gui::FileBrowserSetupSkyboxHDR() {
 }
 
 void Gui::FileBrowserSetupSkybox() {
-    fileBrowserSetupSkyboxHDR.Display();
-    if(fileBrowserSetupSkyboxHDR.HasSelected()) {
-        skybox_paths[static_cast<int>(cubemapSide)] = "/" + fileBrowserSetupSkyboxHDR.GetSelected().relative_path().u8string();
-        skybox_roots[static_cast<int>(cubemapSide)] = fileBrowserSetupSkyboxHDR.GetSelected().root_path().u8string();
-        skybox_names[static_cast<int>(cubemapSide)] = fileBrowserSetupSkyboxHDR.GetSelected().filename().u8string();
+    fileBrowserSetupSkybox.Display();
+    if(fileBrowserSetupSkybox.HasSelected()) {
+        skybox_paths[static_cast<int>(cubemapSide)] = "/" + fileBrowserSetupSkybox.GetSelected().relative_path().u8string();
+        skybox_roots[static_cast<int>(cubemapSide)] = fileBrowserSetupSkybox.GetSelected().root_path().u8string();
+        skybox_names[static_cast<int>(cubemapSide)] = fileBrowserSetupSkybox.GetSelected().filename().u8string();
 
-        fileBrowserSetupSkyboxHDR.ClearSelected();
-        fileBrowserSetupSkyboxHDR.Close();
+        fileBrowserSetupSkybox.ClearSelected();
+        fileBrowserSetupSkybox.Close();
     }
 }
 
@@ -351,54 +351,52 @@ void Gui::MainParameters() {
             
             if (ImGui::Button("Front(+Z):")) {
                 cubemapSide = CubemapSide::Front;
-                fileBrowserSetupSkyboxHDR.Open();
+                fileBrowserSetupSkybox.Open();
             }
             ImGui::SameLine();
-            ImGui::Text((skybox_roots[static_cast<int>(CubemapSide::Front)] + "..." + skybox_names[static_cast<int>(CubemapSide::Front)]).c_str());
+            ImGui::Text((skybox_roots[0] + "..." + skybox_names[0]).c_str());
 
             if (ImGui::Button("Back(-Z):")) {
                 cubemapSide = CubemapSide::Back;
-                fileBrowserSetupSkyboxHDR.Open();
+                fileBrowserSetupSkybox.Open();
             }
             ImGui::SameLine();
-            ImGui::Text((skybox_roots[static_cast<int>(CubemapSide::Back)] + "..." + skybox_names[static_cast<int>(CubemapSide::Back)]).c_str());
+            ImGui::Text((skybox_roots[1] + "..." + skybox_names[1]).c_str());
             
             if (ImGui::Button("Up(+Y):")) {
                 cubemapSide = CubemapSide::Up;
-                fileBrowserSetupSkyboxHDR.Open();
+                fileBrowserSetupSkybox.Open();
             }
             ImGui::SameLine();
-            ImGui::Text((skybox_roots[static_cast<int>(CubemapSide::Up)] + "..." + skybox_names[static_cast<int>(CubemapSide::Up)]).c_str());
+            ImGui::Text((skybox_roots[2] + "..." + skybox_names[2]).c_str());
 
             if (ImGui::Button("Down(-Y):")) {
                 cubemapSide = CubemapSide::Down;
-                fileBrowserSetupSkyboxHDR.Open();
+                fileBrowserSetupSkybox.Open();
             }
             ImGui::SameLine();
-            ImGui::Text((skybox_roots[static_cast<int>(CubemapSide::Down)] + "..." + skybox_names[static_cast<int>(CubemapSide::Down)]).c_str());
+            ImGui::Text((skybox_roots[3] + "..." + skybox_names[3]).c_str());
 
             if (ImGui::Button("Left(-X):")) {
                 cubemapSide = CubemapSide::Left;
-                fileBrowserSetupSkyboxHDR.Open();
+                fileBrowserSetupSkybox.Open();
             }
             ImGui::SameLine();
-            ImGui::Text((skybox_roots[static_cast<int>(CubemapSide::Left)] + "..." + skybox_names[static_cast<int>(CubemapSide::Left)]).c_str());
+            ImGui::Text((skybox_roots[4] + "..." + skybox_names[4]).c_str());
 
             if (ImGui::Button("Right(+X):")) {
                 cubemapSide = CubemapSide::Right;
-                fileBrowserSetupSkyboxHDR.Open();
+                fileBrowserSetupSkybox.Open();
             }
             ImGui::SameLine();
-            ImGui::Text((skybox_roots[static_cast<int>(CubemapSide::Right)] + "..." + skybox_names[static_cast<int>(CubemapSide::Right)]).c_str());
+            ImGui::Text((skybox_roots[5] + "..." + skybox_names[5]).c_str());
 
             if (ImGui::Button("Use")) {
                 fractalController->SetSkyboxTexture(skybox_paths);
-            }
-            
-        }
-
-        
+            }   
+        }  
     }
+
     if (current_background_type == 2) {
         if (ImGui::Combo("HDR Texture", &current_skybox_texture_hdr, skybox_texture_hdr, IM_ARRAYSIZE(skybox_texture_hdr))) {
             if (static_cast<SkyboxTextureHDR>(current_skybox_texture_hdr) != SkyboxTextureHDR::OtherHDR)

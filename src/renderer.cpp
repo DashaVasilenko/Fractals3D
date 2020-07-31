@@ -57,9 +57,10 @@ const GLuint Renderer::cube_indices[36] = { 0, 1, 2,    // back face
 											21, 20, 23  // top face			
 };    
 
+
 //--------------------------------------------------------------------------
 // convert HDR equirectangular environment map to cubemap equivalent
-//
+//--------------------------------------------------------------------------
 void Renderer::ConvertHdrMapToCubemap() {
 	cubeProgram.Run();
 	cubeProgram.SetUniform("equirectangularMap", 0);
@@ -77,6 +78,33 @@ void Renderer::ConvertHdrMapToCubemap() {
         GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
         //render cube
+		GLCall(glBindVertexArray(cubeVAO));
+		GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIBO)); 
+		GLCall(glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, NULL));
+    }
+    GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+}
+
+
+//--------------------------------------------------------------------------
+// solve diffuse integral by convolution to create an irradiance (cube)map
+//--------------------------------------------------------------------------
+void Renderer::CreateIrradianceCubeMap() {
+    irradianceProgram.Run();
+    irradianceProgram.SetUniform("environmentMap", 0);
+    irradianceProgram.SetUniform("projection", skyBoxHDR.GetProjection());
+    GLCall(glActiveTexture(GL_TEXTURE0));
+	GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxHDR.GetCubemap()));
+
+    GLCall(glViewport(0, 0, 32, 32)); // don't forget to configure the viewport to the capture dimensions.
+	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, skyBoxHDR.GetFBO()));
+	glm::mat4* views = skyBoxHDR.GetView();
+    for (unsigned int i = 0; i < 6; ++i) {
+        irradianceProgram.SetUniform("view", views[i]);
+        GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, skyBoxHDR.GetIrradiance(), 0));
+        GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+
+        //renderCube();
 		GLCall(glBindVertexArray(cubeVAO));
 		GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIBO)); 
 		GLCall(glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, NULL));
@@ -149,11 +177,24 @@ void Renderer::Init() {
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
 	//--------------------------------------------------------------------------
 
+	//-------------------create shader for irradiance cubemap-------------------
+	irradianceMapSources[GL_VERTEX_SHADER] = "glsl/get_irradiance_vertex.glsl";
+ 	irradianceMapSources[GL_FRAGMENT_SHADER] = "glsl/get_irradiance_pixel.glsl";
+	irradianceProgram.Init(irradianceMapSources);
+ 	irradianceProgram.Compile();
+ 	irradianceProgram.Link();
+	irradianceProgram.DeleteShaders();
+	//--------------------------------------------------------------------------
+
 	program.Run();
 	program.SetUniform("skyBox", 0);
+	program.SetUniform("irradianceMap", 1);
  	skyBox.Load(skyBox.orbital);
 	skyBoxHDR.LoadHDR(skyBoxHDR.winterForestHDR);
-	ConvertHdrMapToCubemap();	
+	ConvertHdrMapToCubemap();
+	skyBoxHDR.InitIrradianceCubemap();
+	CreateIrradianceCubeMap();
+	
 }
 
 void Renderer::Render(int width, int height) {
@@ -201,6 +242,8 @@ void Renderer::Render(int width, int height) {
 		case BackgroundType::SkyboxHDR: {
 			GLCall(glActiveTexture(GL_TEXTURE0));
 			GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxHDR.GetCubemap()));
+			GLCall(glActiveTexture(GL_TEXTURE1));
+			GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxHDR.GetIrradiance()));
             break;
         }
     }

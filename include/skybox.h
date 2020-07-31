@@ -46,9 +46,12 @@ private:
 class SkyBoxHDR {
 public:
 	void LoadHDR(const std::string& fileName);
+	void InitIrradianceCubemap();
     void ReloadHDR(const std::string& fileName);
+	void ReloadIrradianceCubemap();
 
     unsigned int GetDescriptor() { return descriptor; }
+	unsigned int GetIrradiance() { return irradianceMap; }
 	unsigned int GetFBO() { return FBO; }
     unsigned int GetRBO() { return RBO; }
     unsigned int GetCubemap() { return envCubemap; }
@@ -74,6 +77,7 @@ private:
     };
 
     unsigned int descriptor;
+	unsigned int irradianceMap;
 
 	unsigned int FBO;
     unsigned int RBO;

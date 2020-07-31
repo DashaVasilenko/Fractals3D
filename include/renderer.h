@@ -21,6 +21,7 @@ public:
     SkyBoxHDR* GetSkyboxHDR() { return &skyBoxHDR; }
 
     void ConvertHdrMapToCubemap();
+    void CreateIrradianceCubeMap();
 
     void Init();
     void Update();
@@ -76,6 +77,9 @@ private:
     GLuint cubeVAO;
     GLuint cubeVBO;
     GLuint cubeIBO;
+
+    std::map<GLenum, std::string> irradianceMapSources;
+    ShaderProgram irradianceProgram;
 
     Camera* camera;
 

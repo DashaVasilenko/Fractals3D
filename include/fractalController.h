@@ -53,11 +53,15 @@ public:
             case SkyboxTextureHDR::WinterForest: {
                 skyboxHDR->ReloadHDR(skyboxHDR->winterForestHDR);
                 renderer->ConvertHdrMapToCubemap();
+                skyboxHDR->ReloadIrradianceCubemap();
+                renderer->CreateIrradianceCubeMap();
                 break;
             }
             case SkyboxTextureHDR::Milkyway: {
                 skyboxHDR->ReloadHDR(skyboxHDR->milkywayHDR);
                 renderer->ConvertHdrMapToCubemap();
+                skyboxHDR->ReloadIrradianceCubemap();
+                renderer->CreateIrradianceCubeMap();
                 break;
             }
         }
@@ -67,7 +71,9 @@ public:
         //std::cout << path.c_str() << std::endl;
         renderer->fractalsParameters.skybox_texture_hdr = SkyboxTextureHDR::OtherHDR; // это возможно вообще надо удалить и в рендерере тоже
         skyboxHDR->ReloadHDR(path);
-        renderer->ConvertHdrMapToCubemap();        
+        renderer->ConvertHdrMapToCubemap();   
+        skyboxHDR->ReloadIrradianceCubemap();
+        renderer->CreateIrradianceCubeMap();     
     }
 
     void SetAmbientFractalColor(const glm::vec3& c) { renderer->fractalsParameters.ambient_fractal_color = c; }

@@ -15,6 +15,7 @@ uniform float fieldOfView;
 
 #ifdef SKYBOX_BACKGROUND
     uniform samplerCube skyBox; // сэмплер для кубической карты
+    uniform samplerCube irradianceMap; // освещенность из кубмапы
 #endif
 
 #ifdef SOLID_BACKGROUND
@@ -283,6 +284,12 @@ float ambientOcclusion(vec3 point, vec3 normal, float step, float samples, float
     //return clamp(1.0f - ao*s, 0.0, 1.0);
 }
 
+// ----------------------------------------------------------------------------
+vec3 fresnelSchlick(float cosTheta, vec3 F0)
+{
+    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+}
+
 // Lighting contribution of a direction light source via Phong illumination.
 vec4 PhongDirectionLight(vec3 ambientColor, vec3 diffuseColor, vec3 specularColor, float shininess, vec3 point, vec3 eye) {
     float shadow = 1.0;
@@ -310,6 +317,27 @@ vec4 PhongDirectionLight(vec3 ambientColor, vec3 diffuseColor, vec3 specularColo
     vec3 diffuse = diffuseLightColor*diffuseColor*max(dot(light_direction, outNormal), 0.0f)*shadow;
     vec3 specular = specularLightColor*specularColor*pow(max(dot(inEye, reflected_light), 0.0), shininess);
     vec3 color = ambient + diffuse + specular;
+
+#ifdef SKYBOX_BACKGROUND
+    // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
+    // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
+    vec3 F0 = vec3(0.04); 
+    //F0 = mix(F0, albedo, metallic);
+    // ambient lighting (we now use IBL as the ambient term)
+    vec3 kS = fresnelSchlick(max(dot(outNormal, inEye), 0.0), F0);
+    vec3 kD = 1.0 - kS;
+    //kD *= 1.0 - metallic;	  
+    vec3 irradiance = texture(irradianceMap, outNormal).rgb;
+    //vec3 diffuse      = irradiance * albedo;
+    vec3 diffuseIBL      = irradiance * diffuseColor;
+    //vec3 ambient = (kD * diffuse) * ao;
+    vec3 ambientIBL = (kD * diffuseIBL) * ambientColor;
+
+    color += ambientIBL; 
+#endif
+
+    //vec3 irradiance = texture(irradianceMap, outNormal).rgb;
+
 
 #ifdef FLAG_AMBIENTOCCLUSION
     float ao = ambientOcclusion(point, outNormal, 2.5, 3.0, 0.5);
@@ -352,6 +380,7 @@ void main() {
     vec3 reflected_dir = reflect(dir, outNormal); //R
 
 #ifdef SKYBOX_BACKGROUND
+//# if defined SKYBOX_BACKGROUND || SKYBOX_BACKGROUND_HDR
     vec4 reflected_color = texture(skyBox, reflected_dir);
     outColor = outColor*(1.0 - reflection) + reflected_color*reflection;
 #endif
