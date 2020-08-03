@@ -406,8 +406,6 @@ void Gui::MainParameters() {
             fractalController->SetIrradianceMap(irradiance_cubemap);
             flag = true; 
         }
-        //if (ambient_occlusion) 
-        //    shaderParameters |= 1 << 3;
 
         if (static_cast<SkyboxTextureHDR>(current_skybox_texture_hdr) == SkyboxTextureHDR::OtherHDR) {
             if (ImGui::Button("File name:")) {

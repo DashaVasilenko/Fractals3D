@@ -19,23 +19,68 @@ public:
     unsigned int GetDescriptor() { return descriptor; }
     ~SkyBox();
 
-    std::array<std::string, 6> orbital = {   "textures/skybox1/front.tga",
- 											 "textures/skybox1/back.tga",
- 											 "textures/skybox1/up.tga",
+    std::array<std::string, 6> orbital = {   "textures/orbital/front.tga",
+ 											 "textures/orbital/back.tga",
+ 											 "textures/orbital/up.tga",
 
- 											 "textures/skybox1/down.tga",
- 											 "textures/skybox1/right.tga",
- 											 "textures/skybox1/left.tga"
+ 											 "textures/orbital/down.tga",
+ 											 "textures/orbital/right.tga",
+ 											 "textures/orbital/left.tga"
  											 };
 
-    std::array<std::string, 6> night = {     "textures/night/posz.jpg",
- 											 "textures/night/negz.jpg",
- 											 "textures/night/posy.jpg",
+    std::array<std::string, 6> night = {     "textures/Night/posz.jpg",
+ 											 "textures/Night/negz.jpg",
+ 											 "textures/Night/posy.jpg",
 
- 											 "textures/night/negy.jpg",
- 											 "textures/night/negx.jpg",
- 											 "textures/night/posx.jpg"
+ 											 "textures/Night/negy.jpg",
+ 											 "textures/Night/negx.jpg",
+ 											 "textures/Night/posx.jpg"
  											 };
+
+	std::array<std::string, 6> palmTrees = { "textures/PalmTrees/posz.jpg",
+ 											 "textures/PalmTrees/negz.jpg",
+ 											 "textures/PalmTrees/posy.jpg",
+
+ 											 "textures/PalmTrees/negy.jpg",
+ 											 "textures/PalmTrees/negx.jpg",
+ 											 "textures/PalmTrees/posx.jpg"
+ 											 };	
+
+	std::array<std::string, 6> coitTower = { "textures/CoitTower/posz.jpg",
+ 											 "textures/CoitTower/negz.jpg",
+ 											 "textures/CoitTower/posy.jpg",
+
+ 											 "textures/CoitTower/negy.jpg",
+ 											 "textures/CoitTower/negx.jpg",
+ 											 "textures/CoitTower/posx.jpg"
+ 											 };	
+
+	std::array<std::string, 6> mountainPath = { "textures/MountainPath/posz.jpg",
+ 											 	"textures/MountainPath/negz.jpg",
+ 											 	"textures/MountainPath/posy.jpg",
+
+ 											 	"textures/MountainPath/negy.jpg",
+ 											 	"textures/MountainPath/negx.jpg",
+ 											 	"textures/MountainPath/posx.jpg"
+ 											 };		
+
+	std::array<std::string, 6> nightPath = { "textures/NightPath/posz.jpg",
+ 											 "textures/NightPath/negz.jpg",
+ 											 "textures/NightPath/posy.jpg",
+
+ 											 "textures/NightPath/negy.jpg",
+ 											 "textures/NightPath/negx.jpg",
+ 											 "textures/NightPath/posx.jpg"
+ 											 };	
+
+	std::array<std::string, 6> vasa = { "textures/Vasa/posz.jpg",
+ 										"textures/Vasa/negz.jpg",
+ 										"textures/Vasa/posy.jpg",
+
+ 										"textures/Vasa/negy.jpg",
+ 										"textures/Vasa/negx.jpg",
+ 										"textures/Vasa/posx.jpg"
+ 										};											  										  									  										  								
 
 
 private:
@@ -62,8 +107,11 @@ public:
 
     ~SkyBoxHDR();
 
-	const std::string winterForestHDR = "textures/WinterForest/WinterForest_Ref.hdr";
-	const std::string milkywayHDR = "textures/Milkyway/Milkyway_small.hdr";
+	const std::string winterForestHDR = "textures/HDR/WinterForest/WinterForest.hdr";
+	const std::string milkywayHDR = "textures/HDR/Milkyway/Milkyway.hdr";
+	const std::string grandCanyonHDR = "textures/HDR/GrandCanyon/GrandCanyon.hdr";
+	const std::string spaceHDR = "textures/HDR/Space/Space.hdr";
+	const std::string factoryHDR = "textures/HDR/Factory/Factory.hdr";
 
 private:
 	// projection and view matrices for capturing data onto the 6 cubemap face directions

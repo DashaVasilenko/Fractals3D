@@ -40,9 +40,9 @@ private:
     const char* background_types[3] = { "Solid color", "Texture", "HDRTexture" };
     int current_background_type = 2; // If the selection isn't within 0..count, Combo won't display a preview
     float background_color[3] = { 0.30, 0.36, 0.60 };
-    const char* skybox_texture[3] = { "Orbital", "Night", "Other" };
+    const char* skybox_texture[8] = { "Orbital", "Night", "PalmTrees", "CoitTower", "MountainPath", "NightPath", "Vasa", "Other" };
     int current_skybox_texture = 0;
-    const char* skybox_texture_hdr[3] = { "WinterForest", "Milkyway", "OtherHDR" };
+    const char* skybox_texture_hdr[6] = { "WinterForest", "Milkyway", "GrandCanyon", "Space", "Factory", "OtherHDR" };
     int current_skybox_texture_hdr = 0;
     bool irradiance_cubemap = true;
 
@@ -72,7 +72,7 @@ private:
 
     // setup new HDR skybox
     ImGui::FileBrowser fileBrowserSetupSkyboxHDR = ImGui::FileBrowser(ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
-    std::string skybox_hdr_path = "/" + std::filesystem::current_path().u8string() + "/textures/Milkyway/Milkyway_small.hdr";
+    std::string skybox_hdr_path = "/" + std::filesystem::current_path().u8string() + "/textures/HDR/Milkyway/Milkyway.hdr";
     std::string skybox_hdr_root = "";
     std::string skybox_hdr_name = "";
 

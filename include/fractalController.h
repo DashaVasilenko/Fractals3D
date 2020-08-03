@@ -39,6 +39,26 @@ public:
                 skybox->Reload(skybox->night);
                 break;
             }
+            case SkyboxTexture::PalmTrees: {
+                skybox->Reload(skybox->palmTrees);
+                break;
+            }
+            case SkyboxTexture::CoitTower: {
+                skybox->Reload(skybox->coitTower);
+                break;
+            }
+            case SkyboxTexture::MountainPath: {
+                skybox->Reload(skybox->mountainPath);
+                break;
+            }
+            case SkyboxTexture::NightPath: {
+                skybox->Reload(skybox->nightPath);
+                break;
+            }
+            case SkyboxTexture::Vasa: {
+                skybox->Reload(skybox->vasa);
+                break;
+            }
         }
     }
 
@@ -52,19 +72,28 @@ public:
         switch(skyboxTextureHDR) {
             case SkyboxTextureHDR::WinterForest: {
                 skyboxHDR->ReloadHDR(skyboxHDR->winterForestHDR);
-                renderer->ConvertHdrMapToCubemap();
-                skyboxHDR->ReloadIrradianceCubemap();
-                renderer->CreateIrradianceCubeMap();
                 break;
             }
             case SkyboxTextureHDR::Milkyway: {
                 skyboxHDR->ReloadHDR(skyboxHDR->milkywayHDR);
-                renderer->ConvertHdrMapToCubemap();
-                skyboxHDR->ReloadIrradianceCubemap();
-                renderer->CreateIrradianceCubeMap();
+                break;
+            }
+            case SkyboxTextureHDR::GrandCanyon: {
+                skyboxHDR->ReloadHDR(skyboxHDR->grandCanyonHDR);
+                break;
+            }
+            case SkyboxTextureHDR::Space: {
+                skyboxHDR->ReloadHDR(skyboxHDR->spaceHDR);
+                break;
+            }
+            case SkyboxTextureHDR::Factory: {
+                skyboxHDR->ReloadHDR(skyboxHDR->factoryHDR);
                 break;
             }
         }
+        renderer->ConvertHdrMapToCubemap();
+        skyboxHDR->ReloadIrradianceCubemap();
+        renderer->CreateIrradianceCubeMap();
     }
 
     void SetIrradianceMap(bool irradianceMap) {

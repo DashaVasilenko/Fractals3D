@@ -32,12 +32,20 @@ enum BackgroundType {
 enum SkyboxTexture {
         Orbital,
         Night,
+        PalmTrees,
+        CoitTower,
+        MountainPath,
+        NightPath,
+        Vasa,
         Other,
 };
 
 enum SkyboxTextureHDR {
         WinterForest,
         Milkyway,
+        GrandCanyon,
+        Space,
+        Factory,
         OtherHDR,
 };
 
