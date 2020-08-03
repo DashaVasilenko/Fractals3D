@@ -256,8 +256,7 @@ vec3 computeNormal(vec3 p) {
 
 // https://www.iquilezles.org/www/articles/rmshadows/rmshadows.htm
 // w is the size of the light source, and controls how hard/soft the shadows are
-float softShadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end, float w )
-{ 
+float softShadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end, float w ) { 
     float res = 1.0;
     float ph = 1e20;
     for(float t=start; t<end; ) {
@@ -309,7 +308,8 @@ vec4 PhongDirectionLight(vec3 ambientColor, vec3 diffuseColor, vec3 specularColo
 #ifdef FLAG_SOFT_SHADOWS
     vec3 shadowRayOrigin = point + computeNormal(point)*0.01;
     vec3 shadowRayDir = normalize(vec3(-lightDirection));
-    shadow = softShadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, 3.0);
+    // последний параметр это сила размытости мягких теней
+    shadow = softShadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, 6.0);
 #endif
 
     vec3 light_direction = normalize(vec3(-lightDirection)); // L для направленного
@@ -340,9 +340,6 @@ vec4 PhongDirectionLight(vec3 ambientColor, vec3 diffuseColor, vec3 specularColo
 
     color += ambientIBL; 
 #endif
-
-    //vec3 irradiance = texture(irradianceMap, outNormal).rgb;
-
 
 #ifdef FLAG_AMBIENTOCCLUSION
     float ao = ambientOcclusion(point, outNormal, 2.5, 3.0, 0.5);
