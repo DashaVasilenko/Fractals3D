@@ -82,12 +82,20 @@ public:
                 skyboxHDR->ReloadHDR(skyboxHDR->grandCanyonHDR);
                 break;
             }
-            case SkyboxTextureHDR::Space: {
-                skyboxHDR->ReloadHDR(skyboxHDR->spaceHDR);
+            case SkyboxTextureHDR::IceLake: {
+                skyboxHDR->ReloadHDR(skyboxHDR->iceLakeHDR);
                 break;
             }
             case SkyboxTextureHDR::Factory: {
                 skyboxHDR->ReloadHDR(skyboxHDR->factoryHDR);
+                break;
+            }
+            case SkyboxTextureHDR::TopangaForest: {
+                skyboxHDR->ReloadHDR(skyboxHDR->topangaForestHDR);
+                break;
+            }
+            case SkyboxTextureHDR::TropicalBeach: {
+                skyboxHDR->ReloadHDR(skyboxHDR->tropicalBeachHDR);
                 break;
             }
         }

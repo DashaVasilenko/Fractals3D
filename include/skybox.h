@@ -110,8 +110,11 @@ public:
 	const std::string winterForestHDR = "textures/HDR/WinterForest/WinterForest.hdr";
 	const std::string milkywayHDR = "textures/HDR/Milkyway/Milkyway.hdr";
 	const std::string grandCanyonHDR = "textures/HDR/GrandCanyon/GrandCanyon.hdr";
-	const std::string spaceHDR = "textures/HDR/Space/Space.hdr";
+	const std::string iceLakeHDR = "textures/HDR/IceLake/IceLake.hdr";
 	const std::string factoryHDR = "textures/HDR/Factory/Factory.hdr";
+	const std::string topangaForestHDR = "textures/HDR/TopangaForest/TopangaForest.hdr";
+	const std::string tropicalBeachHDR = "textures/HDR/TropicalBeach/TropicalBeach.hdr";
+
 
 private:
 	// projection and view matrices for capturing data onto the 6 cubemap face directions

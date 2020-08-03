@@ -42,7 +42,7 @@ private:
     float background_color[3] = { 0.30, 0.36, 0.60 };
     const char* skybox_texture[8] = { "Orbital", "Night", "PalmTrees", "CoitTower", "MountainPath", "NightPath", "Vasa", "Other" };
     int current_skybox_texture = 0;
-    const char* skybox_texture_hdr[6] = { "WinterForest", "Milkyway", "GrandCanyon", "Space", "Factory", "OtherHDR" };
+    const char* skybox_texture_hdr[8] = { "WinterForest", "Milkyway", "GrandCanyon", "IceLake", "Factory", "TopangaForest", "TropicalBeach", "OtherHDR" };
     int current_skybox_texture_hdr = 0;
     bool irradiance_cubemap = true;
 

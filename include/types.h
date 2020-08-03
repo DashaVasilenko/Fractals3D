@@ -44,8 +44,10 @@ enum SkyboxTextureHDR {
         WinterForest,
         Milkyway,
         GrandCanyon,
-        Space,
+        IceLake,
         Factory,
+        TopangaForest,
+        TropicalBeach,
         OtherHDR,
 };
 
