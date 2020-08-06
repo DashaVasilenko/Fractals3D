@@ -4,9 +4,6 @@
 //#define FLAG_SOFT_SHADOWS
 //#define FLAG_AMBIENTOCCLUSION
 
-//#define TEST
-//#define MANDELBULB
-
 in mat4 viewMatrix;
 out vec4 outColor;
 
@@ -38,12 +35,6 @@ uniform vec3 diffuseColor; // отражение рассеянного свет
 uniform vec3 specularColor; // отражение зеркального света материалом
 uniform float shininess; // показатель степени зеркального отражения
 uniform float reflection;
-
-#ifdef MANDELBULB
-    uniform int Iterations = 8;
-    uniform float Bailout = 10.0f;
-    uniform float Power = 9.0;
-#endif
 
 const int MAX_MARCHING_STEPS = 255;
 const float MIN_DIST = 0.0;
@@ -140,40 +131,6 @@ float sierpinskiTriangle(vec3 pos) {
 */
 }
 
-#ifdef MANDELBULB
-float mandelbulbFractal(vec3 pos) {
-    //int Iterations = 8;
-    //float Bailout = 10.0f;
-    //float Power = 9.0;
-
-    //float Power = 9.0*sin(Time / 50.0f);
-
-	vec3 z = pos;
-	float dr = 1.0;
-	float r = 0.0;
-	for (int i = 0; i < Iterations ; i++) {
-		r = length(z);
-		if (r > Bailout) break;
-		
-		// convert to polar coordinates
-		float theta = acos(z.z/r);
-		float phi = atan(z.y,z.x);
-		dr =  pow(r, Power - 1.0)*Power*dr + 1.0;
-		
-		// scale and rotate the point
-		float zr = pow(r, Power);
-		theta = theta*Power;
-		phi = phi*Power;
-		
-		// convert back to cartesian coordinates
-		z = zr*vec3(sin(theta)*cos(phi), sin(phi)*sin(theta), cos(theta));
-		z += pos;
-	}
-	return 0.5*log(r)*r/dr;
-}
-#endif
-
-
 // Absolute value of the return value indicates the distance to the surface. 
 // Sign indicates whether the point is inside or outside the surface, negative indicating inside.
 float sceneSDF(vec3 point) {
@@ -185,21 +142,6 @@ float sceneSDF(vec3 point) {
     t = unionSDF(t, sphereSDF(point-vec3(0, 0, 10), 2.5));
     t = unionSDF(t, planeSDF(point, vec4(0, 1, 0, 5.5)));
     return t;
-#endif
-/*
-    float t = sphereSDF(point-vec3(3,-2.5,10), 2.5);
-    t = unionSDF(t, sphereSDF(point-vec3(-3, -2.5, 10), 2.5));
-    t = unionSDF(t, sphereSDF(point-vec3(0, 2.0, 10), 2.5));
-    t = unionSDF(t, planeSDF(point, vec4(0, 1, 0, 5.5)));
-    return t;
-*/
-
-    //point.x = mod(point.x, 2.0f) - 1.0f;
-    //point.z = mod(point.z, 2.0f) - 1.0f;
-    //return mandelbulbFractal(point);
-
-#ifdef MANDELBULB
-    return mandelbulbFractal(point);
 #endif
 
     return 0;
@@ -287,14 +229,12 @@ float ambientOcclusion(vec3 point, vec3 normal, float step, float samples, float
     //return clamp(1.0f - ao*s, 0.0, 1.0);
 }
 
-// ----------------------------------------------------------------------------
-vec3 fresnelSchlick(float cosTheta, vec3 F0)
-{
+vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
 // Lighting contribution of a direction light source via Phong illumination.
-vec4 PhongDirectionLight(vec3 ambientColor, vec3 diffuseColor, vec3 specularColor, float shininess, vec3 point, vec3 eye) {
+vec4 PhongDirectionLight(vec3 ambientColor, vec3 diffuseColor, vec3 specularColor, float shininess, vec3 point, vec3 eye, vec4 trapColor) {
     float shadow = 1.0;
      
 #ifdef FLAG_HARD_SHADOWS
@@ -360,6 +300,7 @@ void main() {
     vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
     vec3 dir = rayDirection(fieldOfView, iResolution, pixelCoord);
     vec3 eye = viewMatrix[3].xyz;
+    vec4 trapColor;
     float dist = shortestDistanceToSurface(eye, dir, MIN_DIST, MAX_DIST);
     
     // Didn't hit anything
@@ -377,7 +318,8 @@ void main() {
 
     vec3 point = eye + dist*dir; // The closest point on the surface to the eyepoint along the view ray
     //outColor = Lambert(vec3(0.0, 1.0 , 0.0), vec3(0.0f, 1.0f, 1.0f), point);
-    outColor = PhongDirectionLight(ambientColor, diffuseColor, specularColor, shininess, point, eye);
+    outColor = PhongDirectionLight(ambientColor, diffuseColor, specularColor, shininess, point, eye, trapColor);
+
     vec3 outNormal = computeNormal(point); // N
     vec3 reflected_dir = reflect(dir, outNormal); //R
 
@@ -390,4 +332,7 @@ void main() {
     outColor = outColor*(1.0 - reflection) + vec4(reflectedColor, 1.0)*reflection;
 #endif
     //outColor = vec4(pow(outColor.xyz, vec3(1.0/2.2)), 1.0); // Gamma correction
+    // vignette
+    //vec2 sp = (2.0*pixelCoord-iResolution.xy) / iResolution.y;
+    //outColor *= 1.0 - 0.05*length(sp);
 } 

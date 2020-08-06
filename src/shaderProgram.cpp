@@ -10,6 +10,21 @@ void ShaderProgram::Init(const std::map<GLenum, std::string>& mapSources) {
 
 void ShaderProgram::Load() {
     // разбираемся с дефайнами до компиляции
+    switch(currentFractalType) {
+        case FractalType::Test: {
+            mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
+ 	        mapSources[GL_FRAGMENT_SHADER] = "glsl/quad_pixel.glsl";
+	        Init(mapSources);
+            break;
+        }
+        case FractalType::Mandelbulb: {
+            mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
+ 	        mapSources[GL_FRAGMENT_SHADER] = "glsl/mandelbulb_pixel.glsl";
+	        Init(mapSources);
+            break;
+        }
+    }
+    
     defines = "";
     
     if (shader_parameters & ShaderParametersType::HardShadows)
@@ -29,6 +44,7 @@ void ShaderProgram::Load() {
             break;
         }
     }
+
 
     switch(currentBackgroundType) {
         case BackgroundType::Solid: {
