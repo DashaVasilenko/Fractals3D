@@ -52,9 +52,24 @@ private:
         glm::vec3 ambient_fractal_color = { 0.19225, 0.19225, 0.19225 };
         glm::vec3 diffuse_fractal_color = { 0.50754, 0.50754, 0.50754 };
         glm::vec3 specular_fractal_color = { 0.50827, 0.50827, 0.50827 };
-        float shininess = 2.0f;
+        float shininess = 32.0f;
         float reflection = 0.2f;
 
+//--------------------------------mandelbulb-----------------------------------
+        glm::vec3 mandelbulb_lightDirection1 = { 0.577, 0.577, -0.577 };
+        glm::vec3 mandelbulb_lightColor1 = { 1.0, 1.0, 0.70 };
+        float mandelbulb_lightIntensity1 = 12.0;
+
+        glm::vec3 mandelbulb_lightDirection2 = { -0.707, 0.000, 0.707 };
+        glm::vec3 mandelbulb_lightColor2 = { 0.25, 0.20, 0.15 };
+        float mandelbulb_lightIntensity2 = 4.0;
+
+        glm::vec3 mandelbulb_ambientLightColor = { 0.35, 0.30, 0.25 };
+        float mandelbulb_ambientLightIntensity = 2.5;
+
+        glm::vec3 mandelbulb_color1 = { 0.10, 0.20, 0.30 };
+        glm::vec3 mandelbulb_color2 = { 0.02, 0.10, 0.30 };
+        glm::vec3 mandelbulb_color3 = { 0.30, 0.10, 0.02 };
         int mandelbulb_iterations = 8;
         float mandelbulb_bailout = 10.0f;
         float mandelbulb_power = 9.0f;

@@ -29,13 +29,6 @@ private:
     float diffuse_light_color[3] = { 1.0, 1.0, 1.0 };
     float specular_light_color[3] = { 1.0, 1.0, 1.0 };
 
-    // fractal color
-    float ambient_fractal_color[3] = { 0.19225, 0.19225, 0.19225 };
-    float diffuse_fractal_color[3] = { 0.50754, 0.50754, 0.50754 };
-    float specular_fractal_color[3] = { 0.50827, 0.50827, 0.50827 };
-    float shininess = 20.0;
-    float reflection = 0.2;
-
     // background parameters
     const char* background_types[3] = { "Solid color", "Texture", "HDRTexture" };
     int current_background_type = 2; // If the selection isn't within 0..count, Combo won't display a preview
@@ -54,7 +47,28 @@ private:
     // fractal type
     FractalType currentFractalType = FractalType::Test;
 
+    // test fractal parameters
+    float ambient_fractal_color[3] = { 0.19225, 0.19225, 0.19225 };
+    float diffuse_fractal_color[3] = { 0.50754, 0.50754, 0.50754 };
+    float specular_fractal_color[3] = { 0.50827, 0.50827, 0.50827 };
+    float shininess = 32.0;
+    float reflection = 0.2;
+
     // mandelbulb fractal parameters
+    float light_direction1[3] = { 0.577, 0.577, -0.577 }; // sun. compute shadows for it
+    float light_color1[3] = { 1.0, 1.0, 0.70 }; 
+    float light_intensity1 = 12.0; 
+
+    float light_direction2[3] = { -0.707, 0.000, 0.707 }; // light. compute occlusion for it
+    float light_color2[3] = { 0.25, 0.20, 0.15 };
+    float light_intensity2 = 4.0;
+
+    float ambient_fractal_light_color[3] = { 0.35, 0.30, 0.25 }; // ambient light
+    float ambient_light_intensity = 2.5;
+
+    float color1[3] = { 0.10, 0.20, 0.30 };
+    float color2[3] = { 0.02, 0.10, 0.30 };
+    float color3[3] = { 0.30, 0.10, 0.02 };
     int mandelbulb_iterations = 8;
     float mandelbulb_bailout = 10.0f;
     float mandelbulb_power = 9.0f;

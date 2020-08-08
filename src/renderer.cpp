@@ -267,6 +267,20 @@ void Renderer::Render(int width, int height) {
             break;
         }
         case FractalType::Mandelbulb: {
+			program.SetUniform("lightDirection1", fractalsParameters.mandelbulb_lightDirection1);
+			program.SetUniform("lightColor1", fractalsParameters.mandelbulb_lightColor1);
+			program.SetUniform("lightIntensity1", fractalsParameters.mandelbulb_lightIntensity1);
+
+			program.SetUniform("lightDirection2", fractalsParameters.mandelbulb_lightDirection2);
+			program.SetUniform("lightColor2", fractalsParameters.mandelbulb_lightColor2);
+			program.SetUniform("lightIntensity2", fractalsParameters.mandelbulb_lightIntensity2);
+
+			program.SetUniform("ambientLightColor3", fractalsParameters.mandelbulb_ambientLightColor);
+			program.SetUniform("ambientLightIntensity3", fractalsParameters.mandelbulb_ambientLightIntensity);
+
+			program.SetUniform("color1", fractalsParameters.mandelbulb_color1);
+			program.SetUniform("color2", fractalsParameters.mandelbulb_color2);
+			program.SetUniform("color3", fractalsParameters.mandelbulb_color3);
 			program.SetUniform("Iterations", fractalsParameters.mandelbulb_iterations);
 			program.SetUniform("Bailout", fractalsParameters.mandelbulb_bailout);
 			program.SetUniform("Power", fractalsParameters.mandelbulb_power);

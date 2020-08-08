@@ -125,6 +125,21 @@ public:
     void SetFractalReflect(float c) { renderer->fractalsParameters.reflection = c; }
 
     void SetFractalType(FractalType c) { program->SetFractalType(c); renderer->currentFractalType = c; }
+
+    void SetLightDirection1(const glm::vec3& c) { renderer->fractalsParameters.mandelbulb_lightDirection1 = c; }
+    void SetLightColor1(const glm::vec3& c) { renderer->fractalsParameters.mandelbulb_lightColor1 = c; }
+    void SetLightIntensity1(float c) { renderer->fractalsParameters.mandelbulb_lightIntensity1 = c; }
+
+    void SetLightDirection2(const glm::vec3& c) { renderer->fractalsParameters.mandelbulb_lightDirection2 = c; }
+    void SetLightColor2(const glm::vec3& c) { renderer->fractalsParameters.mandelbulb_lightColor2 = c; }
+    void SetLightIntensity2(float c) { renderer->fractalsParameters.mandelbulb_lightIntensity2 = c; }
+
+    void SetAmbientFractalLightColor(const glm::vec3& c) { renderer->fractalsParameters.mandelbulb_ambientLightColor = c; }
+    void SetAmbientFractalLightIntensity(float c) { renderer->fractalsParameters.mandelbulb_ambientLightIntensity = c; }
+
+    void SetMandelbulbColor1(const glm::vec3& c) { renderer->fractalsParameters.mandelbulb_color1 = c; }
+    void SetMandelbulbColor2(const glm::vec3& c) { renderer->fractalsParameters.mandelbulb_color2 = c; }
+    void SetMandelbulbColor3(const glm::vec3& c) { renderer->fractalsParameters.mandelbulb_color3 = c; }
     void SetMandelbulbIterations(const int c) { renderer->fractalsParameters.mandelbulb_iterations = c;  }
     void SetMandelbulbBailout(const float c) { renderer->fractalsParameters.mandelbulb_bailout = c; }
     void SetMandelbulbPower(float c) { renderer-> fractalsParameters.mandelbulb_power = c; }
