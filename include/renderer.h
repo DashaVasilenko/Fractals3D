@@ -23,6 +23,9 @@ public:
     void ConvertHdrMapToCubemap();
     void CreateIrradianceCubeMap();
 
+    void ConvertHdrMapToCubemapMonster();
+
+
     void Init();
     void Update();
     void Render(int width, int height);
@@ -73,6 +76,8 @@ private:
         int mandelbulb_iterations = 8;
         float mandelbulb_bailout = 10.0f;
         float mandelbulb_power = 9.0f;
+
+        SkyBoxHDR monsterColorHDR;
 
     };
     FractalsParameters fractalsParameters;

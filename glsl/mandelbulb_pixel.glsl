@@ -117,10 +117,10 @@ float mandelbulb(vec3 pos, out vec4 resColor) {
 		point = pos + zr*vec3(sin(theta)*cos(phi), sin(phi)*sin(theta), cos(theta));
 
         m = dot(point, point);
-        trap = min(trap, vec4(abs(point),m));    
+        trap = min(trap, vec4(abs(point),m));   
     }
     resColor = vec4(m,trap.yzw);
-    //resColor = vec4(m,trap.xyw);
+    //resColor = trap;
     return 0.5*log(r)*r/dr;
 }
  
@@ -159,10 +159,10 @@ float softShadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end
     float iterations = 64;
     for(float t=start; t<end; iterations--) {
         float h = mandelbulb(shadowRayOrigin + shadowRayDir*t, trap);
-        if (h < 0.0001 ) return 0.0;
+        //if (h < 0.0001 ) return 0.0;
         res = min( res, w*h/t );
-        if (res < 0.001) break;
-        if (iterations <= 0) break;
+        if (res < 0.001 || iterations <= 0) break;
+        //if (iterations <= 0) break;
         t += h;
     }
     return clamp(res, 0.0, 1.0);
@@ -283,12 +283,12 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
 
     // lighting terms
     vec3 point = eye + dist*dir; // The closest point on the surface to the eyepoint along the view ray
-    vec3 inEye = normalize(eye - point); // V
+    //vec3 inEye = normalize(eye - point); // V
     vec3 outNormal = computeNormal(point); // N
-    vec3 reflected_dir = reflect(dir, outNormal); //R
-    vec3 hal = normalize(lightDirection1 - dir);
-    float occlusion = clamp(0.05*log(trap.x), 0.0, 1.0);
-    float shadow = 1.0;
+    //vec3 reflected_dir = reflect(dir, outNormal); //R
+    //vec3 hal = normalize(lightDirection1 - dir);
+    //float occlusion = clamp(0.05*log(trap.x), 0.0, 1.0);
+    //float shadow = 1.0;
 
     // Didn't hit anything. sky color
     if (dist > MAX_DIST - EPSILON) {
@@ -298,13 +298,18 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
 
 #ifdef SOLID_BACKGROUND
         return vec4(reflectedColor - (dir.y * 0.7), 1.0); // Skybox color
-        //col  = vec3(0.8,0.9,1.1)*(0.6+0.4*dir.y);
+        //vec3 col  = vec3(0.8,0.9,1.1)*(0.6+0.4*dir.y);
 		//col += 5.0*vec3(0.8,0.7,0.5)*pow( clamp(dot(dir,light1),0.0,1.0), 32.0 );
-        //outColor = vec4(col, 1.0);
+        //return vec4(col, 1.0);
 #endif
     }
     // color fractal
 	else {
+        // lighting terms
+        vec3 hal = normalize(lightDirection1 - dir);
+        float occlusion = clamp(0.05*log(trap.x), 0.0, 1.0);
+        float shadow = 1.0;
+        
         // main color
         vec3 albedo = vec3(0.001); // чем больше значение, тем более засвеченный фрактал
         albedo = mix(albedo, color1, clamp(trap.y, 0.0, 1.0));
@@ -325,7 +330,6 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
         vec3 shadowRayOrigin = point + 0.001*outNormal;
         vec3 shadowRayDir = normalize(lightDirection1); // луч, направленный на источник света
         // последний параметр это сила размытости мягких теней
-        //shadow = softShadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, 32.0);
         shadow = softShadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, 32.0);
     #endif
 
@@ -347,6 +351,7 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
         col += spe1*15.0;
 
     #if defined SKYBOX_BACKGROUND_HDR && defined IRRADIANCE_CUBEMAP
+        vec3 inEye = normalize(eye - point); // V
         // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
         // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
         vec3 F0 = vec3(0.04); 
@@ -367,6 +372,7 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
         vec4 color;
         // sky
     #if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
+        vec3 reflected_dir = reflect(dir, outNormal); //R
         vec4 reflected_color = texture(skyBox, reflected_dir);
         color = vec4(col, 1.0)*(1.0 - reflection) + reflected_color*reflection;
     #endif
@@ -386,7 +392,7 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
 }
 
 void main() {
-/*
+
     float time = Time*.1;
     vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
     float f = fieldOfView;
@@ -410,12 +416,13 @@ void main() {
 
     vec3  eye = vec3( cam[0].w, cam[1].w, cam[2].w );
 	vec3  dir = normalize( (cam*vec4(sp,fle,0.0)).xyz );
-*/
+
+/*
     vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
     vec3 dir = rayDirection(fieldOfView, iResolution, pixelCoord);
     vec3 eye = viewMatrix[3].xyz;
     vec2  sp = (2.0*pixelCoord-iResolution.xy) / iResolution.y;
-
+*/
     outColor = Render(eye, dir, sp);
 
     vec3 l = lightDirection;
@@ -428,6 +435,7 @@ void main() {
     vec3 slc = specularLightColor;
 
 /*
+// !!!!!!!!!! добавить антиалиасинг при рендеринге картинки конечной !!!!!!!!!
     // render
     //#if AA<2
     //cam = transpose(viewMatrix);

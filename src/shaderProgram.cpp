@@ -23,6 +23,19 @@ void ShaderProgram::Load() {
 	        Init(mapSources);
             break;
         }
+        case FractalType::Monster: {
+            mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
+ 	        mapSources[GL_FRAGMENT_SHADER] = "glsl/monster_pixel.glsl";
+	        Init(mapSources);
+            break;
+        }
+        case FractalType::Julia: {
+            mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
+ 	        mapSources[GL_FRAGMENT_SHADER] = "glsl/julia_pixel.glsl";
+	        Init(mapSources);
+            break;
+        }
+
     }
     
     defines = "";

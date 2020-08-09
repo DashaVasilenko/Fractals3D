@@ -12,6 +12,8 @@ enum ExportType {
 enum FractalType {
         Test,
         Mandelbulb,
+        Monster,
+        Julia,
 };
 
 enum CubemapSide {

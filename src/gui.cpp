@@ -438,6 +438,16 @@ void Gui::MainParameters() {
             fractalController->SetFractalType(currentFractalType);
             flag = true;
         }   
+        if (ImGui::MenuItem("Monster Fractal")) {
+            currentFractalType = FractalType::Monster;
+            fractalController->SetFractalType(currentFractalType);
+            flag = true;
+        }  
+        if (ImGui::MenuItem("Julia Fractal")) {
+            currentFractalType = FractalType::Julia;
+            fractalController->SetFractalType(currentFractalType);
+            flag = true;
+        }  
         ImGui::EndMenu();
     }
 
@@ -450,6 +460,16 @@ void Gui::MainParameters() {
         case FractalType::Mandelbulb: {
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 150.0f);
             ImGui::Text("Mandelbulb fractal");
+            break;
+        }
+        case FractalType::Monster: {
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 150.0f);
+            ImGui::Text("Monster fractal");
+            break;
+        }
+        case FractalType::Julia: {
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 150.0f);
+            ImGui::Text("Julia fractal");
             break;
         }
     }
@@ -477,7 +497,15 @@ void Gui::FractalParameters() {
             break;
         }
         case FractalType::Mandelbulb: {
-             Mandelbulb();
+            Mandelbulb();
+            break;
+        }
+        case FractalType::Monster: {
+
+            break;
+        }
+        case FractalType::Julia: {
+            Julia();
             break;
         }
     }
@@ -575,6 +603,14 @@ void Gui::Mandelbulb() {
     if (MyDragFloat("Power", &mandelbulb_power, 1, 1, 30)) {
         fractalController->SetMandelbulbPower(mandelbulb_power);
     }
+
+    ImGui::End();
+}
+
+void Gui::Julia() {
+    ImGui::Begin("Julia parameters", NULL, parametersWindowFlags); 
+    
+    FractalColor();
 
     ImGui::End();
 }

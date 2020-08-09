@@ -128,6 +128,7 @@ private:
 
     void Test();
     void Mandelbulb();
+    void Julia();
 
 };
 

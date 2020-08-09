@@ -10,6 +10,7 @@ void SkyBox::Load(const std::array<std::string, 6>& fileNames) {
         unsigned char *data = stbi_load(fileNames[i].c_str(), &width, &height, &nrChannels, 0);
         if (data) {
             GLCall(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data));
+            //stbi_image_free(data);
         }
         else {
             std::cout << "Cubemap texture failed to load at path: " << fileNames[i] << std::endl;
@@ -22,6 +23,8 @@ void SkyBox::Load(const std::array<std::string, 6>& fileNames) {
     GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
     GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
     GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE));  
+
+    // !!!!!!!!!!!!!!!!!!!!!! нужно отбиндить в конце текстуру ... !!!!!!!!!!!!!!!!!!!
 }
 
 void SkyBox::Reload(const std::array<std::string, 6>& fileNames) {
@@ -82,11 +85,13 @@ void SkyBoxHDR::LoadHDR(const std::string& fileName) {
         GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
 
         stbi_image_free(data); 
+        GLCall(glBindTexture(GL_TEXTURE_2D, 0));
     }
     else {
         std::cout << "Failed to load HDR image." << std::endl;
         stbi_image_free(data); 
     }  
+
     //--------------------------------------------------------------------------
 
     //-----------setup cubemap to render to and attach to framebuffer-----------
@@ -100,6 +105,8 @@ void SkyBoxHDR::LoadHDR(const std::string& fileName) {
     GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE));
     GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR)); 
     GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR)); 
+
+    GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
     //--------------------------------------------------------------------------
 }
 
@@ -122,6 +129,8 @@ void SkyBoxHDR::InitIrradianceCubemap() {
     GLCall(glBindFramebuffer(GL_FRAMEBUFFER, FBO));
     GLCall(glBindRenderbuffer(GL_RENDERBUFFER, RBO));
     GLCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, irradianceMapSize, irradianceMapSize));
+
+    GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -148,6 +157,7 @@ void SkyBoxHDR::ReloadHDR(const std::string& fileName) {
         GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
 
         stbi_image_free(data); 
+        GLCall(glBindTexture(GL_TEXTURE_2D, 0));
     }
     else {
         std::cout << "Failed to load HDR image." << std::endl;
