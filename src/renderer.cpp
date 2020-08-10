@@ -251,6 +251,7 @@ void Renderer::Render(int width, int height) {
 	program.SetUniform("iResolution", glm::vec2(width, height));
 	program.SetUniform("fieldOfView", fov);
 	program.SetUniform("Time", (float)glfwGetTime());
+	program.SetUniform("shadowStrength", fractalsParameters.shadow_strength);
 
 	program.SetUniform("lightDirection1", fractalsParameters.lightDirection1);
 	program.SetUniform("lightColor1", fractalsParameters.lightColor1);

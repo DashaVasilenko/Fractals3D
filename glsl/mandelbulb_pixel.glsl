@@ -27,6 +27,8 @@ uniform float Time;
 uniform float shininess; // показатель степени зеркального отражения
 uniform float reflection; // сила отражения
 
+uniform float shadowStrength;
+
 uniform vec3 lightDirection1;
 uniform vec3 lightColor1;
 uniform float lightIntensity1;
@@ -234,7 +236,7 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
         vec3 shadowRayOrigin = point + 0.001*outNormal;
         vec3 shadowRayDir = normalize(lightDirection1); // луч, направленный на источник света
         // последний параметр это сила размытости мягких теней
-        shadow = softShadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, 32.0);
+        shadow = softShadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, shadowStrength);
     #endif
 
         // sun
@@ -296,6 +298,7 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
 }
 
 void main() {
+    float s = shadowStrength;
     float time = Time*.1;
     vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
     float f = fieldOfView;

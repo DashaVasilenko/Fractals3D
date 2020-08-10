@@ -280,7 +280,7 @@ void Gui::MainParameters() {
     int width, height;
     window->GetSize(&width, &height);
     ImGui::SetNextWindowPos(ImVec2((float)width*2/3, 18.0f));
-    ImVec2 parametersSize = ImVec2((float)width*1/3, (float)(height*2/3));
+    ImVec2 parametersSize = ImVec2((float)width*1/3, (float)(height*2/3 + 25.0));
 	ImGui::SetNextWindowSize(parametersSize);
     
     ImGui::Begin("Parameters", NULL, parametersWindowFlags); 
@@ -291,43 +291,47 @@ void Gui::MainParameters() {
     if (ImGui::Checkbox("Soft shadows", &soft_shadows)) { 
         flag = true; 
     }
+    if (MyDragFloat("Shadow strength", &shadow_strength, 1, 1, 128)) {
+        fractalController->SetShadowStrength(shadow_strength);
+    }
     //-------------------------------------------------------------------
 
     //--------------------------Light parameters-------------------------
+    ImGui::NewLine();
     ImGui::Separator();
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + parametersSize[0]/2.0 - 57.0);
     ImGui::Text("Light parameters");
     ImGui::Separator();
 
     ImGui::Text("Light 1:");
-     if (ImGui::InputFloat3("Direction", light_direction1)) {
+    if (ImGui::InputFloat3("Direction1", light_direction1)) {
         fractalController->SetLightDirection1(glm::vec3(light_direction1[0], light_direction1[1], light_direction1[2]));
     }
-    if (ImGui::ColorEdit3("Color", light_color1)) {
+    if (ImGui::ColorEdit3("Color1", light_color1)) {
         fractalController->SetLightColor1(glm::vec3(light_color1[0], light_color1[1], light_color1[2]));
     }
-    if (MyDragFloat("Intensity", &light_intensity1, 1, 1, 100)) {
+    if (MyDragFloat("Intensity1", &light_intensity1, 1, 1, 100)) {
         fractalController->SetLightIntensity1(light_intensity1);
     }
     ImGui::Separator();
 
     ImGui::Text("Light 2:");
-    if (ImGui::InputFloat3("Direction", light_direction2)) {
+    if (ImGui::InputFloat3("Direction2", light_direction2)) {
         fractalController->SetLightDirection2(glm::vec3(light_direction2[0], light_direction2[1], light_direction2[2]));
     }
-    if (ImGui::ColorEdit3("Color", light_color2)) {
+    if (ImGui::ColorEdit3("Color2", light_color2)) {
         fractalController->SetLightColor2(glm::vec3(light_color2[0], light_color2[1], light_color2[2]));
     }
-    if (MyDragFloat("Intensity", &light_intensity2, 1, 1, 100)) {
+    if (MyDragFloat("Intensity2", &light_intensity2, 1, 1, 100)) {
         fractalController->SetLightIntensity2(light_intensity2);
     }
     ImGui::Separator();
 
     ImGui::Text("Ambient light:");
-    if (ImGui::ColorEdit3("Color", ambient_fractal_light_color)) {
+    if (ImGui::ColorEdit3("Color3", ambient_fractal_light_color)) {
         fractalController->SetAmbientFractalLightColor(glm::vec3(ambient_fractal_light_color[0], ambient_fractal_light_color[1], ambient_fractal_light_color[2]));
     }
-    if (MyDragFloat("Intensity", &ambient_light_intensity, 1, 1, 100)) {
+    if (MyDragFloat("Intensity3", &ambient_light_intensity, 1, 1, 100)) {
         fractalController->SetAmbientFractalLightIntensity(ambient_light_intensity);
     }
     //-------------------------------------------------------------------
@@ -471,8 +475,8 @@ void Gui::MainParameters() {
 void Gui::FractalParameters() {
     int width, height;
     window->GetSize(&width, &height);
-    ImGui::SetNextWindowPos(ImVec2((float)width*2/3, (float)(height*2/3) + 18.0f));
-    ImVec2 parametersSize = ImVec2((float)width*1/3, (float)(height*1/3) - 18.0f);
+    ImGui::SetNextWindowPos(ImVec2((float)width*2/3, (float)(height*2/3) + 43.0f));
+    ImVec2 parametersSize = ImVec2((float)width*1/3, (float)(height*1/3) - 43.0f);
 	ImGui::SetNextWindowSize(parametersSize);
     
     switch(currentFractalType) {
@@ -497,7 +501,7 @@ void Gui::FractalParameters() {
 }
 
 void Gui::FractalColor() {
-    if (MyDragFloat("Shininess", &shininess, 1, 0, 100)) {
+    if (MyDragFloat("Shininess", &shininess, 1, 1, 100)) {
         fractalController->SetFractalShininess(shininess);
     }
     if (MyDragFloat("Reflection", &reflection, 0.1, 0, 1)) {

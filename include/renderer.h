@@ -61,6 +61,7 @@ private:
         bool irradianceCubemap = true;
 
         // General fractal parameters
+        float shadow_strength = 32.0f;
         float shininess = 32.0f;
         float reflection = 0.2f;
 

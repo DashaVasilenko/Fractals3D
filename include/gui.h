@@ -52,6 +52,7 @@ private:
 
     // general fractal parameters
     bool soft_shadows = false;
+    float shadow_strength = 32.0;
     float shininess = 32.0;
     float reflection = 0.2;
 

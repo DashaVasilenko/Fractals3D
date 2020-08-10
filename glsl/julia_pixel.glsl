@@ -1,5 +1,3 @@
-
-//
 // Related shaders
 //
 // Julia - Quaternion 1 : https://www.shadertoy.com/view/MsfGRr
@@ -25,6 +23,8 @@ uniform float fieldOfView;
 #endif
 
 uniform float Time;
+
+uniform float shadowStrength;
 
 uniform vec3 lightDirection1;
 uniform vec3 lightColor1;
@@ -67,6 +67,7 @@ const int numIterations = 11;
 // Compute Julia set
 // http://iquilezles.org/www/articles/juliasets3d/juliasets3d.htm
 // https://iquilezles.org/www/articles/distancefractals/distancefractals.htm
+// https://www.shadertoy.com/view/MsfGRr
 float julia(vec3 pos, vec4 c, out vec4 trapColor) {
     vec4 z = vec4(pos, 0.0);
     float md2 = 1.0;
@@ -223,7 +224,7 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
         vec3 shadowRayOrigin = point + 0.001*outNormal;
         vec3 shadowRayDir = normalize(lightDirection1); // луч, направленный на источник света
         // предпоследний параметр это сила размытости мягких теней
-        shadow = softShadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, 32.0, c);
+        shadow = softShadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, shadowStrength, c);
     #endif
 
         // sun
@@ -285,6 +286,7 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
 }
 
 void main() {
+    float s = shadowStrength;
     float f = fieldOfView; // !!!!!!!!!!!!!!!!!!!!! удалить эту строку потом !!!!!!!!!!!!!!!!!!!
 
     vec2 fragCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);

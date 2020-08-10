@@ -23,6 +23,8 @@ uniform float fieldOfView;
 
 uniform float Time;
 
+uniform float shadowStrength;
+
 uniform vec3 lightDirection1;
 uniform vec3 lightColor1;
 uniform float lightIntensity1;
@@ -229,6 +231,7 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
 }
 
 vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
+    float s = shadowStrength;
     vec4 trap;  
     float dist = shortestDistanceToSurface(eye, dir, MIN_DIST, MAX_DIST, trap); // intersect fractal
 
@@ -266,8 +269,7 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
     #ifdef FLAG_SOFT_SHADOWS
         vec3 shadowRayOrigin = point + 0.001*outNormal;
         vec3 shadowRayDir = normalize(lightDirection1); // луч, направленный на источник света
-        // последний параметр это сила размытости мягких теней
-        shadow = softShadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, 32.0);
+        shadow = softShadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, shadowStrength);
     #endif
 
         // sun

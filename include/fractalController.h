@@ -166,6 +166,8 @@ public:
         }
     }
 
+    void SetShadowStrength(float c ) { renderer->fractalsParameters.shadow_strength = c; }
+
     void SetLightDirection1(const glm::vec3& c) { renderer->fractalsParameters.lightDirection1 = c; }
     void SetLightColor1(const glm::vec3& c) { renderer->fractalsParameters.lightColor1 = c; }
     void SetLightIntensity1(float c) { renderer->fractalsParameters.lightIntensity1 = c; }
