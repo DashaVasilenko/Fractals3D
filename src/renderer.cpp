@@ -289,10 +289,7 @@ void Renderer::Render(int width, int height) {
     }
 	//--------------------------------------------------------------------------
 	
-	//---------------------------set fractal color------------------------------
-	program.SetUniform("ambientColor", fractalsParameters.ambient_fractal_color);
-	program.SetUniform("diffuseColor", fractalsParameters.diffuse_fractal_color);
-	program.SetUniform("specularColor", fractalsParameters.specular_fractal_color);
+	//-----------------------set general fractal parameters---------------------
 	program.SetUniform("shininess", fractalsParameters.shininess);
 	program.SetUniform("reflection", fractalsParameters.reflection);
 	//--------------------------------------------------------------------------
@@ -300,7 +297,7 @@ void Renderer::Render(int width, int height) {
 	//-------------------------set fractal parameters---------------------------
 	switch(currentFractalType) {
         case FractalType::Test: {
-            
+            program.SetUniform("color", fractalsParameters.test_color);
             break;
         }
         case FractalType::Mandelbulb: {

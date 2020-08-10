@@ -60,14 +60,14 @@ private:
         SkyboxTextureHDR skybox_texture_hdr = SkyboxTextureHDR::WinterForest;
         bool irradianceCubemap = true;
 
-        // Fractal color
-        glm::vec3 ambient_fractal_color = { 0.19225, 0.19225, 0.19225 };
-        glm::vec3 diffuse_fractal_color = { 0.50754, 0.50754, 0.50754 };
-        glm::vec3 specular_fractal_color = { 0.50827, 0.50827, 0.50827 };
+        // General fractal parameters
         float shininess = 32.0f;
         float reflection = 0.2f;
 
-        // Mandelbulb parameters
+        // Test fractal parameters
+        glm::vec3 test_color = { 0.19225, 0.19225, 0.19225 };
+
+        // Mandelbulb fractal parameters
         glm::vec3 mandelbulb_color1 = { 0.10, 0.20, 0.30 };
         glm::vec3 mandelbulb_color2 = { 0.02, 0.10, 0.30 };
         glm::vec3 mandelbulb_color3 = { 0.30, 0.10, 0.02 };

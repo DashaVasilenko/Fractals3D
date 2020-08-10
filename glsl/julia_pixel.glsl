@@ -37,12 +37,8 @@ uniform float lightIntensity2;
 uniform vec3 ambientLightColor3;
 uniform float ambientLightIntensity3;
 
-uniform vec3 ambientColor; // отражение фонового света материалом
-uniform vec3 diffuseColor; // отражение рассеянного света материалом
-uniform vec3 specularColor; // отражение зеркального света материалом
 uniform float shininess; // показатель степени зеркального отражения
-uniform float reflection;
-
+uniform float reflection; // сила отражения
 
 //const int MAX_MARCHING_STEPS = 255;
 const int MAX_MARCHING_STEPS = 128;
@@ -56,6 +52,7 @@ const float EPSILON = 0.0005;
 //#define AA 2  // Set AA to 1 if your machine is too slow
 //#endif
 
+//-------------------------------------------------------------------------------------------------------
 // square a quaterion
 vec4 qsqr(vec4 a)  {
     return vec4( a.x*a.x - a.y*a.y - a.z*a.z - a.w*a.w,
@@ -288,10 +285,7 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
 }
 
 void main() {
-    float f = fieldOfView;
-    vec3 a = ambientColor;
-    vec3 d = diffuseColor;
-    vec3 s = specularColor;
+    float f = fieldOfView; // !!!!!!!!!!!!!!!!!!!!! удалить эту строку потом !!!!!!!!!!!!!!!!!!!
 
     vec2 fragCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
     vec2  sp = (2.0*fragCoord-iResolution.xy) / iResolution.y;

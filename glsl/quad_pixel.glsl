@@ -34,11 +34,9 @@ uniform float lightIntensity2;
 uniform vec3 ambientLightColor3;
 uniform float ambientLightIntensity3;
 
-uniform vec3 ambientColor; // отражение фонового света материалом
-uniform vec3 diffuseColor; // отражение рассеянного света материалом
-uniform vec3 specularColor; // отражение зеркального света материалом
+uniform vec3 color;
 uniform float shininess; // показатель степени зеркального отражения
-uniform float reflection;
+uniform float reflection; // сила отражения
 
 const int MAX_MARCHING_STEPS = 255;
 const float MIN_DIST = 0.0;
@@ -258,7 +256,7 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
         float shadow = 1.0;
         
         // main color
-        vec3 albedo = ambientColor;
+        vec3 albedo = color;
         //vec3 albedo = vec3(0.001); // чем больше значение, тем более засвеченный фрактал
         //albedo = mix(albedo, color1, clamp(trap.y, 0.0, 1.0));
 	 	//albedo = mix(albedo, color2, clamp(trap.z*trap.z, 0.0, 1.0));
@@ -329,11 +327,6 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
 }
 
 void main() {
-    vec3 a = ambientColor;
-    vec3 d = diffuseColor;
-    vec3 s = specularColor;
-    float sh = shininess;
-
     vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
     vec3 dir = rayDirection(fieldOfView, iResolution, pixelCoord);
     vec3 eye = viewMatrix[3].xyz;

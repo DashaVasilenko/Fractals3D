@@ -119,9 +119,6 @@ public:
         renderer->CreateIrradianceCubeMap();     
     }
 
-    void SetAmbientFractalColor(const glm::vec3& c) { renderer->fractalsParameters.ambient_fractal_color = c; }
-    void SetDiffuseFractalColor(const glm::vec3& c) { renderer->fractalsParameters.diffuse_fractal_color = c; }
-    void SetSpecularFractalColor(const glm::vec3& c) { renderer->fractalsParameters.specular_fractal_color = c; }
     void SetFractalShininess(float c) { renderer->fractalsParameters.shininess = c; }
     void SetFractalReflect(float c) { renderer->fractalsParameters.reflection = c; }
 
@@ -179,6 +176,8 @@ public:
 
     void SetAmbientFractalLightColor(const glm::vec3& c) { renderer->fractalsParameters.ambientLightColor = c; }
     void SetAmbientFractalLightIntensity(float c) { renderer->fractalsParameters.ambientLightIntensity = c; }
+
+    void SetTestColor(const glm::vec3& c) { renderer->fractalsParameters.test_color = c; }
 
     void SetMandelbulbColor1(const glm::vec3& c) { renderer->fractalsParameters.mandelbulb_color1 = c; }
     void SetMandelbulbColor2(const glm::vec3& c) { renderer->fractalsParameters.mandelbulb_color2 = c; }

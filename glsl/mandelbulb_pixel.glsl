@@ -24,11 +24,8 @@ uniform float fieldOfView;
 
 uniform float Time;
 
-uniform vec3 ambientColor; // отражение фонового света материалом
-uniform vec3 diffuseColor; // отражение рассеянного света материалом
-uniform vec3 specularColor; // отражение зеркального света материалом
 uniform float shininess; // показатель степени зеркального отражения
-uniform float reflection;
+uniform float reflection; // сила отражения
 
 uniform vec3 lightDirection1;
 uniform vec3 lightColor1;
@@ -299,7 +296,6 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
 }
 
 void main() {
-
     float time = Time*.1;
     vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
     float f = fieldOfView;
@@ -331,10 +327,6 @@ void main() {
     vec2  sp = (2.0*pixelCoord-iResolution.xy) / iResolution.y;
 */
     outColor = Render(eye, dir, sp);
-
-    vec3 a = ambientColor;
-    vec3 d = diffuseColor;
-    vec3 s = specularColor;
 
 /*
 // !!!!!!!!!! добавить антиалиасинг при рендеринге картинки конечной !!!!!!!!!

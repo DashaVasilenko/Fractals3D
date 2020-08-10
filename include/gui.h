@@ -23,8 +23,6 @@ public:
     void Destroy();
 
 private:
-    bool soft_shadows = false;
-
     // light parameters
     float light_direction1[3] = { 0.577, 0.577, -0.577 }; // sun. compute shadows for it
     float light_color1[3] = { 1.0, 1.0, 0.70 }; 
@@ -52,17 +50,18 @@ private:
     const char* fractal_type[4] = { "Test", "Mandelbulb", "Monster", "Julia" };
     int current_fractal_type = 0; 
 
-    // test fractal parameters
-    float ambient_fractal_color[3] = { 0.19225, 0.19225, 0.19225 };
-    float diffuse_fractal_color[3] = { 0.50754, 0.50754, 0.50754 };
-    float specular_fractal_color[3] = { 0.50827, 0.50827, 0.50827 };
+    // general fractal parameters
+    bool soft_shadows = false;
     float shininess = 32.0;
     float reflection = 0.2;
 
+    // test fractal parameters
+    float test_color[3] = { 0.19225, 0.19225, 0.19225 };
+
     // mandelbulb fractal parameters
-    float color1[3] = { 0.10, 0.20, 0.30 };
-    float color2[3] = { 0.02, 0.10, 0.30 };
-    float color3[3] = { 0.30, 0.10, 0.02 };
+    float mandelbulb_color1[3] = { 0.10, 0.20, 0.30 };
+    float mandelbulb_color2[3] = { 0.02, 0.10, 0.30 };
+    float mandelbulb_color3[3] = { 0.30, 0.10, 0.02 };
     int mandelbulb_iterations = 8;
     float mandelbulb_bailout = 10.0f;
     float mandelbulb_power = 9.0f;
