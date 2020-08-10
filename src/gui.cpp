@@ -263,6 +263,14 @@ void Gui::Stats() {
             ImGui::Text("Current fractal type: Mandelbulb fractal");
             break;
         }
+        case FractalType::Monster: {
+            ImGui::Text("Current fractal type: Monster fractal");
+            break;
+        }
+        case FractalType::Julia: {
+            ImGui::Text("Current fractal type: Julia fractal");
+            break;
+        }
     }
 
     ImGui::End();
@@ -349,48 +357,54 @@ void Gui::MainParameters() {
                 fractalController->SetSkyboxTexture(static_cast<SkyboxTexture>(current_skybox_texture));
         }
         if (static_cast<SkyboxTexture>(current_skybox_texture) == SkyboxTexture::Other) {
-            
+            std::string text = "";
             if (ImGui::Button("Front(+Z):")) {
                 cubemapSide = CubemapSide::Front;
                 fileBrowserSetupSkybox.Open();
             }
             ImGui::SameLine();
-            ImGui::Text((skybox_roots[0] + "..." + skybox_names[0]).c_str());
+            text = skybox_roots[0] + "..." + skybox_names[0];
+            ImGui::Text("%s", text.c_str());
 
             if (ImGui::Button("Back(-Z):")) {
                 cubemapSide = CubemapSide::Back;
                 fileBrowserSetupSkybox.Open();
             }
             ImGui::SameLine();
-            ImGui::Text((skybox_roots[1] + "..." + skybox_names[1]).c_str());
+            text = skybox_roots[1] + "..." + skybox_names[1];
+            ImGui::Text("%s", text.c_str());
             
             if (ImGui::Button("Up(+Y):")) {
                 cubemapSide = CubemapSide::Up;
                 fileBrowserSetupSkybox.Open();
             }
             ImGui::SameLine();
-            ImGui::Text((skybox_roots[2] + "..." + skybox_names[2]).c_str());
+            text = skybox_roots[2] + "..." + skybox_names[2];
+            ImGui::Text("%s", text.c_str());
 
             if (ImGui::Button("Down(-Y):")) {
                 cubemapSide = CubemapSide::Down;
                 fileBrowserSetupSkybox.Open();
             }
             ImGui::SameLine();
-            ImGui::Text((skybox_roots[3] + "..." + skybox_names[3]).c_str());
+            text = skybox_roots[3] + "..." + skybox_names[3];
+            ImGui::Text("%s", text.c_str());
 
             if (ImGui::Button("Left(-X):")) {
                 cubemapSide = CubemapSide::Left;
                 fileBrowserSetupSkybox.Open();
             }
             ImGui::SameLine();
-            ImGui::Text((skybox_roots[4] + "..." + skybox_names[4]).c_str());
+            text = skybox_roots[4] + "..." + skybox_names[4];
+            ImGui::Text("%s", text.c_str());
 
             if (ImGui::Button("Right(+X):")) {
                 cubemapSide = CubemapSide::Right;
                 fileBrowserSetupSkybox.Open();
             }
             ImGui::SameLine();
-            ImGui::Text((skybox_roots[5] + "..." + skybox_names[5]).c_str());
+            text = skybox_roots[5] + "..." + skybox_names[5];
+            ImGui::Text("%s", text.c_str());
 
             if (ImGui::Button("Use")) {
                 fractalController->SetSkyboxTexture(skybox_paths);
@@ -414,7 +428,8 @@ void Gui::MainParameters() {
                 fileBrowserSetupSkyboxHDR.Open();
             }
             ImGui::SameLine();
-            ImGui::Text((skybox_hdr_root + "..." + skybox_hdr_name).c_str());
+            std::string t = skybox_hdr_root + "..." + skybox_hdr_name;
+            ImGui::Text("%s", t.c_str());
 
             if (ImGui::Button("Use")) {
                 fractalController->SetSkyboxTextureHDR(skybox_hdr_path);
@@ -573,7 +588,8 @@ void Gui::ExportAs() {
             fileBrowserSaveImage.Open();
         }
         ImGui::SameLine();
-        ImGui::Text((output_path + output_name).c_str());
+        std::string t = output_path + output_name;
+        ImGui::Text("%s", t.c_str());
 
         ImGui::Text("Width:");
         ImGui::SetNextItemWidth(200);

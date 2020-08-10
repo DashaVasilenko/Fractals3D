@@ -54,6 +54,9 @@ public:
                 skybox->Reload(skybox->vasa);
                 break;
             }
+            case SkyboxTexture::Other: {
+                break;
+            }
         }
     }
 
@@ -91,6 +94,9 @@ public:
             }
             case SkyboxTextureHDR::TropicalBeach: {
                 skyboxHDR->ReloadHDR(skyboxHDR->tropicalBeachHDR);
+                break;
+            }
+            case SkyboxTextureHDR::OtherHDR: {
                 break;
             }
         }
