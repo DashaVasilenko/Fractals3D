@@ -37,6 +37,16 @@ uniform float lightIntensity2;
 uniform vec3 ambientLightColor3;
 uniform float ambientLightIntensity3;
 
+#ifdef COLORING_TYPE_ONE_COLOR
+uniform vec3 color;
+#endif
+
+#ifdef COLORING_TYPE_THREE_COLORS
+uniform vec3 color1;
+uniform vec3 color2;
+uniform vec3 color3;
+#endif
+
 uniform float shininess; // показатель степени зеркального отражения
 uniform float reflection; // сила отражения
 
@@ -213,8 +223,22 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
 	}
     // color fractal
 	else {
-        vec3 albedo = vec3(1.0,0.8,0.7)*0.3;
-		//albedo.x = 1.0-10.0*trap.x;
+
+        // main color
+    #ifdef COLORING_TYPE_ONE_COLOR
+        vec3 albedo = color*0.3;
+    #endif
+    #ifdef COLORING_TYPE_THREE_COLORS
+        vec3 albedo = vec3(0.001); // чем больше значение, тем более засвеченный фрактал
+        albedo = mix(albedo, color1, clamp(trap.y, 0.0, 1.0));
+	 	albedo = mix(albedo, color2, clamp(trap.z*trap.z, 0.0, 1.0));
+        albedo = mix(albedo, color3, clamp(pow(trap.w, 6.0), 0.0, 1.0));
+        albedo *= 0.5;
+    #endif
+
+        //vec3 albedo = color*0.3;
+		//albedo.x = 1.0-10.0*trap.x; // !!!!!!!!!!!!!!!! добавить еще эту окраску !!!!!!!!!!!!!!!!!!!!!!!
+
 		float occlusion = clamp(2.5*trap.w - 0.15, 0.0, 1.0);
         vec3 col = vec3(0.0);
         vec3 hal = normalize(lightDirection1 - dir);

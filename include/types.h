@@ -16,6 +16,11 @@ enum FractalType {
         Julia,
 };
 
+enum ColoringType {
+        OneColor,
+        ThreeColors,
+};
+
 enum CubemapSide {
         Front,
         Back, 

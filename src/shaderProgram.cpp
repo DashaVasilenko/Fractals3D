@@ -72,6 +72,17 @@ void ShaderProgram::Load() {
     if (irradianceCubemap) 
         defines += "#define IRRADIANCE_CUBEMAP" + std::string("\n");
     //std::cout << currentBackgroundType << std::endl;
+
+    switch(currentColoringType) {
+        case ColoringType::OneColor: {
+            defines += "#define COLORING_TYPE_ONE_COLOR" + std::string("\n");
+            break;
+        }
+        case ColoringType::ThreeColors: {
+            defines += "#define COLORING_TYPE_THREE_COLORS" + std::string("\n");
+            break;
+        }
+    }
     
     Compile();
     Link();

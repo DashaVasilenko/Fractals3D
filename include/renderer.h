@@ -65,16 +65,22 @@ private:
         float shininess = 32.0f;
         float reflection = 0.2f;
 
+        // Fractals coloring
+        ColoringType coloring_type = ColoringType::OneColor;
+        glm::vec3 one_color_color = { 1.0, 0.8, 0.7 };
+        glm::vec3 three_colors_color1 = { 0.10, 0.20, 0.30 };
+        glm::vec3 three_colors_color2 = { 0.02, 0.10, 0.30 };
+        glm::vec3 three_colors_color3 = { 0.30, 0.10, 0.02 };
+
         // Test fractal parameters
-        glm::vec3 test_color = { 0.19225, 0.19225, 0.19225 };
 
         // Mandelbulb fractal parameters
-        glm::vec3 mandelbulb_color1 = { 0.10, 0.20, 0.30 };
-        glm::vec3 mandelbulb_color2 = { 0.02, 0.10, 0.30 };
-        glm::vec3 mandelbulb_color3 = { 0.30, 0.10, 0.02 };
         int mandelbulb_iterations = 8;
         float mandelbulb_bailout = 10.0f;
         float mandelbulb_power = 9.0f;
+
+        // Julia fractal parameters
+
 
         SkyBoxHDR monsterColorHDR;
 

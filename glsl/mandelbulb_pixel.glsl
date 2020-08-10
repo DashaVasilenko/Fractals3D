@@ -24,11 +24,6 @@ uniform float fieldOfView;
 
 uniform float Time;
 
-uniform float shininess; // показатель степени зеркального отражения
-uniform float reflection; // сила отражения
-
-uniform float shadowStrength;
-
 uniform vec3 lightDirection1;
 uniform vec3 lightColor1;
 uniform float lightIntensity1;
@@ -40,9 +35,19 @@ uniform float lightIntensity2;
 uniform vec3 ambientLightColor3;
 uniform float ambientLightIntensity3;
 
+#ifdef COLORING_TYPE_ONE_COLOR
+uniform vec3 color;
+#endif
+
+#ifdef COLORING_TYPE_THREE_COLORS
 uniform vec3 color1;
 uniform vec3 color2;
 uniform vec3 color3;
+#endif
+
+uniform float shininess; // показатель степени зеркального отражения
+uniform float reflection; // сила отражения
+uniform float shadowStrength;
 
 uniform int Iterations = 8;
 uniform float Bailout = 10.0f;
@@ -224,18 +229,22 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
         vec3 hal = normalize(lightDirection1 - dir);
         float occlusion = clamp(0.05*log(trap.x), 0.0, 1.0);
         float shadow = 1.0;
-        
+
         // main color
+    #ifdef COLORING_TYPE_ONE_COLOR
+        vec3 albedo = color;
+    #endif
+    #ifdef COLORING_TYPE_THREE_COLORS
         vec3 albedo = vec3(0.001); // чем больше значение, тем более засвеченный фрактал
         albedo = mix(albedo, color1, clamp(trap.y, 0.0, 1.0));
 	 	albedo = mix(albedo, color2, clamp(trap.z*trap.z, 0.0, 1.0));
         albedo = mix(albedo, color3, clamp(pow(trap.w, 6.0), 0.0, 1.0));
         albedo *= 0.5;
+    #endif
         
     #ifdef FLAG_SOFT_SHADOWS
         vec3 shadowRayOrigin = point + 0.001*outNormal;
         vec3 shadowRayDir = normalize(lightDirection1); // луч, направленный на источник света
-        // последний параметр это сила размытости мягких теней
         shadow = softShadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, shadowStrength);
     #endif
 

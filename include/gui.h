@@ -56,16 +56,24 @@ private:
     float shininess = 32.0;
     float reflection = 0.2;
 
+    // coloring types
+    ColoringType currentColoringType = ColoringType::OneColor;
+    const char* coloring_type[2] = { "One color", "Three colors" };
+    int current_coloring_type = 0; 
+    float one_color_color[3] = { 1.0, 0.8, 0.7 };
+    float three_colors_color1[3] = { 0.10, 0.20, 0.30 };
+    float three_colors_color2[3] = { 0.02, 0.10, 0.30 };
+    float three_colors_color3[3] = { 0.30, 0.10, 0.02 };
+
+
     // test fractal parameters
-    float test_color[3] = { 0.19225, 0.19225, 0.19225 };
 
     // mandelbulb fractal parameters
-    float mandelbulb_color1[3] = { 0.10, 0.20, 0.30 };
-    float mandelbulb_color2[3] = { 0.02, 0.10, 0.30 };
-    float mandelbulb_color3[3] = { 0.30, 0.10, 0.02 };
     int mandelbulb_iterations = 8;
     float mandelbulb_bailout = 10.0f;
     float mandelbulb_power = 9.0f;
+
+    // julia fractal parameters
 
     // export
     bool exportWindowFlag = false;

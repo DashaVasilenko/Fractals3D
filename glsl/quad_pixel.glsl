@@ -23,8 +23,6 @@ uniform float fieldOfView;
 
 uniform float Time;
 
-uniform float shadowStrength;
-
 uniform vec3 lightDirection1;
 uniform vec3 lightColor1;
 uniform float lightIntensity1;
@@ -36,9 +34,20 @@ uniform float lightIntensity2;
 uniform vec3 ambientLightColor3;
 uniform float ambientLightIntensity3;
 
+#ifdef COLORING_TYPE_ONE_COLOR
 uniform vec3 color;
+#endif
+
+#ifdef COLORING_TYPE_THREE_COLORS
+uniform vec3 color1;
+uniform vec3 color2;
+uniform vec3 color3;
+#endif
+
 uniform float shininess; // показатель степени зеркального отражения
 uniform float reflection; // сила отражения
+uniform float shadowStrength;
+
 
 const int MAX_MARCHING_STEPS = 255;
 const float MIN_DIST = 0.0;
@@ -259,12 +268,16 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
         float shadow = 1.0;
         
         // main color
+    #ifdef COLORING_TYPE_ONE_COLOR
         vec3 albedo = color;
-        //vec3 albedo = vec3(0.001); // чем больше значение, тем более засвеченный фрактал
-        //albedo = mix(albedo, color1, clamp(trap.y, 0.0, 1.0));
-	 	//albedo = mix(albedo, color2, clamp(trap.z*trap.z, 0.0, 1.0));
-        //albedo = mix(albedo, color3, clamp(pow(trap.w, 6.0), 0.0, 1.0));
-        //albedo *= 0.5;
+    #endif
+    #ifdef COLORING_TYPE_THREE_COLORS
+        vec3 albedo = vec3(0.001); // чем больше значение, тем более засвеченный фрактал
+        albedo = mix(albedo, color1, clamp(trap.y, 0.0, 1.0));
+	    albedo = mix(albedo, color2, clamp(trap.z*trap.z, 0.0, 1.0));
+        albedo = mix(albedo, color3, clamp(pow(trap.w, 6.0), 0.0, 1.0));
+        albedo *= 0.5;
+    #endif
         
     #ifdef FLAG_SOFT_SHADOWS
         vec3 shadowRayOrigin = point + 0.001*outNormal;

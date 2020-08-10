@@ -290,7 +290,20 @@ void Renderer::Render(int width, int height) {
     }
 	//--------------------------------------------------------------------------
 	
-	//-----------------------set general fractal parameters---------------------
+	//-----------------------set color fractal parameters-----------------------
+	switch(fractalsParameters.coloring_type) {
+		case ColoringType::OneColor: {
+            program.SetUniform("color", fractalsParameters.one_color_color);
+			break;
+		}
+		case ColoringType::ThreeColors: {
+			program.SetUniform("color1", fractalsParameters.three_colors_color1);
+			program.SetUniform("color2", fractalsParameters.three_colors_color2);
+			program.SetUniform("color3", fractalsParameters.three_colors_color3);
+			break;
+		}
+	}
+
 	program.SetUniform("shininess", fractalsParameters.shininess);
 	program.SetUniform("reflection", fractalsParameters.reflection);
 	//--------------------------------------------------------------------------
@@ -298,13 +311,9 @@ void Renderer::Render(int width, int height) {
 	//-------------------------set fractal parameters---------------------------
 	switch(currentFractalType) {
         case FractalType::Test: {
-            program.SetUniform("color", fractalsParameters.test_color);
             break;
         }
         case FractalType::Mandelbulb: {
-			program.SetUniform("color1", fractalsParameters.mandelbulb_color1);
-			program.SetUniform("color2", fractalsParameters.mandelbulb_color2);
-			program.SetUniform("color3", fractalsParameters.mandelbulb_color3);
 			program.SetUniform("Iterations", fractalsParameters.mandelbulb_iterations);
 			program.SetUniform("Bailout", fractalsParameters.mandelbulb_bailout);
 			program.SetUniform("Power", fractalsParameters.mandelbulb_power);
