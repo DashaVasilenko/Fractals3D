@@ -252,10 +252,16 @@ void Renderer::Render(int width, int height) {
 	program.SetUniform("fieldOfView", fov);
 	program.SetUniform("Time", (float)glfwGetTime());
 
-	program.SetUniform("lightDirection", fractalsParameters.light_direction);
-	program.SetUniform("ambientLightColor", fractalsParameters.ambient_light_color);
-	program.SetUniform("diffuseLightColor", fractalsParameters.diffuse_light_color);
-	program.SetUniform("specularLightColor", fractalsParameters.specular_light_color);
+	program.SetUniform("lightDirection1", fractalsParameters.lightDirection1);
+	program.SetUniform("lightColor1", fractalsParameters.lightColor1);
+	program.SetUniform("lightIntensity1", fractalsParameters.lightIntensity1);
+
+	program.SetUniform("lightDirection2", fractalsParameters.lightDirection2);
+	program.SetUniform("lightColor2", fractalsParameters.lightColor2);
+	program.SetUniform("lightIntensity2", fractalsParameters.lightIntensity2);
+
+	program.SetUniform("ambientLightColor3", fractalsParameters.ambientLightColor);
+	program.SetUniform("ambientLightIntensity3", fractalsParameters.ambientLightIntensity);
 	//--------------------------------------------------------------------------
 
 	//-------------------------set background type------------------------------
@@ -298,17 +304,6 @@ void Renderer::Render(int width, int height) {
             break;
         }
         case FractalType::Mandelbulb: {
-			program.SetUniform("lightDirection1", fractalsParameters.mandelbulb_lightDirection1);
-			program.SetUniform("lightColor1", fractalsParameters.mandelbulb_lightColor1);
-			program.SetUniform("lightIntensity1", fractalsParameters.mandelbulb_lightIntensity1);
-
-			program.SetUniform("lightDirection2", fractalsParameters.mandelbulb_lightDirection2);
-			program.SetUniform("lightColor2", fractalsParameters.mandelbulb_lightColor2);
-			program.SetUniform("lightIntensity2", fractalsParameters.mandelbulb_lightIntensity2);
-
-			program.SetUniform("ambientLightColor3", fractalsParameters.mandelbulb_ambientLightColor);
-			program.SetUniform("ambientLightIntensity3", fractalsParameters.mandelbulb_ambientLightIntensity);
-
 			program.SetUniform("color1", fractalsParameters.mandelbulb_color1);
 			program.SetUniform("color2", fractalsParameters.mandelbulb_color2);
 			program.SetUniform("color3", fractalsParameters.mandelbulb_color3);

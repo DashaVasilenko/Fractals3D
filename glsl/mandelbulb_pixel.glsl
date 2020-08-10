@@ -4,8 +4,6 @@
 //#define FLAG_SOFT_SHADOWS
 //#define FLAG_AMBIENTOCCLUSION
 
-// https://www.shadertoy.com/view/ltfSWn
-
 in mat4 viewMatrix;
 out vec4 outColor;
 
@@ -25,11 +23,6 @@ uniform float fieldOfView;
 #endif
 
 uniform float Time;
-
-uniform vec3 lightDirection;
-uniform vec3 ambientLightColor; // интенсивность фонового света
-uniform vec3 diffuseLightColor; // интенсивность рассеянного света
-uniform vec3 specularLightColor; // интенсивность зеркального света
 
 uniform vec3 ambientColor; // отражение фонового света материалом
 uniform vec3 diffuseColor; // отражение рассеянного света материалом
@@ -65,26 +58,13 @@ const float EPSILON = 0.0005;
 //-------------------------------------------------------------------------------------------------------
 // The basic formulation of the Mandelbulb is derived from extracting the polar coordinates of a 3D point 
 // and doubling its angles and squaring its length. The idea of duplicating can be generalized to triplicating,
-// or more popularly multiplying by eight. We will in fact choose the arbitrary value of eight, because for higher 
-// powers the asymptotic behaviour of the formulas tends to produce more symmetric shapes. So, let's call w to our 3D point,
-// then choose eight as our polynomial degree for our Mandelbrot, and so multiply the polar angles of our 3D point by eight 
-// and expand it's modulo by a power of eight:
+// or more popularly multiplying by eight. 
 // https://iquilezles.org/www/articles/mandelbulb/mandelbulb.htm
-
-//-------------------------------------------------------------------------------------------------------
-// In my experiments I opted for using the old orbit traps method applied in 3D but using the results to assign a color. 
-// What I did is to compute four orbit traps. One of the traps was the origin, and the other three traps were the x=0, y=0 and z=0 planes.
-// The last three traps were used to mix the basic surface color with three other colors. The point trap in the origin was used as 
-// a multiplicative factor to the color, which simulated some ambient occlusion.
+// https://www.shadertoy.com/view/ltfSWn
 //
-// The improvement from the other rudimentary coloring methods is that because the behaviour of the orbit traps follows 
-// the fractal structure of the set, so do the colors, and therefore we get meaningful color patterns emerging in the 
-// surface as opposed to generic perlin noise based coloring.
+// colord using orbit traps method
 // https://iquilezles.org/www/articles/orbittraps3d/orbittraps3d.htm
 // https://iquilezles.org/www/articles/ftrapsgeometric/ftrapsgeometric.htm
-// In mathematics, an orbit trap is a method of colouring fractal images based upon how close an iterative function,
-// used to create the fractal, approaches a geometric shape, called a "trap". Typical traps are points, lines, circles,
-// flower shapes and even raster images.
 // https://en.wikipedia.org/wiki/Orbit_trap
 float mandelbulb(vec3 pos, out vec4 resColor) {
     //int Iterations = 8;
@@ -169,23 +149,6 @@ float softShadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end
 }
 
 //-------------------------------------------------------------------------------------------------------
-// s is a scale variable determining the darkening effects of the occlusion
-// http://www2.compute.dtu.dk/pubdb/views/edoc_download.php/6392/pdf/imm6392.pdf
-float ambientOcclusion(vec3 point, vec3 normal, float step, float samples, float s) {
-    float ao = 0.0f;
-    float dist;
-    vec4 trap;
-    for (float i = 1.0f; i <= samples; i += 1.0f) {
-        dist = step*i;  
-        ao = max( (dist - (mandelbulb(point + normal*dist, trap))) / pow(2.0, i), ao); 
-        //ao += max( (dist - (mandelbulb(point + normal*dist))) / pow(2.0, i), 0.0); 
-        //ao += (dist - (mandelbulb(point + normal*dist))) / (dist*dist); 
-    }
-    return 1.0f - ao*s;
-    //return clamp(1.0f - ao*s, 0.0, 1.0);
-}
-
-//-------------------------------------------------------------------------------------------------------
 // Basic Bounding Volumes
 // boundingSphere.xyz - centrum, boundingSphere..w - radius
 // https://iquilezles.org/www/articles/sdfbounding/sdfbounding.htm
@@ -231,64 +194,17 @@ float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end
     return res;
 }
 
-
 //-------------------------------------------------------------------------------------------------------
 vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
-/*
-vec4 PhongDirectionLight(vec3 ambientColor, vec3 diffuseColor, vec3 specularColor, float shininess, vec3 point, vec3 eye, vec4 trapColor) {
-    
-    vec3 light_direction = normalize(vec3(-lightDirection)); // L для направленного
-    vec3 inEye = normalize(eye - point); // V
-    vec3 outNormal = computeNormal(point); // N
-    vec3 reflected_light = reflect(-light_direction, outNormal); //R
-
-    vec3 ambient = ambientLightColor*ambientColor;
-    vec3 diffuse = diffuseLightColor*diffuseColor*max(dot(light_direction, outNormal), 0.0f)*shadow;
-    vec3 specular = specularLightColor*specularColor*pow(max(dot(inEye, reflected_light), 0.0), shininess);
-    vec3 color = ambient + diffuse + specular;
-
-#if defined SKYBOX_BACKGROUND_HDR && defined IRRADIANCE_CUBEMAP
-//#ifdef IRRADIANCE_CUBEMAP
-    // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
-    // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
-    vec3 F0 = vec3(0.04); 
-    //F0 = mix(F0, albedo, metallic);
-    // ambient lighting (we now use IBL as the ambient term)
-    vec3 kS = fresnelSchlick(max(dot(outNormal, inEye), 0.0), F0);
-    vec3 kD = 1.0 - kS;
-    //kD *= 1.0 - metallic;	  
-    vec3 irradiance = texture(irradianceMap, outNormal).rgb;
-    //vec3 diffuse      = irradiance * albedo;
-    vec3 diffuseIBL      = irradiance * diffuseColor;
-    //vec3 ambient = (kD * diffuse) * ao;
-    vec3 ambientIBL = (kD * diffuseIBL) * ambientColor;
-
-    color += ambientIBL; 
-#endif
-
-#ifdef FLAG_AMBIENTOCCLUSION
-    float ao = ambientOcclusion(point, outNormal, 2.5, 3.0, 0.5);
-    color *= ao;
-#endif
-
-    return clamp(vec4(color, 1.0), 0.0f, 1.0f);
-}
-*/
 vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
     vec4 trap;  
     float dist = shortestDistanceToSurface(eye, dir, MIN_DIST, MAX_DIST, trap); // intersect fractal
 
-    // lighting terms
     vec3 point = eye + dist*dir; // The closest point on the surface to the eyepoint along the view ray
-    //vec3 inEye = normalize(eye - point); // V
     vec3 outNormal = computeNormal(point); // N
-    //vec3 reflected_dir = reflect(dir, outNormal); //R
-    //vec3 hal = normalize(lightDirection1 - dir);
-    //float occlusion = clamp(0.05*log(trap.x), 0.0, 1.0);
-    //float shadow = 1.0;
 
     // Didn't hit anything. sky color
     if (dist > MAX_DIST - EPSILON) {
@@ -317,15 +233,6 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
         albedo = mix(albedo, color3, clamp(pow(trap.w, 6.0), 0.0, 1.0));
         albedo *= 0.5;
         
-    #ifdef FLAG_HARD_SHADOWS
-        vec3 shadowRayOrigin = point + computeNormal(point)*0.01;
-        vec3 shadowRayDir = normalize(vec3(-lightDirection));
-        vec4 t; 
-        float dist = shortestDistanceToSurface(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, t);
-        if (dist < MAX_DIST) 
-            return vec4(0.0, 0.0, 0.0, 1.0);
-    #endif
-
     #ifdef FLAG_SOFT_SHADOWS
         vec3 shadowRayOrigin = point + 0.001*outNormal;
         vec3 shadowRayDir = normalize(lightDirection1); // луч, направленный на источник света
@@ -425,14 +332,9 @@ void main() {
 */
     outColor = Render(eye, dir, sp);
 
-    vec3 l = lightDirection;
     vec3 a = ambientColor;
     vec3 d = diffuseColor;
     vec3 s = specularColor;
-    float sh = shininess;
-    vec3 alc = ambientLightColor;
-    vec3 dlc = diffuseLightColor;
-    vec3 slc = specularLightColor;
 
 /*
 // !!!!!!!!!! добавить антиалиасинг при рендеринге картинки конечной !!!!!!!!!

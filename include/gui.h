@@ -23,38 +23,9 @@ public:
     void Destroy();
 
 private:
-    // light parameters
-    float light_direction[3] = { 0.0f, -1.0f, 0.0f };
-    float ambient_light_color[3] = { 1.0, 1.0, 1.0 };
-    float diffuse_light_color[3] = { 1.0, 1.0, 1.0 };
-    float specular_light_color[3] = { 1.0, 1.0, 1.0 };
-
-    // background parameters
-    const char* background_types[3] = { "Solid color", "Texture", "HDRTexture" };
-    int current_background_type = 2; // If the selection isn't within 0..count, Combo won't display a preview
-    float background_color[3] = { 0.30, 0.36, 0.60 };
-    const char* skybox_texture[8] = { "Orbital", "Night", "PalmTrees", "CoitTower", "MountainPath", "NightPath", "Vasa", "Other" };
-    int current_skybox_texture = 0;
-    const char* skybox_texture_hdr[8] = { "WinterForest", "Milkyway", "GrandCanyon", "IceLake", "Factory", "TopangaForest", "TropicalBeach", "OtherHDR" };
-    int current_skybox_texture_hdr = 0;
-    bool irradiance_cubemap = true;
-
-    // general fractal parameters
-    bool hard_shadows = false;
     bool soft_shadows = false;
-    bool ambient_occlusion = false;
 
-    // fractal type
-    FractalType currentFractalType = FractalType::Test;
-
-    // test fractal parameters
-    float ambient_fractal_color[3] = { 0.19225, 0.19225, 0.19225 };
-    float diffuse_fractal_color[3] = { 0.50754, 0.50754, 0.50754 };
-    float specular_fractal_color[3] = { 0.50827, 0.50827, 0.50827 };
-    float shininess = 32.0;
-    float reflection = 0.2;
-
-    // mandelbulb fractal parameters
+    // light parameters
     float light_direction1[3] = { 0.577, 0.577, -0.577 }; // sun. compute shadows for it
     float light_color1[3] = { 1.0, 1.0, 0.70 }; 
     float light_intensity1 = 12.0; 
@@ -66,6 +37,29 @@ private:
     float ambient_fractal_light_color[3] = { 0.35, 0.30, 0.25 }; // ambient light
     float ambient_light_intensity = 2.5;
 
+    // background parameters
+    const char* background_types[3] = { "Solid color", "Texture", "HDRTexture" };
+    int current_background_type = 2; // If the selection isn't within 0..count, Combo won't display a preview
+    float background_color[3] = { 0.30, 0.36, 0.60 };
+    const char* skybox_texture[8] = { "Orbital", "Night", "PalmTrees", "CoitTower", "MountainPath", "NightPath", "Vasa", "Other" };
+    int current_skybox_texture = 0;
+    const char* skybox_texture_hdr[8] = { "WinterForest", "Milkyway", "GrandCanyon", "IceLake", "Factory", "TopangaForest", "TropicalBeach", "OtherHDR" };
+    int current_skybox_texture_hdr = 0;
+    bool irradiance_cubemap = true;
+
+    // fractal type
+    FractalType currentFractalType = FractalType::Test;
+    const char* fractal_type[4] = { "Test", "Mandelbulb", "Monster", "Julia" };
+    int current_fractal_type = 0; 
+
+    // test fractal parameters
+    float ambient_fractal_color[3] = { 0.19225, 0.19225, 0.19225 };
+    float diffuse_fractal_color[3] = { 0.50754, 0.50754, 0.50754 };
+    float specular_fractal_color[3] = { 0.50827, 0.50827, 0.50827 };
+    float shininess = 32.0;
+    float reflection = 0.2;
+
+    // mandelbulb fractal parameters
     float color1[3] = { 0.10, 0.20, 0.30 };
     float color2[3] = { 0.02, 0.10, 0.30 };
     float color3[3] = { 0.30, 0.10, 0.02 };

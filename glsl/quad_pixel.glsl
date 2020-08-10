@@ -1,8 +1,6 @@
 //#version 330
 
-//#define FLAG_HARD_SHADOWS
 //#define FLAG_SOFT_SHADOWS
-//#define FLAG_AMBIENTOCCLUSION
 
 in mat4 viewMatrix;
 out vec4 outColor;
@@ -25,10 +23,16 @@ uniform float fieldOfView;
 
 uniform float Time;
 
-uniform vec3 lightDirection;
-uniform vec3 ambientLightColor; // интенсивность фонового света
-uniform vec3 diffuseLightColor; // интенсивность рассеянного света
-uniform vec3 specularLightColor; // интенсивность зеркального света
+uniform vec3 lightDirection1;
+uniform vec3 lightColor1;
+uniform float lightIntensity1;
+
+uniform vec3 lightDirection2;
+uniform vec3 lightColor2;
+uniform float lightIntensity2;
+
+uniform vec3 ambientLightColor3;
+uniform float ambientLightIntensity3;
 
 uniform vec3 ambientColor; // отражение фонового света материалом
 uniform vec3 diffuseColor; // отражение рассеянного света материалом
@@ -131,16 +135,20 @@ float sierpinskiTriangle(vec3 pos) {
 */
 }
 
+//-------------------------------------------------------------------------------------------------------
 // Absolute value of the return value indicates the distance to the surface. 
 // Sign indicates whether the point is inside or outside the surface, negative indicating inside.
-float sceneSDF(vec3 point) {
+float sceneSDF(vec3 point, out vec4 resColor) {
     float time = Time;
+    float m = dot(point, point);
+    vec4 trap = vec4(abs(point), m);
 
 #ifdef TEST
     float t = sphereSDF(point - vec3(-3, 0, 0), 2.5);
     t = unionSDF(t, sphereSDF(point-vec3(3, 0, 0), 2.5));
     t = unionSDF(t, sphereSDF(point-vec3(0, 0, 10), 2.5));
     t = unionSDF(t, planeSDF(point, vec4(0, 1, 0, 5.5)));
+    resColor = vec4(m,trap.yzw);
     return t;
 #endif
 
@@ -148,38 +156,40 @@ float sceneSDF(vec3 point) {
     //return sierpinskiTriangle(point);
 }
 
-/*
-    Return the shortest distance from the eyepoint to the scene surface along
-    the marching direction. If no part of the surface is found between start and end,
-    return end.
-  
-    eye: the eye point, acting as the origin of the ray
-    direction: the normalized direction to march in
-    start: the starting distance away from the eye
-    end: the max distance away from the eye to march before giving up
-*/
-float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end) {
+//-------------------------------------------------------------------------------------------------------
+// Return the shortest distance from the eyepoint to the scene surface along the marching direction. 
+// If no part of the surface is found between start and end, return end.
+// 
+// eye: the eye point, acting as the origin of the ray
+// direction: the normalized direction to march in
+// start: the starting distance away from the eye
+// end: the max distance away from the eye to march before giving up
+float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end, out vec4 trapColor) {
+    vec4 trap;
     float depth = start;
+    float res = end;
+
     for (int i = 0; i < MAX_MARCHING_STEPS; i++) {
-        float dist = sceneSDF(eye + depth*direction);
-        if (dist < EPSILON) {
-			return depth; // We're inside the scene surface!
-        }
-        depth += dist; // Move along the view ray
-        if (depth >= end) {
-            return depth; // Gone too far; give up
-        }
+        float h = sceneSDF(eye + depth*direction, trap);
+        if (h < EPSILON) break; // We're inside the scene surface!
+        if (depth >= end) break; // Gone too far; give up
+        depth += h; // Move along the view ray
     }
-    return depth;
+    
+    if (depth < end) { 
+        trapColor = trap;
+        res = depth;
+    }
+    return res;
 }
 
-/*
-    Return the normalized direction to march in from the eye point for a single pixel.
- 
-    fieldOfView: vertical field of view in degrees
-    size: resolution of the output image
-    fragCoord: the x,y coordinate of the pixel in the output image
-*/
+
+//-------------------------------------------------------------------------------------------------------
+// Return the normalized direction to march in from the eye point for a single pixel.
+// 
+// fieldOfView: vertical field of view in degrees
+// size: resolution of the output image
+// fragCoord: the x,y coordinate of the pixel in the output image
 vec3 rayDirection(float fieldOfView, vec2 size, vec2 fragCoord) {
     vec2 xy = fragCoord - size / 2.0;
     float z = size.y / tan(radians(fieldOfView) / 2.0);
@@ -187,152 +197,147 @@ vec3 rayDirection(float fieldOfView, vec2 size, vec2 fragCoord) {
     return normalize(dir);
 }
 
+//-------------------------------------------------------------------------------------------------------
 //Compute the normal on the surface at point p, using the gradient of the SDF
 vec3 computeNormal(vec3 p) {
+    vec4 t;
     return normalize(vec3(
-        sceneSDF(vec3(p.x + EPSILON, p.y, p.z)) - sceneSDF(vec3(p.x - EPSILON, p.y, p.z)),
-        sceneSDF(vec3(p.x, p.y + EPSILON, p.z)) - sceneSDF(vec3(p.x, p.y - EPSILON, p.z)),
-        sceneSDF(vec3(p.x, p.y, p.z + EPSILON)) - sceneSDF(vec3(p.x, p.y, p.z - EPSILON))
+        sceneSDF(vec3(p.x + EPSILON, p.y, p.z), t) - sceneSDF(vec3(p.x - EPSILON, p.y, p.z), t),
+        sceneSDF(vec3(p.x, p.y + EPSILON, p.z), t) - sceneSDF(vec3(p.x, p.y - EPSILON, p.z), t),
+        sceneSDF(vec3(p.x, p.y, p.z + EPSILON), t) - sceneSDF(vec3(p.x, p.y, p.z - EPSILON), t)
     ));
 }
 
-// https://www.iquilezles.org/www/articles/rmshadows/rmshadows.htm
+//-------------------------------------------------------------------------------------------------------
 // w is the size of the light source, and controls how hard/soft the shadows are
+// https://www.iquilezles.org/www/articles/rmshadows/rmshadows.htm
 float softShadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end, float w ) { 
     float res = 1.0;
-    float ph = 1e20;
-    for(float t=start; t<end; ) {
-        float h = sceneSDF(shadowRayOrigin + shadowRayDir*t);
-        if( h<0.001 )
-            return 0.0;
-        float y = h*h/(2.0*ph);
-        float d = sqrt(h*h - y*y);
-        res = min(res, w*d/max(0.0, t - y) );
-        ph = h;
+    vec4 trap;
+    float iterations = 64;
+    for(float t=start; t<end; iterations--) {
+        float h = sceneSDF(shadowRayOrigin + shadowRayDir*t, trap);
+        //if (h < 0.0001 ) return 0.0;
+        res = min( res, w*h/t );
+        if (res < 0.001 || iterations <= 0) break;
+        //if (iterations <= 0) break;
         t += h;
     }
-    return res;
-}
-
-// s is a scale variable determining the darkening effects of the occlusion
-// http://www2.compute.dtu.dk/pubdb/views/edoc_download.php/6392/pdf/imm6392.pdf
-float ambientOcclusion(vec3 point, vec3 normal, float step, float samples, float s) {
-    float ao = 0.0f;
-    float dist;
-    for (float i = 1.0f; i <= samples; i += 1.0f) {
-        dist = step*i;  
-        ao = max( (dist - (sceneSDF(point + normal*dist))) / pow(2.0, i), ao); 
-        //ao += max( (dist - (sceneSDF(point + normal*dist))) / pow(2.0, i), 0.0); 
-        //ao += (dist - (sceneSDF(point + normal*dist))) / (dist*dist); 
-    }
-    return 1.0f - ao*s;
-    //return clamp(1.0f - ao*s, 0.0, 1.0);
+    return clamp(res, 0.0, 1.0);
 }
 
 vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
-// Lighting contribution of a direction light source via Phong illumination.
-vec4 PhongDirectionLight(vec3 ambientColor, vec3 diffuseColor, vec3 specularColor, float shininess, vec3 point, vec3 eye, vec4 trapColor) {
-    float shadow = 1.0;
-     
-#ifdef FLAG_HARD_SHADOWS
-    vec3 shadowRayOrigin = point + computeNormal(point)*0.01;
-    vec3 shadowRayDir = normalize(vec3(-lightDirection)); 
-    float dist = shortestDistanceToSurface(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST);
-    if (dist < MAX_DIST)
-        return vec4(0.0, 0.0, 0.0, 1.0);
-#endif
+vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
+    vec4 trap;  
+    float dist = shortestDistanceToSurface(eye, dir, MIN_DIST, MAX_DIST, trap); // intersect fractal
 
-#ifdef FLAG_SOFT_SHADOWS
-    vec3 shadowRayOrigin = point + computeNormal(point)*0.01;
-    vec3 shadowRayDir = normalize(vec3(-lightDirection));
-    // последний параметр это сила размытости мягких теней
-    shadow = softShadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, 6.0);
-#endif
-
-    vec3 light_direction = normalize(vec3(-lightDirection)); // L для направленного
-    vec3 inEye = normalize(eye - point); // V
+    vec3 point = eye + dist*dir; // The closest point on the surface to the eyepoint along the view ray
     vec3 outNormal = computeNormal(point); // N
-    vec3 reflected_light = reflect(-light_direction, outNormal); //R
 
-    vec3 ambient = ambientLightColor*ambientColor;
-    vec3 diffuse = diffuseLightColor*diffuseColor*max(dot(light_direction, outNormal), 0.0f)*shadow;
-    vec3 specular = specularLightColor*specularColor*pow(max(dot(inEye, reflected_light), 0.0), shininess);
-    vec3 color = ambient + diffuse + specular;
-
-#if defined SKYBOX_BACKGROUND_HDR && defined IRRADIANCE_CUBEMAP
-//#ifdef IRRADIANCE_CUBEMAP
-    // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
-    // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
-    vec3 F0 = vec3(0.04); 
-    //F0 = mix(F0, albedo, metallic);
-    // ambient lighting (we now use IBL as the ambient term)
-    vec3 kS = fresnelSchlick(max(dot(outNormal, inEye), 0.0), F0);
-    vec3 kD = 1.0 - kS;
-    //kD *= 1.0 - metallic;	  
-    vec3 irradiance = texture(irradianceMap, outNormal).rgb;
-    //vec3 diffuse      = irradiance * albedo;
-    vec3 diffuseIBL      = irradiance * diffuseColor;
-    //vec3 ambient = (kD * diffuse) * ao;
-    vec3 ambientIBL = (kD * diffuseIBL) * ambientColor;
-
-    color += ambientIBL; 
+    // Didn't hit anything. sky color
+    if (dist > MAX_DIST - EPSILON) {
+#if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
+        return texture(skyBox, dir);
 #endif
 
-#ifdef FLAG_AMBIENTOCCLUSION
-    float ao = ambientOcclusion(point, outNormal, 2.5, 3.0, 0.5);
-    color *= ao;
+#ifdef SOLID_BACKGROUND
+        return vec4(reflectedColor - (dir.y * 0.7), 1.0); // Skybox color
+        //vec3 col  = vec3(0.8,0.9,1.1)*(0.6+0.4*dir.y);
+		//col += 5.0*vec3(0.8,0.7,0.5)*pow( clamp(dot(dir,light1),0.0,1.0), 32.0 );
+        //return vec4(col, 1.0);
 #endif
+    }
+    // color fractal
+	else {
+        // lighting terms
+        vec3 hal = normalize(lightDirection1 - dir);
+        float occlusion = clamp(0.05*log(trap.x), 0.0, 1.0);
+        float shadow = 1.0;
+        
+        // main color
+        vec3 albedo = ambientColor;
+        //vec3 albedo = vec3(0.001); // чем больше значение, тем более засвеченный фрактал
+        //albedo = mix(albedo, color1, clamp(trap.y, 0.0, 1.0));
+	 	//albedo = mix(albedo, color2, clamp(trap.z*trap.z, 0.0, 1.0));
+        //albedo = mix(albedo, color3, clamp(pow(trap.w, 6.0), 0.0, 1.0));
+        //albedo *= 0.5;
+        
+    #ifdef FLAG_SOFT_SHADOWS
+        vec3 shadowRayOrigin = point + 0.001*outNormal;
+        vec3 shadowRayDir = normalize(lightDirection1); // луч, направленный на источник света
+        // последний параметр это сила размытости мягких теней
+        shadow = softShadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, 32.0);
+    #endif
 
-    return clamp(vec4(color, 1.0), 0.0f, 1.0f);
-}
+        // sun
+        float dif1 = clamp(dot(lightDirection1, outNormal), 0.0, 1.0 )*shadow;
+        float spe1 = pow(clamp(dot(outNormal, hal), 0.0, 1.0), shininess)*dif1*(0.04 + 0.96*pow(clamp(dot(dir, lightDirection1), 0.0, 1.0), 5.0));
+        // bounce
+        float dif2 = clamp(0.5 + 0.5*dot(lightDirection2, outNormal), 0.0, 1.0)*occlusion;
+        // sky
+        //float dif3 = (0.7+0.3*outNormal.y)*(0.2+0.8*occlusion);
+        
+		vec3 lin = vec3(0.0); 
+		     lin += lightIntensity1*lightColor1*dif1; // sun
+		     lin += lightIntensity2*lightColor2*dif2; //light1
+        	 //lin +=  1.5*vec3(0.10,0.20,0.30)*dif3;
+             lin +=  ambientLightIntensity3*ambientLightColor3*(0.05+0.95*occlusion); // ambient light
+		vec3 col = albedo*lin;
+		col = pow(col, vec3(0.7, 0.9, 1.0));
+        col += spe1*15.0;
 
-vec4 Lambert(vec3 color, vec3 dir_light, vec3 point) {
-    vec3 directional_light = normalize(dir_light);
-    vec3 outNormal = computeNormal(point); 
-    float kd = clamp(dot(directional_light, outNormal), 0.0f, 1.0f);
-    return kd*vec4(color, 1.0);
+    #if defined SKYBOX_BACKGROUND_HDR && defined IRRADIANCE_CUBEMAP
+        vec3 inEye = normalize(eye - point); // V
+        // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
+        // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
+        vec3 F0 = vec3(0.04); 
+        //F0 = mix(F0, albedo, metallic);
+        // ambient lighting (we now use IBL as the ambient term)
+        vec3 kS = fresnelSchlick(max(dot(outNormal, inEye), 0.0), F0);
+        vec3 kD = 1.0 - kS;
+        //kD *= 1.0 - metallic;	  
+        vec3 irradiance = texture(irradianceMap, outNormal).rgb;
+        //vec3 diffuse      = irradiance * albedo;
+        vec3 diffuseIBL      = irradiance * albedo;
+        //vec3 ambient = (kD * diffuse) * ao;
+        vec3 ambientIBL = (kD * diffuseIBL) * occlusion;
+
+        col += ambientIBL; 
+    #endif
+
+        vec4 color;
+        // sky
+    #if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
+        vec3 reflected_dir = reflect(dir, outNormal); //R
+        vec4 reflected_color = texture(skyBox, reflected_dir);
+        color = vec4(col, 1.0)*(1.0 - reflection) + reflected_color*reflection;
+    #endif
+
+    #ifdef SOLID_BACKGROUND
+        color = vec4(col, 1.0)*(1.0 - reflection) + vec4(reflectedColor, 1.0)*reflection;
+    #endif
+
+        //color = clamp(color, 0.0, 1.0);
+        color = sqrt(color); // gamma
+        //color = vec4(pow(color.xyz, vec3(1.0/2.2)), 1.0); // gamma
+        color *= 1.0 - 0.05*length(sp); // vignette
+        return color;
+    }
 }
 
 void main() {
+    vec3 a = ambientColor;
+    vec3 d = diffuseColor;
+    vec3 s = specularColor;
+    float sh = shininess;
+
     vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
     vec3 dir = rayDirection(fieldOfView, iResolution, pixelCoord);
     vec3 eye = viewMatrix[3].xyz;
-    vec4 trapColor;
-    float dist = shortestDistanceToSurface(eye, dir, MIN_DIST, MAX_DIST);
-    
-    // Didn't hit anything
-    if (dist > MAX_DIST - EPSILON) {
-#if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
-        outColor = texture(skyBox, dir);
-#endif
+    vec2  sp = (2.0*pixelCoord-iResolution.xy) / iResolution.y;
 
-#ifdef SOLID_BACKGROUND
-        //outColor = vec4(vec3(0.30, 0.36, 0.60) - (dir.y * 0.7), 1.0); // Skybox color
-        outColor = vec4(reflectedColor - (dir.y * 0.7), 1.0); // Skybox color
-#endif
-		return;
-    }
-
-    vec3 point = eye + dist*dir; // The closest point on the surface to the eyepoint along the view ray
-    //outColor = Lambert(vec3(0.0, 1.0 , 0.0), vec3(0.0f, 1.0f, 1.0f), point);
-    outColor = PhongDirectionLight(ambientColor, diffuseColor, specularColor, shininess, point, eye, trapColor);
-
-    vec3 outNormal = computeNormal(point); // N
-    vec3 reflected_dir = reflect(dir, outNormal); //R
-
-#if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
-    vec4 reflected_color = texture(skyBox, reflected_dir);
-    outColor = outColor*(1.0 - reflection) + reflected_color*reflection;
-#endif
-
-#ifdef SOLID_BACKGROUND
-    outColor = outColor*(1.0 - reflection) + vec4(reflectedColor, 1.0)*reflection;
-#endif
-    //outColor = vec4(pow(outColor.xyz, vec3(1.0/2.2)), 1.0); // Gamma correction
-    // vignette
-    //vec2 sp = (2.0*pixelCoord-iResolution.xy) / iResolution.y;
-    //outColor *= 1.0 - 0.05*length(sp);
-} 
+    outColor = Render(eye, dir, sp);
+}

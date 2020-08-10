@@ -95,7 +95,6 @@ void Gui::FileBrowserSetupSkybox() {
     }
 }
 
-
 void Gui::Init(Window* window, FractalController* fr) {
     this->window = window;
     this->fractalController = fr;
@@ -278,45 +277,43 @@ void Gui::MainParameters() {
     
     ImGui::Begin("Parameters", NULL, parametersWindowFlags); 
     ShaderProgram* program = fractalController->GetShaderProgram(); 
-    uint32_t shaderParameters = 0; 
     bool flag = false;
 
-    //--------------------------AO and shadows---------------------------
-    if (ImGui::Checkbox("Hard shadows", &hard_shadows)) { flag = true; }
-    if (hard_shadows) {
-        shaderParameters = 1 << 1;
-        soft_shadows = false;
+    //-----------------------------Shadows-------------------------------
+    if (ImGui::Checkbox("Soft shadows", &soft_shadows)) { 
+        flag = true; 
     }
-
-    if (ImGui::Checkbox("Soft shadows", &soft_shadows)) { flag = true; }
-    if (soft_shadows) {
-        shaderParameters = 1 << 2;
-        hard_shadows = false;
-    }
-
-    if (ImGui::Checkbox("Ambient occlusion", &ambient_occlusion)) { flag = true; }
-    if (ambient_occlusion) 
-        shaderParameters |= 1 << 3;
     //-------------------------------------------------------------------
 
     //--------------------------Light parameters-------------------------
     ImGui::Separator();
     ImGui::Text("Light parameters:");
     ImGui::Separator();
-    if (ImGui::InputFloat3("Light direction", light_direction)) {
-        fractalController->SetLightDirection(glm::vec3(light_direction[0], light_direction[1], light_direction[2]));
+     if (ImGui::InputFloat3("Light direction 1", light_direction1)) {
+        fractalController->SetLightDirection1(glm::vec3(light_direction1[0], light_direction1[1], light_direction1[2]));
+    }
+    if (ImGui::ColorEdit3("Light color 1", light_color1)) {
+        fractalController->SetLightColor1(glm::vec3(light_color1[0], light_color1[1], light_color1[2]));
+    }
+    if (MyDragFloat("Light Intensity 1", &light_intensity1, 1, 1, 100)) {
+        fractalController->SetLightIntensity1(light_intensity1);
     }
 
-    if (ImGui::ColorEdit3("Ambient color", ambient_light_color)) {
-        fractalController->SetAmbientLightColor(glm::vec3(ambient_light_color[0], ambient_light_color[1], ambient_light_color[2]));
+    if (ImGui::InputFloat3("Light direction 2", light_direction2)) {
+        fractalController->SetLightDirection2(glm::vec3(light_direction2[0], light_direction2[1], light_direction2[2]));
+    }
+    if (ImGui::ColorEdit3("Light color 2", light_color2)) {
+        fractalController->SetLightColor2(glm::vec3(light_color2[0], light_color2[1], light_color2[2]));
+    }
+    if (MyDragFloat("Light Intensity 2", &light_intensity2, 1, 1, 100)) {
+        fractalController->SetLightIntensity2(light_intensity2);
     }
 
-    if (ImGui::ColorEdit3("Diffuse color", diffuse_light_color)) {
-        fractalController->SetDiffuseLightColor(glm::vec3(diffuse_light_color[0], diffuse_light_color[1], diffuse_light_color[2]));
+    if (ImGui::ColorEdit3("Ambient light color", ambient_fractal_light_color)) {
+        fractalController->SetAmbientFractalLightColor(glm::vec3(ambient_fractal_light_color[0], ambient_fractal_light_color[1], ambient_fractal_light_color[2]));
     }
-
-    if (ImGui::ColorEdit3("Specular color", specular_light_color)) {
-        fractalController->SetSpecularLightColor(glm::vec3(specular_light_color[0], specular_light_color[1], specular_light_color[2]));
+    if (MyDragFloat("Ambient light intensity", &ambient_light_intensity, 1, 1, 100)) {
+        fractalController->SetAmbientFractalLightIntensity(ambient_light_intensity);
     }
     //-------------------------------------------------------------------
 
@@ -337,11 +334,15 @@ void Gui::MainParameters() {
         }
     }
     ImGui::Separator();
+
+    // Solid background
     if (current_background_type == 0) {
         if (ImGui::ColorEdit3("Color", background_color)) {
             fractalController->SetBackgroundColor(glm::vec3(background_color[0], background_color[1], background_color[2]));
         }
     }
+
+    // Texture background
     if (current_background_type == 1) {
         if (ImGui::Combo("Texture", &current_skybox_texture, skybox_texture, IM_ARRAYSIZE(skybox_texture))) {
             if (static_cast<SkyboxTexture>(current_skybox_texture) != SkyboxTexture::Other)
@@ -397,6 +398,7 @@ void Gui::MainParameters() {
         }  
     }
 
+    // HDR Texture background
     if (current_background_type == 2) {
         if (ImGui::Combo("HDR Texture", &current_skybox_texture_hdr, skybox_texture_hdr, IM_ARRAYSIZE(skybox_texture_hdr))) {
             if (static_cast<SkyboxTextureHDR>(current_skybox_texture_hdr) != SkyboxTextureHDR::OtherHDR)
@@ -420,65 +422,22 @@ void Gui::MainParameters() {
         }
 
     }
-    
-    
-    
     //-------------------------------------------------------------------
 
     //--------------------------Type of fractal--------------------------
     ImGui::Separator();
-    if (ImGui::BeginMenu("Type of fractal:")) {
-        if (ImGui::MenuItem("Test")) {
-            currentFractalType = FractalType::Test;
-            fractalController->SetFractalType(currentFractalType);
-            flag = true;
-        }
-        if (ImGui::MenuItem("Mandelbulb Fractal")) {
-            currentFractalType = FractalType::Mandelbulb;
-            fractalController->SetFractalType(currentFractalType);
-            flag = true;
-        }   
-        if (ImGui::MenuItem("Monster Fractal")) {
-            currentFractalType = FractalType::Monster;
-            fractalController->SetFractalType(currentFractalType);
-            flag = true;
-        }  
-        if (ImGui::MenuItem("Julia Fractal")) {
-            currentFractalType = FractalType::Julia;
-            fractalController->SetFractalType(currentFractalType);
-            flag = true;
-        }  
-        ImGui::EndMenu();
-    }
-
-    switch(currentFractalType) {
-        case FractalType::Test: {
-            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 150.0f);
-            ImGui::Text("Test");
-            break;
-        }
-        case FractalType::Mandelbulb: {
-            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 150.0f);
-            ImGui::Text("Mandelbulb fractal");
-            break;
-        }
-        case FractalType::Monster: {
-            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 150.0f);
-            ImGui::Text("Monster fractal");
-            break;
-        }
-        case FractalType::Julia: {
-            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 150.0f);
-            ImGui::Text("Julia fractal");
-            break;
-        }
+    ImGui::Text("Type of fractal:");
+    ImGui::Separator();
+    if (ImGui::Combo("Type of fractal:", &current_fractal_type, fractal_type, IM_ARRAYSIZE(fractal_type))) {
+        currentFractalType = static_cast<FractalType>(current_fractal_type);
+        fractalController->SetFractalType(currentFractalType);
+        flag = true;
     }
     //-------------------------------------------------------------------
     
     if (flag) {
-        program->SetShaderParameters(shaderParameters);
+        program->SetShaderParameters(soft_shadows);
         fractalController->LoadShaderProgram();
-        //program->Load();
     }
 
     ImGui::End();
@@ -545,38 +504,6 @@ void Gui::Test() {
 void Gui::Mandelbulb() {
     ImGui::Begin("Mandelbulb parameters", NULL, parametersWindowFlags); 
 
-    //ImGui::Text("Light parameters:");
-    //ImGui::Separator();
-    FractalColor();
-
-    if (ImGui::InputFloat3("Light direction 1", light_direction1)) {
-        fractalController->SetLightDirection1(glm::vec3(light_direction1[0], light_direction1[1], light_direction1[2]));
-    }
-    if (ImGui::ColorEdit3("Light color 1", light_color1)) {
-        fractalController->SetLightColor1(glm::vec3(light_color1[0], light_color1[1], light_color1[2]));
-    }
-    if (MyDragFloat("Light Intensity 1", &light_intensity1, 1, 1, 100)) {
-        fractalController->SetLightIntensity1(light_intensity1);
-    }
-
-    if (ImGui::InputFloat3("Light direction 2", light_direction2)) {
-        fractalController->SetLightDirection2(glm::vec3(light_direction2[0], light_direction2[1], light_direction2[2]));
-    }
-    if (ImGui::ColorEdit3("Light color 2", light_color2)) {
-        fractalController->SetLightColor2(glm::vec3(light_color2[0], light_color2[1], light_color2[2]));
-    }
-    if (MyDragFloat("Light Intensity 2", &light_intensity2, 1, 1, 100)) {
-        fractalController->SetLightIntensity2(light_intensity2);
-    }
-
-    if (ImGui::ColorEdit3("Ambient light color", ambient_fractal_light_color)) {
-        fractalController->SetAmbientFractalLightColor(glm::vec3(ambient_fractal_light_color[0], ambient_fractal_light_color[1], ambient_fractal_light_color[2]));
-    }
-    if (MyDragFloat("Ambient light intensity", &ambient_light_intensity, 1, 1, 100)) {
-        fractalController->SetAmbientFractalLightIntensity(ambient_light_intensity);
-    }
-    ImGui::Separator();
-
     if (ImGui::ColorEdit3("Color1", color1)) {
         fractalController->SetMandelbulbColor1(glm::vec3(color1[0], color1[1], color1[2]));
     }
@@ -589,8 +516,6 @@ void Gui::Mandelbulb() {
         fractalController->SetMandelbulbColor3(glm::vec3(color3[0], color3[1], color3[2]));
     }
     ImGui::Separator();
-
-    //FractalColor();
 
     if (MyDragInt("Iterations", &mandelbulb_iterations, 1, 1, 15)) {
         fractalController->SetMandelbulbIterations(mandelbulb_iterations);

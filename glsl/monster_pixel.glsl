@@ -1,3 +1,5 @@
+// https://www.shadertoy.com/view/4sX3R2
+
 in mat4 viewMatrix;
 out vec4 outColor;
 

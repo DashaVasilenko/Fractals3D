@@ -41,35 +41,33 @@ private:
 	static const GLuint indices[6];
 
     struct FractalsParameters {
-        glm::vec3 light_direction = { 0.0f, -1.0f, 0.0f };
-        glm::vec3 ambient_light_color = { 1.0, 1.0, 1.0 };
-        glm::vec3 diffuse_light_color = { 1.0, 1.0, 1.0 };
-        glm::vec3 specular_light_color = { 1.0, 1.0, 1.0 };
+        // Light parameters
+        glm::vec3 lightDirection1 = { 0.577, 0.577, -0.577 };
+        glm::vec3 lightColor1 = { 1.0, 1.0, 0.70 };
+        float lightIntensity1 = 12.0;
 
+        glm::vec3 lightDirection2 = { -0.707, 0.000, 0.707 };
+        glm::vec3 lightColor2 = { 0.25, 0.20, 0.15 };
+        float lightIntensity2 = 4.0;
+
+        glm::vec3 ambientLightColor = { 0.35, 0.30, 0.25 };
+        float ambientLightIntensity = 2.5;
+
+        // Background parameters
         BackgroundType background_type = BackgroundType::SkyboxHDR;
         glm::vec3 background_color = { 0.30, 0.36, 0.60 };
         SkyboxTexture skybox_texture = SkyboxTexture::Orbital;
         SkyboxTextureHDR skybox_texture_hdr = SkyboxTextureHDR::WinterForest;
         bool irradianceCubemap = true;
 
+        // Fractal color
         glm::vec3 ambient_fractal_color = { 0.19225, 0.19225, 0.19225 };
         glm::vec3 diffuse_fractal_color = { 0.50754, 0.50754, 0.50754 };
         glm::vec3 specular_fractal_color = { 0.50827, 0.50827, 0.50827 };
         float shininess = 32.0f;
         float reflection = 0.2f;
 
-//--------------------------------mandelbulb-----------------------------------
-        glm::vec3 mandelbulb_lightDirection1 = { 0.577, 0.577, -0.577 };
-        glm::vec3 mandelbulb_lightColor1 = { 1.0, 1.0, 0.70 };
-        float mandelbulb_lightIntensity1 = 12.0;
-
-        glm::vec3 mandelbulb_lightDirection2 = { -0.707, 0.000, 0.707 };
-        glm::vec3 mandelbulb_lightColor2 = { 0.25, 0.20, 0.15 };
-        float mandelbulb_lightIntensity2 = 4.0;
-
-        glm::vec3 mandelbulb_ambientLightColor = { 0.35, 0.30, 0.25 };
-        float mandelbulb_ambientLightIntensity = 2.5;
-
+        // Mandelbulb parameters
         glm::vec3 mandelbulb_color1 = { 0.10, 0.20, 0.30 };
         glm::vec3 mandelbulb_color2 = { 0.02, 0.10, 0.30 };
         glm::vec3 mandelbulb_color3 = { 0.30, 0.10, 0.02 };

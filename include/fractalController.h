@@ -20,11 +20,6 @@ public:
     void Render(int width, int height) { renderer->Render(width, height); }
     void LoadShaderProgram() { program->Load(); }
 
-    void SetLightDirection(const glm::vec3& c) { renderer->fractalsParameters.light_direction = c; }
-    void SetAmbientLightColor(const glm::vec3& c) { renderer->fractalsParameters.ambient_light_color = c; }
-    void SetDiffuseLightColor(const glm::vec3& c) { renderer->fractalsParameters.diffuse_light_color = c; }
-    void SetSpecularLightColor(const glm::vec3& c) { renderer->fractalsParameters.specular_light_color = c; }
-
     void SetBackgroundType(BackgroundType c) { program->SetBackgroundType(c); renderer->fractalsParameters.background_type = c; }
     void SetBackgroundColor(const glm::vec3& c) { renderer->fractalsParameters.background_color = c; }
 
@@ -124,18 +119,60 @@ public:
     void SetFractalShininess(float c) { renderer->fractalsParameters.shininess = c; }
     void SetFractalReflect(float c) { renderer->fractalsParameters.reflection = c; }
 
-    void SetFractalType(FractalType c) { program->SetFractalType(c); renderer->currentFractalType = c; }
+    void SetFractalType(FractalType c) { 
+        program->SetFractalType(c); 
+        renderer->currentFractalType = c; 
+    
+        switch(c) {
+            case FractalType::Test: {
 
-    void SetLightDirection1(const glm::vec3& c) { renderer->fractalsParameters.mandelbulb_lightDirection1 = c; }
-    void SetLightColor1(const glm::vec3& c) { renderer->fractalsParameters.mandelbulb_lightColor1 = c; }
-    void SetLightIntensity1(float c) { renderer->fractalsParameters.mandelbulb_lightIntensity1 = c; }
+                break;
+            }
+            case FractalType::Mandelbulb: {
+                renderer->fractalsParameters.lightDirection1 = glm::vec3(0.577, 0.577, -0.577);
+                renderer->fractalsParameters.lightColor1 = glm::vec3(1.0, 1.0, 0.70);
+                renderer->fractalsParameters.lightIntensity1 = 12.0;
+                
+                renderer->fractalsParameters.lightDirection2 = glm::vec3(-0.707, 0.000, 0.707);
+                renderer->fractalsParameters.lightColor2 = glm::vec3(0.25, 0.20, 0.15);
+                renderer->fractalsParameters.lightIntensity2 = 4.0;
 
-    void SetLightDirection2(const glm::vec3& c) { renderer->fractalsParameters.mandelbulb_lightDirection2 = c; }
-    void SetLightColor2(const glm::vec3& c) { renderer->fractalsParameters.mandelbulb_lightColor2 = c; }
-    void SetLightIntensity2(float c) { renderer->fractalsParameters.mandelbulb_lightIntensity2 = c; }
+                renderer->fractalsParameters.ambientLightColor = glm::vec3(0.35, 0.30, 0.25);
+                renderer->fractalsParameters.ambientLightIntensity = 2.5;
 
-    void SetAmbientFractalLightColor(const glm::vec3& c) { renderer->fractalsParameters.mandelbulb_ambientLightColor = c; }
-    void SetAmbientFractalLightIntensity(float c) { renderer->fractalsParameters.mandelbulb_ambientLightIntensity = c; }
+                break;
+            }
+            case FractalType::Monster: {
+
+                break;
+            }
+            case FractalType::Julia: {
+                renderer->fractalsParameters.lightDirection1 = glm::vec3(0.577, 0.577,  0.577);
+                renderer->fractalsParameters.lightColor1 = glm::vec3(1.00,0.90,0.70);
+                renderer->fractalsParameters.lightIntensity1 = 3.5;
+                
+                renderer->fractalsParameters.lightDirection2 = glm::vec3(-0.707, 0.000, 0.707);
+                renderer->fractalsParameters.lightColor2 = glm::vec3(1.00,0.90,0.70);
+                renderer->fractalsParameters.lightIntensity2 = 3.5;
+
+                renderer->fractalsParameters.ambientLightColor = glm::vec3(0.35, 0.30, 0.25);
+                renderer->fractalsParameters.ambientLightIntensity = 2.5;
+
+                break;
+            }
+        }
+    }
+
+    void SetLightDirection1(const glm::vec3& c) { renderer->fractalsParameters.lightDirection1 = c; }
+    void SetLightColor1(const glm::vec3& c) { renderer->fractalsParameters.lightColor1 = c; }
+    void SetLightIntensity1(float c) { renderer->fractalsParameters.lightIntensity1 = c; }
+
+    void SetLightDirection2(const glm::vec3& c) { renderer->fractalsParameters.lightDirection2 = c; }
+    void SetLightColor2(const glm::vec3& c) { renderer->fractalsParameters.lightColor2 = c; }
+    void SetLightIntensity2(float c) { renderer->fractalsParameters.lightIntensity2 = c; }
+
+    void SetAmbientFractalLightColor(const glm::vec3& c) { renderer->fractalsParameters.ambientLightColor = c; }
+    void SetAmbientFractalLightIntensity(float c) { renderer->fractalsParameters.ambientLightIntensity = c; }
 
     void SetMandelbulbColor1(const glm::vec3& c) { renderer->fractalsParameters.mandelbulb_color1 = c; }
     void SetMandelbulbColor2(const glm::vec3& c) { renderer->fractalsParameters.mandelbulb_color2 = c; }

@@ -39,14 +39,9 @@ void ShaderProgram::Load() {
     }
     
     defines = "";
-    
-    if (shader_parameters & ShaderParametersType::HardShadows)
-        defines += "#define FLAG_HARD_SHADOWS" + std::string("\n");
-    if (shader_parameters & ShaderParametersType::SoftShadows)
+    if (shader_parameters)
         defines += "#define FLAG_SOFT_SHADOWS" + std::string("\n");
-    if (shader_parameters & ShaderParametersType::AO) 
-        defines += "#define FLAG_AMBIENTOCCLUSION" + std::string("\n");
-
+    
     switch(currentFractalType) {
         case FractalType::Test: {
             defines += "#define TEST" + std::string("\n");
@@ -57,7 +52,6 @@ void ShaderProgram::Load() {
             break;
         }
     }
-
 
     switch(currentBackgroundType) {
         case BackgroundType::Solid: {
@@ -78,7 +72,6 @@ void ShaderProgram::Load() {
     if (irradianceCubemap) 
         defines += "#define IRRADIANCE_CUBEMAP" + std::string("\n");
     //std::cout << currentBackgroundType << std::endl;
-    //std::cout << currentFractalType << std::endl;
     
     Compile();
     Link();

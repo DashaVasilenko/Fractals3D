@@ -1,6 +1,4 @@
-// Info here:
-//    http://iquilezles.org/www/articles/juliasets3d/juliasets3d.htm
-//    https://iquilezles.org/www/articles/distancefractals/distancefractals.htm
+
 //
 // Related shaders
 //
@@ -28,10 +26,16 @@ uniform float fieldOfView;
 
 uniform float Time;
 
-uniform vec3 lightDirection;
-uniform vec3 ambientLightColor; // интенсивность фонового света
-uniform vec3 diffuseLightColor; // интенсивность рассеянного света
-uniform vec3 specularLightColor; // интенсивность зеркального света
+uniform vec3 lightDirection1;
+uniform vec3 lightColor1;
+uniform float lightIntensity1;
+
+uniform vec3 lightDirection2;
+uniform vec3 lightColor2;
+uniform float lightIntensity2;
+
+uniform vec3 ambientLightColor3;
+uniform float ambientLightIntensity3;
 
 uniform vec3 ambientColor; // отражение фонового света материалом
 uniform vec3 diffuseColor; // отражение рассеянного света материалом
@@ -47,7 +51,6 @@ const float MAX_DIST = 10.0; //50
 const float EPSILON = 0.0005;
 
 // antialias level (1, 2, 3...)
-//#if HW_PERFORMANCE==1
 #define AA 1
 //#else
 //#define AA 2  // Set AA to 1 if your machine is too slow
@@ -63,6 +66,10 @@ vec4 qsqr(vec4 a)  {
 
 const int numIterations = 11;
 
+//-------------------------------------------------------------------------------------------------------
+// Compute Julia set
+// http://iquilezles.org/www/articles/juliasets3d/juliasets3d.htm
+// https://iquilezles.org/www/articles/distancefractals/distancefractals.htm
 float julia(vec3 pos, vec4 c, out vec4 trapColor) {
     vec4 z = vec4(pos, 0.0);
     float md2 = 1.0;
@@ -180,23 +187,19 @@ float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end
     return res;
 }
 
+//-------------------------------------------------------------------------------------------------------
+vec3 fresnelSchlick(float cosTheta, vec3 F0) {
+    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+}
+
+//-------------------------------------------------------------------------------------------------------
 vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
 	vec4 trap;  
     float dist = shortestDistanceToSurface(eye, dir, MIN_DIST, MAX_DIST, c, trap); // intersect fractal
 
-    // lighting terms
     vec3 point = eye + dist*dir; // The closest point on the surface to the eyepoint along the view ray
-    //vec3 inEye = normalize(eye - point); // V
     vec3 outNormal = computeNormal(point, c); // N
-    //vec3 reflected_dir = reflect(dir, outNormal); //R
-    //vec3 hal = normalize(lightDirection1 - dir);
-    //float occlusion = clamp(0.05*log(trap.x), 0.0, 1.0);
-    float shadow = 1.0;
     
-
-    const vec3 sun = vec3(  0.577, 0.577,  0.577 );
-    const vec3 lightDirection2 = vec3(-0.707, 0.000, 0.707);
-
     // Didn't hit anything. sky color
     if (dist >= MAX_DIST) {
 #if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
@@ -212,62 +215,83 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
 	}
     // color fractal
 	else {
-        vec3 mate = vec3(1.0,0.8,0.7)*0.3;
-		//mate.x = 1.0-10.0*trap.x;
+        vec3 albedo = vec3(1.0,0.8,0.7)*0.3;
+		//albedo.x = 1.0-10.0*trap.x;
 		float occlusion = clamp(2.5*trap.w - 0.15, 0.0, 1.0);
         vec3 col = vec3(0.0);
-
-        vec3 hal = normalize(sun - dir);
+        vec3 hal = normalize(lightDirection1 - dir);
         float shadow = 1.0;
 
+    #ifdef FLAG_SOFT_SHADOWS
         vec3 shadowRayOrigin = point + 0.001*outNormal;
-        vec3 shadowRayDir = normalize(sun); // луч, направленный на источник света
-        // последний параметр это сила размытости мягких теней
+        vec3 shadowRayDir = normalize(lightDirection1); // луч, направленный на источник света
+        // предпоследний параметр это сила размытости мягких теней
         shadow = softShadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, 32.0, c);
+    #endif
 
         // sun
-        float dif1 = clamp(dot(sun, outNormal), 0.0, 1.0 )*shadow;
-        float spe1 = pow(clamp(dot(outNormal, hal), 0.0, 1.0), shininess)*dif1*(0.04 + 0.96*pow(clamp(dot(dir, sun), 0.0, 1.0), 5.0));
+        float dif1 = clamp(dot(lightDirection1, outNormal), 0.0, 1.0 )*shadow;
+        float spe1 = pow(clamp(dot(outNormal, hal), 0.0, 1.0), shininess)*dif1*(0.04 + 0.96*pow(clamp(dot(dir, lightDirection1), 0.0, 1.0), 5.0));
         // bounce
         float dif2 = clamp(0.5 + 0.5*dot(lightDirection2, outNormal), 0.0, 1.0)*occlusion;
         // sky
         //float dif3 = (0.7+0.3*outNormal.y)*(0.2+0.8*occlusion);
         
         vec3 lin = vec3(0.0); 
-		     //lin += lightIntensity1*lightColor1*dif1; // sun
-             lin += 3.5*vec3(1.00,0.90,0.70)*dif1; // sun
-		     //lin += lightIntensity2*lightColor2*dif2; //light1
-             lin += 3.5*vec3(1.00,0.90,0.70)*dif2; // light2
-        	 //lin +=  1.5*vec3(0.10,0.20,0.30)*dif3;
-             //lin +=  ambientLightIntensity3*ambientLightColor3*(0.05+0.95*occlusion); // ambient light
-            lin += 2.5*vec3(0.35, 0.30, 0.25)*(0.05+0.95*occlusion);
+		     lin += lightIntensity1*lightColor1*dif1; // sun
+		     lin += lightIntensity2*lightColor2*dif2; //light1
+        	 ////lin +=  1.5*vec3(0.10,0.20,0.30)*dif3;
+             lin +=  ambientLightIntensity3*ambientLightColor3*(0.05+0.95*occlusion); // ambient light
 		//vec3 col = albedo*lin;
-        col = mate*lin;
+        col = albedo*lin;
 		col = pow(col, vec3(0.7, 0.9, 1.0));
         col += spe1*15.0;
 
-        
+    #if defined SKYBOX_BACKGROUND_HDR && defined IRRADIANCE_CUBEMAP
+        vec3 inEye = normalize(eye - point); // V
+        // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
+        // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
+        vec3 F0 = vec3(0.04); 
+        //F0 = mix(F0, albedo, metallic);
+        // ambient lighting (we now use IBL as the ambient term)
+        vec3 kS = fresnelSchlick(max(dot(outNormal, inEye), 0.0), F0);
+        vec3 kD = 1.0 - kS;
+        //kD *= 1.0 - metallic;	  
+        vec3 irradiance = texture(irradianceMap, outNormal).rgb;
+        //vec3 diffuse      = irradiance * albedo;
+        vec3 diffuseIBL      = irradiance * albedo;
+        //vec3 ambient = (kD * diffuse) * ao;
+        vec3 ambientIBL = (kD * diffuseIBL) * occlusion;
 
-        //col = clamp(col, 0.0, 1.0);
-        //col = sqrt(col); // gamma
-        //col = vec4(pow(col.xyz, vec3(1.0/2.2)), 1.0); // gamma
-        //col *= 1.0 - 0.05*length(sp); // vignette
-        //return col;
-	    return vec4(pow(col, vec3(0.4545)), 1.0);
+        col += ambientIBL; 
+    #endif
+
+        vec4 color;
+        // sky
+    #if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
+        vec3 reflected_dir = reflect(dir, outNormal); //R
+        vec4 reflected_color = texture(skyBox, reflected_dir);
+        color = vec4(col, 1.0)*(1.0 - reflection) + reflected_color*reflection;
+    #endif
+
+    #ifdef SOLID_BACKGROUND
+        color = vec4(col, 1.0)*(1.0 - reflection) + vec4(reflectedColor, 1.0)*reflection;
+    #endif
+
+        //color = clamp(color, 0.0, 1.0);
+        //color = sqrt(color); // gamma
+        //color = vec4(pow(color.xyz, vec3(1.0/2.2)), 1.0); // gamma
+        //color *= 1.0 - 0.05*length(sp); // vignette
+        //return color;
+	    return vec4(pow(color.xyz, vec3(0.4545)), 1.0);
     }
 }
 
 void main() {
     float f = fieldOfView;
-    vec3 l = lightDirection;
     vec3 a = ambientColor;
     vec3 d = diffuseColor;
     vec3 s = specularColor;
-    float sh = shininess;
-    vec3 alc = ambientLightColor;
-    vec3 dlc = diffuseLightColor;
-    vec3 slc = specularLightColor;
-    float re = reflection;
 
     vec2 fragCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
     vec2  sp = (2.0*fragCoord-iResolution.xy) / iResolution.y;
