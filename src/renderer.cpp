@@ -271,6 +271,11 @@ void Renderer::Render(int width, int height) {
 			program.SetUniform("reflectedColor", fractalsParameters.background_color);
             break;
         }
+		case BackgroundType::SolidWithSun: {
+			program.SetUniform("reflectedColor", fractalsParameters.background_color);
+			program.SetUniform("sunColor", fractalsParameters.sun_color);
+            break;
+        }
         case BackgroundType::Skybox: {
 			GLCall(glActiveTexture(GL_TEXTURE0));
 			GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, skyBox.GetDescriptor()));

@@ -17,6 +17,7 @@ public:
     // Background
     void SetBackgroundType(BackgroundType c) { program->SetBackgroundType(c); renderer->fractalsParameters.background_type = c; }
     void SetBackgroundColor(const glm::vec3& c) { renderer->fractalsParameters.background_color = c; }
+    void SetSunColor(const glm::vec3& c) { renderer->fractalsParameters.sun_color = c; }
 
     // Textures
     void SetSkyboxTexture(SkyboxTexture skyboxTexture);

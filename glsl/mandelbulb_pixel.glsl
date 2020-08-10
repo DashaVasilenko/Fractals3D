@@ -18,8 +18,12 @@ uniform float fieldOfView;
     uniform samplerCube irradianceMap; // освещенность из кубмапы
 #endif
 
-#ifdef SOLID_BACKGROUND
+#if defined SOLID_BACKGROUND || defined SOLID_BACKGROUND_WITH_SUN
     uniform vec3 reflectedColor;
+#endif
+
+#ifdef SOLID_BACKGROUND_WITH_SUN
+    uniform vec3 sunColor;
 #endif
 
 uniform float Time;
@@ -218,9 +222,12 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
 
 #ifdef SOLID_BACKGROUND
         return vec4(reflectedColor - (dir.y * 0.7), 1.0); // Skybox color
-        //vec3 col  = vec3(0.8,0.9,1.1)*(0.6+0.4*dir.y);
-		//col += 5.0*vec3(0.8,0.7,0.5)*pow( clamp(dot(dir,light1),0.0,1.0), 32.0 );
-        //return vec4(col, 1.0);
+#endif
+
+#ifdef SOLID_BACKGROUND_WITH_SUN
+        vec3 col  = reflectedColor*(0.6+0.4*dir.y); 
+        col += lightIntensity1*sunColor*pow( clamp(dot(dir, lightDirection1),0.0,1.0), 32.0); 
+        return vec4(col, 1.0);
 #endif
     }
     // color fractal
@@ -248,18 +255,13 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
         shadow = softShadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, shadowStrength);
     #endif
 
-        // sun
-        float dif1 = clamp(dot(lightDirection1, outNormal), 0.0, 1.0 )*shadow;
+        float dif1 = clamp(dot(lightDirection1, outNormal), 0.0, 1.0 )*shadow; // sun
         float spe1 = pow(clamp(dot(outNormal, hal), 0.0, 1.0), shininess)*dif1*(0.04 + 0.96*pow(clamp(dot(dir, lightDirection1), 0.0, 1.0), 5.0));
-        // bounce
-        float dif2 = clamp(0.5 + 0.5*dot(lightDirection2, outNormal), 0.0, 1.0)*occlusion;
-        // sky
-        //float dif3 = (0.7+0.3*outNormal.y)*(0.2+0.8*occlusion);
+        float dif2 = clamp(0.5 + 0.5*dot(lightDirection2, outNormal), 0.0, 1.0)*occlusion; // bounce
         
 		vec3 lin = vec3(0.0); 
 		     lin += lightIntensity1*lightColor1*dif1; // sun
 		     lin += lightIntensity2*lightColor2*dif2; //light1
-        	 //lin +=  1.5*vec3(0.10,0.20,0.30)*dif3;
              lin +=  ambientLightIntensity3*ambientLightColor3*(0.05+0.95*occlusion); // ambient light
 		vec3 col = albedo*lin;
 		col = pow(col, vec3(0.7, 0.9, 1.0));
@@ -292,7 +294,7 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
         color = vec4(col, 1.0)*(1.0 - reflection) + reflected_color*reflection;
     #endif
 
-    #ifdef SOLID_BACKGROUND
+    #if defined SOLID_BACKGROUND || defined SOLID_BACKGROUND_WITH_SUN
         color = vec4(col, 1.0)*(1.0 - reflection) + vec4(reflectedColor, 1.0)*reflection;
     #endif
 

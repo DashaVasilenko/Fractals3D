@@ -58,6 +58,10 @@ void ShaderProgram::Load() {
             defines += "#define SOLID_BACKGROUND" + std::string("\n");
             break;
         }
+        case BackgroundType::SolidWithSun: {
+            defines += "#define SOLID_BACKGROUND_WITH_SUN" + std::string("\n");
+            break;
+        }
         case BackgroundType::Skybox: {
             defines += "#define SKYBOX_BACKGROUND" + std::string("\n");
             break;

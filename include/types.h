@@ -32,6 +32,7 @@ enum CubemapSide {
 
 enum BackgroundType {
         Solid,
+        SolidWithSun,
         Skybox,
         SkyboxHDR,
 };

@@ -345,17 +345,6 @@ void Gui::MainParameters() {
     if (ImGui::Combo("Type", &current_background_type, background_types, IM_ARRAYSIZE(background_types))) {
         flag = true;
         fractalController->SetBackgroundType(static_cast<BackgroundType>(current_background_type));
-        /*
-        if (current_background_type == 0) {
-            fractalController->SetBackgroundType(BackgroundType::Solid);
-        }
-        else if (current_background_type == 1) {
-            fractalController->SetBackgroundType(BackgroundType::Skybox);
-        }
-        else if (current_background_type == 2) {
-            fractalController->SetBackgroundType(BackgroundType::SkyboxHDR);
-        }
-        */
     }
 
     // Solid background
@@ -365,8 +354,18 @@ void Gui::MainParameters() {
         }
     }
 
-    // Texture background
+    // Solid background with sun
     if (current_background_type == 1) {
+        if (ImGui::ColorEdit3("Solid color", background_color)) {
+            fractalController->SetBackgroundColor(glm::vec3(background_color[0], background_color[1], background_color[2]));
+        }
+        if (ImGui::ColorEdit3("Sun color", sun_color)) {
+            fractalController->SetSunColor(glm::vec3(sun_color[0], sun_color[1], sun_color[2]));
+        }
+    }
+
+    // Texture background
+    if (current_background_type == 2) {
         if (ImGui::Combo("Texture", &current_skybox_texture, skybox_texture, IM_ARRAYSIZE(skybox_texture))) {
             if (static_cast<SkyboxTexture>(current_skybox_texture) != SkyboxTexture::Other)
                 fractalController->SetSkyboxTexture(static_cast<SkyboxTexture>(current_skybox_texture));
@@ -428,7 +427,7 @@ void Gui::MainParameters() {
     }
 
     // HDR Texture background
-    if (current_background_type == 2) {
+    if (current_background_type == 3) {
         if (ImGui::Combo("HDR Texture", &current_skybox_texture_hdr, skybox_texture_hdr, IM_ARRAYSIZE(skybox_texture_hdr))) {
             if (static_cast<SkyboxTextureHDR>(current_skybox_texture_hdr) != SkyboxTextureHDR::OtherHDR)
                 fractalController->SetSkyboxTextureHDR(static_cast<SkyboxTextureHDR>(current_skybox_texture_hdr));
