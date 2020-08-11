@@ -23,6 +23,25 @@ bool MyDragFloat(const char *label, float *v, float v_speed = (1.0F), float v_mi
     return v_backup != *v;
 }
 
+bool MyDragFloat2(const char *label, float *v, float v_speed = (1.0F), float v_min = 0, float v_max = 0) {
+    glm::vec2 v_backup = glm::vec2(v[0], v[1]);
+    if (!ImGui::DragFloat2(label, v, v_speed, v_min, v_max))
+        return false;
+    v[0] = glm::clamp(v[0], v_min, v_max);
+    v[1] = glm::clamp(v[1], v_min, v_max);
+    return v_backup != glm::vec2(v[0], v[1]);
+}
+
+bool MyDragFloat3(const char *label, float *v, float v_speed = (1.0F), float v_min = 0, float v_max = 0) {
+    glm::vec3 v_backup = glm::vec3(v[0], v[1], v[2]);
+    if (!ImGui::DragFloat3(label, v, v_speed, v_min, v_max))
+        return false;
+    v[0] = glm::clamp(v[0], v_min, v_max);
+    v[1] = glm::clamp(v[1], v_min, v_max);
+    v[2] = glm::clamp(v[2], v_min, v_max);
+    return v_backup != glm::vec3(v[0], v[1], v[2]);
+}
+
 void Gui::FileBrowserExport() {
     fileBrowserSaveImage.Display();
     if(fileBrowserSaveImage.HasSelected()) {
@@ -267,8 +286,16 @@ void Gui::Stats() {
             ImGui::Text("Current fractal type: Monster fractal");
             break;
         }
-        case FractalType::Julia: {
-            ImGui::Text("Current fractal type: Julia fractal");
+        case FractalType::Julia1: {
+            ImGui::Text("Current fractal type: Julia1 fractal");
+            break;
+        }
+        case FractalType::Julia2: {
+            ImGui::Text("Current fractal type: Julia2 fractal");
+            break;
+        }
+        case FractalType::Julia3: {
+            ImGui::Text("Current fractal type: Julia3 fractal");
             break;
         }
     }
@@ -304,25 +331,31 @@ void Gui::MainParameters() {
     ImGui::Separator();
 
     ImGui::Text("Light 1:");
-    if (ImGui::InputFloat3("Direction1", light_direction1)) {
-        fractalController->SetLightDirection1(glm::vec3(light_direction1[0], light_direction1[1], light_direction1[2]));
+    if (MyDragFloat2("Direction1", light_direction1, 1.0, 0, 360)) {
+        float x = sin(glm::radians(light_direction1[1])) * cos(glm::radians(light_direction1[0]));
+        float y = cos(glm::radians(light_direction1[1]));
+        float z = sin(glm::radians(light_direction1[0])) * sin(glm::radians(light_direction1[1]));
+        fractalController->SetLightDirection1(glm::vec3(x, y, z));
     }
     if (ImGui::ColorEdit3("Color1", light_color1)) {
         fractalController->SetLightColor1(glm::vec3(light_color1[0], light_color1[1], light_color1[2]));
     }
-    if (MyDragFloat("Intensity1", &light_intensity1, 1, 1, 100)) {
+    if (MyDragFloat("Intensity1", &light_intensity1, 0.5, 0, 30)) {
         fractalController->SetLightIntensity1(light_intensity1);
     }
     ImGui::Separator();
 
     ImGui::Text("Light 2:");
-    if (ImGui::InputFloat3("Direction2", light_direction2)) {
-        fractalController->SetLightDirection2(glm::vec3(light_direction2[0], light_direction2[1], light_direction2[2]));
+    if (MyDragFloat2("Direction2", light_direction2, 1.0, 0, 360)) {
+        float x = sin(glm::radians(light_direction2[1])) * cos(glm::radians(light_direction2[0]));
+        float y = cos(glm::radians(light_direction2[1]));
+        float z = sin(glm::radians(light_direction2[0])) * sin(glm::radians(light_direction2[1]));
+        fractalController->SetLightDirection2(glm::vec3(x, y, z));
     }
     if (ImGui::ColorEdit3("Color2", light_color2)) {
         fractalController->SetLightColor2(glm::vec3(light_color2[0], light_color2[1], light_color2[2]));
     }
-    if (MyDragFloat("Intensity2", &light_intensity2, 1, 1, 100)) {
+    if (MyDragFloat("Intensity2", &light_intensity2, 0.5, 0, 30)) {
         fractalController->SetLightIntensity2(light_intensity2);
     }
     ImGui::Separator();
@@ -331,7 +364,7 @@ void Gui::MainParameters() {
     if (ImGui::ColorEdit3("Color3", ambient_fractal_light_color)) {
         fractalController->SetAmbientFractalLightColor(glm::vec3(ambient_fractal_light_color[0], ambient_fractal_light_color[1], ambient_fractal_light_color[2]));
     }
-    if (MyDragFloat("Intensity3", &ambient_light_intensity, 1, 1, 100)) {
+    if (MyDragFloat("Intensity3", &ambient_light_intensity, 0.5, 0, 30)) {
         fractalController->SetAmbientFractalLightIntensity(ambient_light_intensity);
     }
     //-------------------------------------------------------------------
@@ -494,8 +527,16 @@ void Gui::FractalParameters() {
 
             break;
         }
-        case FractalType::Julia: {
-            Julia();
+        case FractalType::Julia1: {
+            Julia1();
+            break;
+        }
+        case FractalType::Julia2: {
+            Julia2();
+            break;
+        }
+        case FractalType::Julia3: {
+            Julia3();
             break;
         }
     }
@@ -508,23 +549,29 @@ void Gui::FractalColor() {
         fractalController->SetColoringType(currentColoringType);
     }
 
-    if (static_cast<ColoringType>(currentColoringType) == ColoringType::OneColor) {
-        if (ImGui::ColorEdit3("Fractal color", one_color_color)) {
-            fractalController->SetOneColorColor(glm::vec3(one_color_color[0], one_color_color[1], one_color_color[2]));
+    if (static_cast<ColoringType>(currentColoringType) == ColoringType::Type1) {
+        if (ImGui::ColorEdit3("Type1 color", type1_color)) {
+            fractalController->SetType1Color(glm::vec3(type1_color[0], type1_color[1], type1_color[2]));
         }
     }
 
-    if (static_cast<ColoringType>(currentColoringType) == ColoringType::ThreeColors) {
-        if (ImGui::ColorEdit3("Fractal color1", three_colors_color1)) {
-            fractalController->SetThreeColorsColor1(glm::vec3(three_colors_color1[0], three_colors_color1[1], three_colors_color1[2]));
+    if (static_cast<ColoringType>(currentColoringType) == ColoringType::Type2) {
+        if (ImGui::ColorEdit3("Type2 color1", type2_color1)) {
+            fractalController->SetType2Color1(glm::vec3(type2_color1[0], type2_color1[1], type2_color1[2]));
         }
 
-        if (ImGui::ColorEdit3("Fractal color2", three_colors_color2)) {
-            fractalController->SetThreeColorsColor2(glm::vec3(three_colors_color2[0], three_colors_color2[1], three_colors_color2[2]));
+        if (ImGui::ColorEdit3("Type2 color2", type2_color2)) {
+            fractalController->SetType2Color2(glm::vec3(type2_color2[0], type2_color2[1], type2_color2[2]));
         }
 
-        if (ImGui::ColorEdit3("Fractal color3", three_colors_color3)) {
-            fractalController->SetThreeColorsColor3(glm::vec3(three_colors_color3[0], three_colors_color3[1], three_colors_color3[2])); 
+        if (ImGui::ColorEdit3("Type2 color3", type2_color3)) {
+            fractalController->SetType2Color3(glm::vec3(type2_color3[0], type2_color3[1], type2_color3[2])); 
+        }
+    }
+
+    if (static_cast<ColoringType>(currentColoringType) == ColoringType::Type3) {
+        if (ImGui::ColorEdit3("Type3 color", type3_color)) {
+            fractalController->SetType3Color(glm::vec3(type3_color[0], type3_color[1], type3_color[2]));
         }
     }
 
@@ -563,24 +610,40 @@ void Gui::Mandelbulb() {
     ImGui::End();
 }
 
-void Gui::Julia() {
-    ImGui::Begin("Julia parameters", NULL, parametersWindowFlags); 
+void Gui::Julia1() {
+    ImGui::Begin("Julia1 parameters", NULL, parametersWindowFlags); 
     FractalColor();
     ImGui::Separator();
-/*
-    if (MyDragInt("Iterations", &mandelbulb_iterations, 1, 1, 15)) {
-        fractalController->SetMandelbulbIterations(mandelbulb_iterations);
-    }
 
-    if (MyDragFloat("Bailout", &mandelbulb_bailout, 1, 1, 30)) {
-        fractalController->SetMandelbulbBailout(mandelbulb_bailout);
+    if (MyDragFloat("Julia1 offset", &julia1_offset, 0.1, 0, 100)) {
+        fractalController->SetJulia1Offset(julia1_offset);
     }
+    ImGui::End();
+}
 
-    if (MyDragFloat("Power", &mandelbulb_power, 1, 1, 30)) {
-        fractalController->SetMandelbulbPower(mandelbulb_power);
+void Gui::Julia2() {
+    ImGui::Begin("Julia2 parameters", NULL, parametersWindowFlags); 
+    FractalColor();
+    ImGui::Separator();
+
+    if (MyDragFloat3("Julia2 offset", julia2_offset, 0.1, 0, 100)) {
+        fractalController->SetJulia2Offset(glm::vec3(julia2_offset[0], julia2_offset[1], julia2_offset[2]));
     }
-*/
+    
+    if (MyDragFloat("W", &julia2_w, 0.1, 0, 100)) {
+        fractalController->SetJulia2W(julia2_w);
+    }
+    ImGui::End();
+}
 
+void Gui::Julia3() {
+    ImGui::Begin("Julia3 parameters", NULL, parametersWindowFlags); 
+    FractalColor();
+    ImGui::Separator();
+
+    if (MyDragFloat("Julia3 offset", &julia3_offset, 0.1, 0, 100)) {
+        fractalController->SetJulia3Offset(julia3_offset);
+    }
     ImGui::End();
 }
 

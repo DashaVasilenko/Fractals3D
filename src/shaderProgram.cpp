@@ -10,33 +10,46 @@ void ShaderProgram::Init(const std::map<GLenum, std::string>& mapSources) {
 
 void ShaderProgram::Load() {
     // разбираемся с дефайнами до компиляции
+    mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
     switch(currentFractalType) {
         case FractalType::Test: {
-            mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
+            //mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
  	        mapSources[GL_FRAGMENT_SHADER] = "glsl/quad_pixel.glsl";
-	        Init(mapSources);
+	        //Init(mapSources);
             break;
         }
         case FractalType::Mandelbulb: {
-            mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
+            //mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
  	        mapSources[GL_FRAGMENT_SHADER] = "glsl/mandelbulb_pixel.glsl";
-	        Init(mapSources);
+	        //Init(mapSources);
             break;
         }
         case FractalType::Monster: {
-            mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
+            //mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
  	        mapSources[GL_FRAGMENT_SHADER] = "glsl/monster_pixel.glsl";
-	        Init(mapSources);
+	        //Init(mapSources);
             break;
         }
-        case FractalType::Julia: {
-            mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
- 	        mapSources[GL_FRAGMENT_SHADER] = "glsl/julia_pixel.glsl";
-	        Init(mapSources);
+        case FractalType::Julia1: {
+            //mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
+ 	        mapSources[GL_FRAGMENT_SHADER] = "glsl/julia1_pixel.glsl";
+	        //Init(mapSources);
             break;
         }
-
+        case FractalType::Julia2: {
+            //mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
+ 	        mapSources[GL_FRAGMENT_SHADER] = "glsl/julia2_pixel.glsl";
+	        //Init(mapSources);
+            break;
+        }
+        case FractalType::Julia3: {
+            //mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
+ 	        mapSources[GL_FRAGMENT_SHADER] = "glsl/julia3_pixel.glsl";
+	        //Init(mapSources);
+            break;
+        }
     }
+    Init(mapSources);
     
     defines = "";
     if (shader_parameters)
@@ -78,12 +91,16 @@ void ShaderProgram::Load() {
     //std::cout << currentBackgroundType << std::endl;
 
     switch(currentColoringType) {
-        case ColoringType::OneColor: {
-            defines += "#define COLORING_TYPE_ONE_COLOR" + std::string("\n");
+        case ColoringType::Type1: {
+            defines += "#define COLORING_TYPE_1" + std::string("\n");
             break;
         }
-        case ColoringType::ThreeColors: {
-            defines += "#define COLORING_TYPE_THREE_COLORS" + std::string("\n");
+        case ColoringType::Type2: {
+            defines += "#define COLORING_TYPE_2" + std::string("\n");
+            break;
+        }
+        case ColoringType::Type3: {
+            defines += "#define COLORING_TYPE_3" + std::string("\n");
             break;
         }
     }
@@ -185,6 +202,16 @@ void ShaderProgram::SetUniform(const char* name, const glm::vec2& vector) {
 void ShaderProgram::SetUniform(const char* name, const glm::vec3& vector) {
     GLCall(GLint location = glGetUniformLocation(descriptor, name));
     GLCall(glUniform3f(location, vector.x, vector.y, vector.z));
+    if (location == -1) {
+        std::cerr << "Uniform  " << std::string(name) + " " <<  location << " not found" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    // обработка ошибок!!!
+}
+
+void ShaderProgram::SetUniform(const char* name, const glm::vec4& vector) {
+    GLCall(GLint location = glGetUniformLocation(descriptor, name));
+    GLCall(glUniform4f(location, vector.x, vector.y, vector.z, vector.w));
     if (location == -1) {
         std::cerr << "Uniform  " << std::string(name) + " " <<  location << " not found" << std::endl;
         exit(EXIT_FAILURE);

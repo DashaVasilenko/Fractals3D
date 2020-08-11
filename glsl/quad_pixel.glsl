@@ -38,11 +38,11 @@ uniform float lightIntensity2;
 uniform vec3 ambientLightColor3;
 uniform float ambientLightIntensity3;
 
-#ifdef COLORING_TYPE_ONE_COLOR
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_3
 uniform vec3 color;
 #endif
 
-#ifdef COLORING_TYPE_THREE_COLORS
+#ifdef COLORING_TYPE_2
 uniform vec3 color1;
 uniform vec3 color2;
 uniform vec3 color3;
@@ -154,18 +154,32 @@ float sierpinskiTriangle(vec3 pos) {
 float sceneSDF(vec3 point, out vec4 resColor) {
     float time = Time;
     float m = dot(point, point);
-    vec4 trap = vec4(abs(point), m);
 
-#ifdef TEST
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2
+    vec4 trap = vec4(abs(point), m);
+#endif
+
+#ifdef COLORING_TYPE_3
+    vec2  trap = vec2(1e10);
+#endif
+
     float t = sphereSDF(point - vec3(-3, 0, 0), 2.5);
     t = unionSDF(t, sphereSDF(point-vec3(3, 0, 0), 2.5));
     t = unionSDF(t, sphereSDF(point-vec3(0, 0, 10), 2.5));
     t = unionSDF(t, planeSDF(point, vec4(0, 1, 0, 5.5)));
-    resColor = vec4(m,trap.yzw);
-    return t;
+
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2
+    resColor = vec4(m, trap.yzw); // trapping Oxz, Oyz, Oxy, (0,0,0)
 #endif
 
-    return 0;
+#ifdef COLORING_TYPE_3
+    trap = min(trap, vec2(m, abs(point.x))); // orbit trapping ( |z|² and z_x  )
+    resColor = vec4(trap, 1.0, 1.0);
+#endif
+
+    return t;
+
+    //return 0;
     //return sierpinskiTriangle(point);
 }
 
@@ -253,12 +267,17 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
 
     // Didn't hit anything. sky color
     if (dist > MAX_DIST - EPSILON) {
+float intensity = (lightIntensity1 + lightIntensity2 + ambientLightIntensity3)*0.1;
+#if defined SKYBOX_BACKGROUND_HDR && defined IRRADIANCE_CUBEMAP
+    intensity += 0.5;
+#endif
+
 #if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
-        return texture(skyBox, dir);
+        return texture(skyBox, dir)*intensity;
 #endif
 
 #ifdef SOLID_BACKGROUND
-        return vec4(reflectedColor - (dir.y * 0.7), 1.0); // Skybox color
+        return vec4(reflectedColor - (dir.y * 0.7), 1.0)*intensity; // Skybox color
 #endif
 
 #ifdef SOLID_BACKGROUND_WITH_SUN
@@ -275,15 +294,19 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
         float shadow = 1.0;
         
         // main color
-    #ifdef COLORING_TYPE_ONE_COLOR
+    #ifdef COLORING_TYPE_1
         vec3 albedo = color;
+        albedo *= 0.1;
     #endif
-    #ifdef COLORING_TYPE_THREE_COLORS
+    #ifdef COLORING_TYPE_2
         vec3 albedo = vec3(0.001); // чем больше значение, тем более засвеченный фрактал
         albedo = mix(albedo, color1, clamp(trap.y, 0.0, 1.0));
 	    albedo = mix(albedo, color2, clamp(trap.z*trap.z, 0.0, 1.0));
         albedo = mix(albedo, color3, clamp(pow(trap.w, 6.0), 0.0, 1.0));
         albedo *= 0.5;
+    #endif
+    #ifdef COLORING_TYPE_3
+        vec3 albedo = 0.5 + 0.5*sin(trap.y*4.0 + 4.0 + color + outNormal*0.2).xzy;
     #endif
         
     #ifdef FLAG_SOFT_SHADOWS
@@ -302,7 +325,21 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
              lin +=  ambientLightIntensity3*ambientLightColor3*(0.05+0.95*occlusion); // ambient light
 		vec3 col = albedo*lin;
 		col = pow(col, vec3(0.7, 0.9, 1.0));
-        col += spe1*15.0;
+        //col += spe1*15.0;
+        col += spe1*lightIntensity1;
+
+        // sky
+        vec4 color; 
+        float intensity = (lightIntensity1 + lightIntensity2 + ambientLightIntensity3)*0.1;
+    #if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
+        vec3 reflected_dir = reflect(dir, outNormal); //R
+        vec4 reflected_color = texture(skyBox, reflected_dir);
+        color = vec4(col, 1.0)*(1.0 - reflection) + reflected_color*reflection;
+    #endif
+    #if defined SOLID_BACKGROUND || defined SOLID_BACKGROUND_WITH_SUN
+        color = vec4(col, 1.0)*(1.0 - reflection) + vec4(reflectedColor, 1.0)*reflection;
+    #endif
+        color *= intensity;
 
     #if defined SKYBOX_BACKGROUND_HDR && defined IRRADIANCE_CUBEMAP
         vec3 inEye = normalize(eye - point); // V
@@ -320,18 +357,8 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
         //vec3 ambient = (kD * diffuse) * ao;
         vec3 ambientIBL = (kD * diffuseIBL) * occlusion;
 
-        col += ambientIBL; 
-    #endif
-
-        // sky
-        vec4 color;
-    #if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
-        vec3 reflected_dir = reflect(dir, outNormal); //R
-        vec4 reflected_color = texture(skyBox, reflected_dir);
-        color = vec4(col, 1.0)*(1.0 - reflection) + reflected_color*reflection;
-    #endif
-    #if defined SOLID_BACKGROUND || defined SOLID_BACKGROUND_WITH_SUN
-        color = vec4(col, 1.0)*(1.0 - reflection) + vec4(reflectedColor, 1.0)*reflection;
+        //col += ambientIBL; 
+        color.xyz += ambientIBL; 
     #endif
 
         //color = clamp(color, 0.0, 1.0);

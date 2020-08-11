@@ -1,8 +1,8 @@
-//#version 330
-
-//#define FLAG_HARD_SHADOWS
-//#define FLAG_SOFT_SHADOWS
-//#define FLAG_AMBIENTOCCLUSION
+// Related shaders
+//
+// Julia - Quaternion 1 : https://www.shadertoy.com/view/MsfGRr
+// Julia - Quaternion 2 : https://www.shadertoy.com/view/lsl3W2
+// Julia - Quaternion 3 : https://www.shadertoy.com/view/3tsyzl
 
 in mat4 viewMatrix;
 out vec4 outColor;
@@ -28,6 +28,8 @@ uniform float fieldOfView;
 
 uniform float Time;
 
+uniform float shadowStrength;
+
 uniform vec3 lightDirection1;
 uniform vec3 lightColor1;
 uniform float lightIntensity1;
@@ -51,87 +53,122 @@ uniform vec3 color3;
 
 uniform float shininess; // показатель степени зеркального отражения
 uniform float reflection; // сила отражения
-uniform float shadowStrength;
 
-uniform int Iterations = 8;
-uniform float Bailout = 10.0f;
-uniform float Power = 8.0;
+uniform float offset;
 
 //const int MAX_MARCHING_STEPS = 255;
 const int MAX_MARCHING_STEPS = 128;
 const float MIN_DIST = 0.0;
 const float MAX_DIST = 10.0; //50
 const float EPSILON = 0.0005;
- 
+
+// antialias level (1, 2, 3...)
+#define AA 1
+//#else
+//#define AA 2  // Set AA to 1 if your machine is too slow
+//#endif
+
+vec3 hash3( float n )
+{
+    return fract(sin(vec3(n,n+1.0,n+2.0))*vec3(43758.5453123,22578.1459123,19642.3490423));
+}
+
 //-------------------------------------------------------------------------------------------------------
-// The basic formulation of the Mandelbulb is derived from extracting the polar coordinates of a 3D point 
-// and doubling its angles and squaring its length. The idea of duplicating can be generalized to triplicating,
-// or more popularly multiplying by eight. 
-// https://iquilezles.org/www/articles/mandelbulb/mandelbulb.htm
-// https://www.shadertoy.com/view/ltfSWn
-//
-// colord using orbit traps method
-// https://iquilezles.org/www/articles/orbittraps3d/orbittraps3d.htm
-// https://iquilezles.org/www/articles/ftrapsgeometric/ftrapsgeometric.htm
-// https://en.wikipedia.org/wiki/Orbit_trap
-float mandelbulb(vec3 pos, out vec4 resColor) {
-    //int Iterations = 8;
-    //float Bailout = 10.0f;
-    //float Power = 8.0;
-    //float Power = 8.0*sin(Time / 50.0f);
-    float t = Time;
-    
-    vec3 point = pos;
-	float dr = 1.0;
-	float r = 0.0;
-    float m = dot(point, point);
+// square a quaterion
+vec4 qSquare(vec4 a)  {
+    return vec4( a.x*a.x - a.y*a.y - a.z*a.z - a.w*a.w,
+                 2.0*a.x*a.y,
+                 2.0*a.x*a.z,
+                 2.0*a.x*a.w );
+}
+/*
+vec4 qSquare( vec4 a )
+{
+    return vec4( a.x*a.x - dot(a.yzw,a.yzw), 2.0*a.x*(a.yzw) );
+}
+*/
+
+vec4 qCube(vec4 a) {
+	return a*(4.0*a.x*a.x - dot(a,a)*vec4(3.0,1.0,1.0,1.0));
+}
+
+
+const int numIterations = 11;
+
+//-------------------------------------------------------------------------------------------------------
+// Compute Julia set
+// http://iquilezles.org/www/articles/juliasets3d/juliasets3d.htm
+// https://iquilezles.org/www/articles/distancefractals/distancefractals.htm
+// https://www.shadertoy.com/view/lsl3W2
+float julia( vec3 pos, vec4 c, out vec4 trapColor) {
+    vec4 z = vec4(pos, 0.2);
+	float m2 = 0.0;
+	float dz2 = 1.0;
 
 #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2
-    vec4 trap = vec4(abs(point), m);
+    vec4 trap = vec4(abs(z.xyz), dot(z, z));
 #endif
 
 #ifdef COLORING_TYPE_3
     vec2  trap = vec2(1e10);
 #endif
 
-	for (int i = 0; i < Iterations ; i++) {
-        r = length(point);
-		if (r > Bailout) break;
- 
-		// convert to polar coordinates
-		float theta = acos(point.z/r);
-		float phi = atan(point.y,point.x);
-		dr =  pow(r, Power - 1.0)*Power*dr + 1.0;
-		
-		// scale and rotate the point
-		float zr = pow(r, Power);
-		theta = theta*Power;
-		phi = phi*Power;
-		
-		// convert back to cartesian coordinates
-		point = pos + zr*vec3(sin(theta)*cos(phi), sin(phi)*sin(theta), cos(theta));
 
-        m = dot(point, point);
+	for( int i = 0; i < numIterations; i++ ) {
+        vec4 q = qSquare(z);
+		dz2 *= 9.0*dot(q, q); // |dz|² = |3z²|²		
+		z = qCube(z) + c; // z = z^3 + c
+		
+        // stop under divergence		
+        m2 = dot(z, z);		
+        if (m2 > 10000.0) break;	
+
     #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2
-        trap = min(trap, vec4(abs(point),m));  // trapping Oxz, Oyz, Oxy, (0,0,0)
+        trap = min(trap, vec4(abs(z.xyz), dot(z, z)));  // trapping Oxz, Oyz, Oxy, (0,0,0)
     #endif
 
     #ifdef COLORING_TYPE_3
-        trap = min(trap, vec2(m, abs(point.x))); // orbit trapping ( |z|² and z_x  )
-    #endif
-    }
+        trap = min(trap, vec2(m2, abs(z.x))); // orbit trapping ( |z|² and z_x  )
+    #endif			 
+
+	}
 
 #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2
-    resColor = vec4(m, trap.yzw);
+    trapColor = trap;
 #endif
 
 #ifdef COLORING_TYPE_3
-    resColor = vec4(trap, 1.0, 1.0);
+    trapColor = vec4(trap, 1.0, 1.0);
 #endif
 
-    return 0.5*log(r)*r/dr;
+	return 0.25*log(m2)*sqrt(m2/dz2); // distance estimator: d(z) = 0.5·log|z|·|z|/|dz| 
 }
- 
+
+/*
+float julia(vec3 pos, vec4 c, out vec4 trapColor) {
+    vec4 z = vec4(pos, 0.0);
+    float md2 = 1.0;
+    float mz2 = dot(z, z);
+    vec4 trap = vec4(abs(z.xyz), dot(z, z));
+
+    float n = 1.0;
+    for(int i = 0; i < numIterations; i++ ) {
+        // dz -> 2·z·dz, meaning |dz| -> 2·|z|·|dz|
+        // Now we take the 2.0 out of the loop and do it at the end with an exp2
+        md2 *= 4.0*mz2;
+        // z  -> z^2 + c
+        z = qSquare(z) + c;  
+
+        trap = min(trap, vec4(abs(z.xyz), dot(z, z)));
+
+        mz2 = dot(z, z);
+        if (mz2 > 4.0) break;
+        n += 1.0;
+    }
+    trapColor = trap;
+    return 0.25*sqrt(mz2/md2)*log(mz2);  // d = 0.5·|z|·log|z|/|z'|
+}
+*/
 //-------------------------------------------------------------------------------------------------------
 // Return the normalized direction to march in from the eye point for a single pixel.
 // fieldOfView: vertical field of view in degrees
@@ -148,29 +185,28 @@ vec3 rayDirection(float fieldOfView, vec2 size, vec2 fragCoord) {
 // Compute the normal on the surface at point p, using the gradient of the SDF  
 // Compute the normal on the surface at point p, using the Tetrahedron technique
 // https://iquilezles.org/www/articles/normalsSDF/normalsSDF.htm
-vec3 computeNormal(vec3 p) {
+vec3 computeNormal(vec3 p, vec4 c) {
     vec4 trap;
     const float h = 0.0001; // replace by an appropriate value
     const vec2 k = vec2(1,-1)*h;
-    return normalize( k.xyy*mandelbulb( p + k.xyy, trap) + 
-                      k.yyx*mandelbulb( p + k.yyx, trap) + 
-                      k.yxy*mandelbulb( p + k.yxy, trap) + 
-                      k.xxx*mandelbulb( p + k.xxx, trap) );
+    return normalize( k.xyy*julia( p + k.xyy, c, trap) + 
+                      k.yyx*julia( p + k.yyx, c, trap) + 
+                      k.yxy*julia( p + k.yxy, c, trap) + 
+                      k.xxx*julia( p + k.xxx, c, trap) );
 }
 
 //-------------------------------------------------------------------------------------------------------
 // w is the size of the light source, and controls how hard/soft the shadows are
 // https://www.iquilezles.org/www/articles/rmshadows/rmshadows.htm
-float softShadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end, float w ) { 
+float softShadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end, float w, vec4 c ) { 
     float res = 1.0;
     vec4 trap;
     float iterations = 64;
     for(float t=start; t<end; iterations--) {
-        float h = mandelbulb(shadowRayOrigin + shadowRayDir*t, trap);
-        //if (h < 0.0001 ) return 0.0;
+        //float h = mandelbulb(shadowRayOrigin + shadowRayDir*t, trap);
+        float h = julia(shadowRayOrigin + shadowRayDir*t, c, trap);
         res = min( res, w*h/t );
         if (res < 0.001 || iterations <= 0) break;
-        //if (iterations <= 0) break;
         t += h;
     }
     return clamp(res, 0.0, 1.0);
@@ -198,45 +234,141 @@ float isphere(vec4 boundingSphere, vec3 point, vec3 direction) {
 // direction: the normalized direction to march in
 // start: the starting distance away from the eye
 // end: the max distance away from the eye to march before giving up
-float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end, out vec4 trapColor) {
+float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end, vec4 c, out vec4 trapColor) {
     vec4 trap;
     float depth = start;
     float res = end;
 
     // bounding sphere
+    // !!!!!!!!!!!!!!!!!! проверить, будет ли все влезать!!!!!!!!!!
+    // возможно, надо будет удалить сферу
     float dist = isphere(vec4(0.0, 0.0, 0.0, 1.25), eye, direction);
     if(dist < 0.0) return end;
     dist = min(dist, end);
 
     for (int i = 0; i < MAX_MARCHING_STEPS; i++) {
-        float h = mandelbulb(eye + depth*direction, trap);
+        float h = julia(eye + depth*direction, c, trap);
         if (h < EPSILON) break; // We're inside the scene surface!
         if (depth >= dist) break; // Gone too far; give up
+        //if (depth >= end) break; // Gone too far; give up
         depth += h; // Move along the view ray
     }
     
     if (depth < dist) { 
+    //if (depth < end) { 
         trapColor = trap;
         res = depth;
     }
     return res;
 }
 
+/*
+vec3 raycast( in vec3 ro, in vec3 rd, in vec4 c ) {
+	float maxd = 8.0;
+	float precis = 0.002;
+    float h = 1.0;
+    float t = 0.0;
+	float d = 0.0;
+    float m = 1.0;
+    for( int i=0; i<150; i++ ) {
+        if( h<precis||t>maxd ) break;
+        t += h;
+	    vec3 res = map( ro+rd*t, c );
+        h = res.x;
+		d = res.y;
+		m = res.z;
+    }
+
+    if( t>maxd ) m=-1.0;
+    return vec3( t, d, m );
+}
+*/
+
+/*
+vec3 calcPixel(vec2 pi, float time ) {
+    vec4 c = vec4(-0.1,0.6,0.9,-0.3) + 0.1*sin( vec4(3.0,0.0,1.0,2.0) + 0.5*vec4(1.0,1.3,1.7,2.1)*iTime);
+
+	vec2 q = pi / iResolution.xy;
+    vec2 p = -1.0 + 2.0*q;
+    p.x *= iResolution.x/iResolution.y;
+    vec2 m = vec2(0.5);
+	//if(iMouse.z > 0.0) m = iMouse.xy/iResolution.xy;
+
+    // camera
+	float an = -2.4 + 0.2*time - 6.2*m.x;
+    vec3 ro = 4.0*vec3(sin(an),0.25,cos(an));
+    vec3 ta = vec3( 0.0, 0.08, 0.0 );
+    vec3 ww = normalize( ta - ro );
+    vec3 uu = normalize( cross(ww,vec3(0.0,1.0,0.0) ) );
+    vec3 vv = normalize( cross(uu,ww));
+    vec3 rd = normalize( p.x*uu + p.y*vv + 4.1*ww );
+
+	// raymarch
+    vec3 tmat = raycast(ro,rd,c);
+	
+	// shade
+    vec3 col = vec3(0.0);
+    if( tmat.z>-0.5 )
+    {
+        // geometry
+        vec3 pos = ro + tmat.x*rd;
+        vec3 nor = calcNormal(pos, 0.001,c);
+        vec3 sor = calcNormal(pos, 0.01,c);
+
+        // material		
+		vec3 mate = 0.5 + 0.5*sin( tmat.z*4.0 + 4.0 + vec3(3.0,1.5,2.0)  + nor*0.2 ).xzy;
+		
+        // lighting		
+		float occ = clamp( tmat.y*0.5 + 0.5*(tmat.y*tmat.y), 0.0, 1.0 ) * (1.0 + 0.1*nor.y);
+		
+        // diffuse		
+		col = vec3(0.0);
+		for( int i=0; i<32; i++ )
+		{
+			vec3 rr = normalize(-1.0 + 2.0*hash3(float(i)*123.5463));
+			rr = normalize( nor + 8.0*rr );
+			rr = rr * sign(dot(nor,rr));							  
+            col += pow( texture( iChannel0, rr ).xyz, vec3(2.2) ) * dot(rr,nor);
+		}
+        col = 5.0 * occ * (col/32.0);
+
+        // rim		
+		col *= 1.0 + 1.0*pow(clamp(1.0+dot(rd,sor),0.0,1.0),1.0)*vec3(1.0);
+
+        // specular		 
+		float fre = pow( clamp(1.0+dot(rd,sor),0.0,1.0), 5.0 );
+		vec3  ref = reflect( rd, nor );
+		col *= 1.0 - 0.5*fre; 
+		col += 1.5 * (0.5 + 0.5*fre) * pow( texture( iChannel0, ref ).xyz, vec3(2.0) ) * occ;
+
+        col *= mate;
+    }
+	else {
+        // background		
+		col = pow( texture( iChannel0, rd ).xyz, vec3(2.2) );
+	}
+
+	col = pow( clamp( col, 0.0, 1.0 ), vec3(0.45) ); // gamma
+    return col;
+}
+*/
+
 //-------------------------------------------------------------------------------------------------------
 vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
-vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
-    vec4 trap;  
-    float dist = shortestDistanceToSurface(eye, dir, MIN_DIST, MAX_DIST, trap); // intersect fractal
+//-------------------------------------------------------------------------------------------------------
+vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
+	vec4 trap;  
+    float dist = shortestDistanceToSurface(eye, dir, MIN_DIST, MAX_DIST, c, trap); // intersect fractal
 
     vec3 point = eye + dist*dir; // The closest point on the surface to the eyepoint along the view ray
-    vec3 outNormal = computeNormal(point); // N
-
+    vec3 outNormal = computeNormal(point, c); // N
+    
     // Didn't hit anything. sky color
-    if (dist > MAX_DIST - EPSILON) {
-float intensity = (lightIntensity1 + lightIntensity2 + ambientLightIntensity3)*0.1;
+    if (dist >= MAX_DIST) {
+        float intensity = (lightIntensity1 + lightIntensity2 + ambientLightIntensity3)*0.1;
 #if defined SKYBOX_BACKGROUND_HDR && defined IRRADIANCE_CUBEMAP
     intensity += 0.5;
 #endif
@@ -254,17 +386,13 @@ float intensity = (lightIntensity1 + lightIntensity2 + ambientLightIntensity3)*0
         col += lightIntensity1*sunColor*pow( clamp(dot(dir, lightDirection1),0.0,1.0), 32.0); 
         return vec4(col, 1.0);
 #endif
-    }
+	}
     // color fractal
 	else {
-        // lighting terms
-        vec3 hal = normalize(lightDirection1 - dir);
-        float occlusion = clamp(0.05*log(trap.x), 0.0, 1.0);
-        float shadow = 1.0;
 
         // main color
     #ifdef COLORING_TYPE_1
-        vec3 albedo = color*0.1;
+        vec3 albedo = color*0.3;
     #endif
     #ifdef COLORING_TYPE_2
         vec3 albedo = vec3(0.001); // чем больше значение, тем более засвеченный фрактал
@@ -276,22 +404,32 @@ float intensity = (lightIntensity1 + lightIntensity2 + ambientLightIntensity3)*0
     #ifdef COLORING_TYPE_3
         vec3 albedo = 0.5 + 0.5*sin(trap.y*4.0 + 4.0 + color + outNormal*0.2).xzy;
     #endif
-        
+        // material		
+		//albedo = 0.5 + 0.5*sin(trap.y*4.0 + 4.0 + vec3(3.0,1.5,2.0)  + outNormal*0.2).xzy;
+        		
+        //vec3 albedo = color*0.3;
+		//albedo.x = 1.0-10.0*trap.x; // !!!!!!!!!!!!!!!! добавить еще эту окраску !!!!!!!!!!!!!!!!!!!!!!!
+
+		//float occlusion = clamp(2.5*trap.w - 0.15, 0.0, 1.0);
+        float occlusion = clamp(trap.x*0.5 + 0.5*(trap.x*trap.x), 0.0, 1.0) * (1.0 + 0.1*outNormal.y);
+        vec3 hal = normalize(lightDirection1 - dir);
+        float shadow = 1.0;
+
     #ifdef FLAG_SOFT_SHADOWS
         vec3 shadowRayOrigin = point + 0.001*outNormal;
         vec3 shadowRayDir = normalize(lightDirection1); // луч, направленный на источник света
-        shadow = softShadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, shadowStrength);
+        shadow = softShadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, shadowStrength, c);
     #endif
 
         float dif1 = clamp(dot(lightDirection1, outNormal), 0.0, 1.0 )*shadow; // sun
         float spe1 = pow(clamp(dot(outNormal, hal), 0.0, 1.0), shininess)*dif1*(0.04 + 0.96*pow(clamp(dot(dir, lightDirection1), 0.0, 1.0), 5.0));
         float dif2 = clamp(0.5 + 0.5*dot(lightDirection2, outNormal), 0.0, 1.0)*occlusion; // bounce
         
-		vec3 lin = vec3(0.0); 
+        vec3 lin = vec3(0.0); 
 		     lin += lightIntensity1*lightColor1*dif1; // sun
 		     lin += lightIntensity2*lightColor2*dif2; //light1
              lin +=  ambientLightIntensity3*ambientLightColor3*(0.05+0.95*occlusion); // ambient light
-		vec3 col = albedo*lin;
+        vec3 col = albedo*lin;
 		col = pow(col, vec3(0.7, 0.9, 1.0));
         //col += spe1*15.0;
         col += spe1*lightIntensity1;
@@ -328,7 +466,6 @@ float intensity = (lightIntensity1 + lightIntensity2 + ambientLightIntensity3)*0
         //col += ambientIBL; 
         color.xyz += ambientIBL; 
     #endif
-
 /*
     #if defined SKYBOX_BACKGROUND_HDR && defined IRRADIANCE_CUBEMAP
         vec3 inEye = normalize(eye - point); // V
@@ -362,63 +499,45 @@ float intensity = (lightIntensity1 + lightIntensity2 + ambientLightIntensity3)*0
     #endif
 */
         //color = clamp(color, 0.0, 1.0);
-        color = sqrt(color); // gamma
+        //color = sqrt(color); // gamma
         //color = vec4(pow(color.xyz, vec3(1.0/2.2)), 1.0); // gamma
-        color *= 1.0 - 0.05*length(sp); // vignette
-        //return vec4(pow(color.xyz, vec3(0.4545)), 1.0);
-        return color;
+        //color *= 1.0 - 0.05*length(sp); // vignette
+        //return color;
+        //return vec4(pow(clamp(color.xyz, 0.0, 1.0), vec3(0.4545)), 1.0); // gamma
+	    return vec4(pow(color.xyz, vec3(0.4545)), 1.0);
     }
-
-
 }
 
 void main() {
     float s = shadowStrength;
-    float time = Time*.1;
-    vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
-    float f = fieldOfView;
-
-    // camera
-	float di = 1.4+0.1*cos(.29*time);
-	vec3  ro = di * vec3( cos(.33*time), 0.8*sin(.37*time), sin(.31*time) );
-	vec3  ta = vec3(0.0,0.1,0.0);
-	float cr = 0.5*cos(0.1*time);
-
-    // camera matrix
-	vec3 cp = vec3(sin(cr), cos(cr),0.0);
-    vec3 cw = normalize(ta-ro);
-	vec3 cu = normalize(cross(cw,cp));
-	vec3 cv =          (cross(cu,cw));
-    mat4 cam = mat4( cu, ro.x, cv, ro.y, cw, ro.z, 0.0, 0.0, 0.0, 1.0 );
-
-    const float fle = 1.5; 	// ray setup
-    vec2  sp = (2.0*pixelCoord-iResolution.xy) / iResolution.y;
-    float px = 2.0/(iResolution.y*fle);
-
-    vec3  eye = vec3( cam[0].w, cam[1].w, cam[2].w );
-	vec3  dir = normalize( (cam*vec4(sp,fle,0.0)).xyz );
-
-/*
+    float t = Time;
+    
     vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
     vec3 dir = rayDirection(fieldOfView, iResolution, pixelCoord);
     vec3 eye = viewMatrix[3].xyz;
     vec2  sp = (2.0*pixelCoord-iResolution.xy) / iResolution.y;
-*/
-    outColor = Render(eye, dir, sp);
+    vec4 c = vec4(-0.1,0.6,0.9,-0.3) + 0.1*sin( vec4(3.0,0.0,1.0,2.0) + 0.5*vec4(1.0,1.3,1.7,2.1)*offset);
 
-/*
-// !!!!!!!!!! добавить антиалиасинг при рендеринге картинки конечной !!!!!!!!!
+    //vec4 col = vec4(calcPixel(pixelCoord, Time), 1.0);
+
+    
     // render
-    //#if AA<2
-    //cam = transpose(viewMatrix);
-    vec3 col = render(pixelCoord, cam);
-    //#else
-    //vec3 col = vec3(0.0);
-    //for( int j=ZERO; j<AA; j++ )
-    //for( int i=ZERO; i<AA; i++ ) {
-	//    col += render( fragCoord + (vec2(i,j)/float(AA)), cam );
-    //}
-	//col /= float(AA*AA);
-    //#endif
-*/
-} 
+    vec4 col = vec4(0.0);
+    for( int j=0; j<AA; j++ )
+    for( int i=0; i<AA; i++ )
+    {
+        //vec2 p = (-iResolution.xy + 2.0*(fragCoord + vec2(float(i),float(j))/float(AA))) / iResolution.y;
+        //vec3 cw = normalize(ta-ro);
+        //vec3 cp = vec3(sin(cr), cos(cr),0.0);
+        //vec3 cu = normalize(cross(cw,cp));
+        //vec3 cv = normalize(cross(cu,cw));
+        //vec3 rd = normalize( p.x*cu + p.y*cv + 2.0*cw );
+        //col += render(ro, rd, c, sp );
+
+        col += render(eye, dir, c, sp );
+    }
+    col /= float(AA*AA);
+    
+    
+    outColor = col;
+}

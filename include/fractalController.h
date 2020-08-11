@@ -30,10 +30,12 @@ public:
 
     // Fractals coloring
     void SetColoringType(ColoringType c);
-    void SetOneColorColor(const glm::vec3& c) { renderer->fractalsParameters.one_color_color = c; }
-    void SetThreeColorsColor1(const glm::vec3& c) { renderer->fractalsParameters.three_colors_color1 = c; }
-    void SetThreeColorsColor2(const glm::vec3& c) { renderer->fractalsParameters.three_colors_color2 = c; }
-    void SetThreeColorsColor3(const glm::vec3& c) { renderer->fractalsParameters.three_colors_color3 = c; }
+    void SetType1Color(const glm::vec3& c) { renderer->fractalsParameters.type1_color = c; }
+    void SetType2Color1(const glm::vec3& c) { renderer->fractalsParameters.type2_color1 = c; }
+    void SetType2Color2(const glm::vec3& c) { renderer->fractalsParameters.type2_color2 = c; }
+    void SetType2Color3(const glm::vec3& c) { renderer->fractalsParameters.type2_color3 = c; }
+    void SetType3Color(const glm::vec3& c) { renderer->fractalsParameters.type3_color = c; }
+
 
     // General fractal parameters
     void SetShadowStrength(float c ) { renderer->fractalsParameters.shadow_strength = c; }
@@ -61,9 +63,18 @@ public:
     // Mandelbulb fractal parameters
     void SetMandelbulbIterations(const int c) { renderer->fractalsParameters.mandelbulb_iterations = c;  }
     void SetMandelbulbBailout(const float c) { renderer->fractalsParameters.mandelbulb_bailout = c; }
-    void SetMandelbulbPower(float c) { renderer-> fractalsParameters.mandelbulb_power = c; }
+    void SetMandelbulbPower(float c) { renderer->fractalsParameters.mandelbulb_power = c; }
 
-    // Julia fractal parameters
+    // Julia1 fractal parameters
+    void SetJulia1Offset(float c) { renderer->fractalsParameters.julia1_offset = c; }
+
+    // Julia2 fractal parameters
+    void SetJulia2Offset(const glm::vec3& c) { renderer->fractalsParameters.julia2_offset = c; }
+    void SetJulia2W(float c) { renderer->fractalsParameters.julia2_w = c; }
+
+    // Julia3 fractal parameters
+    void SetJulia3Offset(float c) { renderer->fractalsParameters.julia3_offset = c; }
+
     
 private:
     Renderer* renderer;

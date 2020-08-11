@@ -297,18 +297,22 @@ void Renderer::Render(int width, int height) {
 	
 	//-----------------------set color fractal parameters-----------------------
 	switch(fractalsParameters.coloring_type) {
-		case ColoringType::OneColor: {
-            program.SetUniform("color", fractalsParameters.one_color_color);
+		case ColoringType::Type1: {
+            program.SetUniform("color", fractalsParameters.type1_color);
 			break;
 		}
-		case ColoringType::ThreeColors: {
-			program.SetUniform("color1", fractalsParameters.three_colors_color1);
-			program.SetUniform("color2", fractalsParameters.three_colors_color2);
-			program.SetUniform("color3", fractalsParameters.three_colors_color3);
+		case ColoringType::Type2: {
+			program.SetUniform("color1", fractalsParameters.type2_color1);
+			program.SetUniform("color2", fractalsParameters.type2_color2);
+			program.SetUniform("color3", fractalsParameters.type2_color3);
+			break;
+		}
+		case ColoringType::Type3: {
+			program.SetUniform("color", fractalsParameters.type3_color);
 			break;
 		}
 	}
-
+	
 	program.SetUniform("shininess", fractalsParameters.shininess);
 	program.SetUniform("reflection", fractalsParameters.reflection);
 	//--------------------------------------------------------------------------
@@ -330,8 +334,16 @@ void Renderer::Render(int width, int height) {
 			GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, fractalsParameters.monsterColorHDR.GetCubemap()));
 			break;
 		}
-		case FractalType::Julia: {
-            
+		case FractalType::Julia1: {
+			program.SetUniform("offset", fractalsParameters.julia1_offset);
+            break;
+        }
+		case FractalType::Julia2: {
+            program.SetUniform("offset", glm::vec4(fractalsParameters.julia2_offset, fractalsParameters.julia2_w));
+            break;
+        }
+		case FractalType::Julia3: {
+			program.SetUniform("offset", fractalsParameters.julia3_offset);
             break;
         }
 

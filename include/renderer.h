@@ -42,7 +42,7 @@ private:
 
     struct FractalsParameters {
         // Light parameters
-        glm::vec3 lightDirection1 = { 0.577, 0.577, -0.577 };
+        glm::vec3 lightDirection1 = { 0.469846, 0.573576, 0.67101 };
         glm::vec3 lightColor1 = { 1.0, 1.0, 0.70 };
         float lightIntensity1 = 12.0;
 
@@ -67,11 +67,12 @@ private:
         float reflection = 0.2f;
 
         // Fractals coloring
-        ColoringType coloring_type = ColoringType::OneColor;
-        glm::vec3 one_color_color = { 1.0, 0.8, 0.7 };
-        glm::vec3 three_colors_color1 = { 0.10, 0.20, 0.30 };
-        glm::vec3 three_colors_color2 = { 0.02, 0.10, 0.30 };
-        glm::vec3 three_colors_color3 = { 0.30, 0.10, 0.02 };
+        ColoringType coloring_type = ColoringType::Type1;
+        glm::vec3 type1_color = { 1.0, 0.8, 0.7 };
+        glm::vec3 type2_color1 = { 0.10, 0.20, 0.30 };
+        glm::vec3 type2_color2 = { 0.02, 0.10, 0.30 };
+        glm::vec3 type2_color3 = { 0.30, 0.10, 0.02 };
+        glm::vec3 type3_color = { 1.0, 0.8, 0.7 };
 
         // Test fractal parameters
 
@@ -80,8 +81,15 @@ private:
         float mandelbulb_bailout = 10.0f;
         float mandelbulb_power = 9.0f;
 
-        // Julia fractal parameters
+        // Julia1 fractal parameters
+        float julia1_offset = 1.0;
 
+        // Julia2 fractal parameters
+        glm::vec3 julia2_offset = { 0.1498, 0.4479, 0.4495 };
+        float julia2_w = 0.4491;
+
+        // Julia3 fractal parameters
+        float julia3_offset = 1.0;
 
         SkyBoxHDR monsterColorHDR;
 

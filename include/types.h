@@ -13,12 +13,18 @@ enum FractalType {
         Test,
         Mandelbulb,
         Monster,
-        Julia,
+        Julia1,
+        Julia2,
+        Julia3,
 };
 
+// Type1 - one color without traps
+// Type2 - three colors with traps: Oxy, Oyz, Oyz planes and point (0, 0, 0)
+// Type3 - one color with traps: |z|² and z_x
 enum ColoringType {
-        OneColor,
-        ThreeColors,
+        Type1,
+        Type2,
+        Type3,
 };
 
 enum CubemapSide {

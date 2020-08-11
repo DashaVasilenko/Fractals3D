@@ -30,6 +30,7 @@ public:
 
     void SetUniform(const char* name, const glm::vec2&);
     void SetUniform(const char* name, const glm::vec3&);
+    void SetUniform(const char* name, const glm::vec4&);
     void SetUniform(const char* name, const glm::mat4&);
     void SetUniform(const char* name, float value);
     void SetUniform(const char* name, int value);
@@ -48,7 +49,7 @@ private:
     FractalType currentFractalType = FractalType::Test;
     BackgroundType currentBackgroundType = BackgroundType::SkyboxHDR;
     bool irradianceCubemap = true;
-    ColoringType currentColoringType = ColoringType::OneColor;
+    ColoringType currentColoringType = ColoringType::Type1;
 };
 
 #endif /* End of __SHADERPROGRAM__ */

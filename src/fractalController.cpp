@@ -131,7 +131,7 @@ void FractalController::SetFractalType(FractalType c) {
         case FractalType::Monster: {
             break;
         }
-        case FractalType::Julia: {
+        case FractalType::Julia1: {
             renderer->fractalsParameters.lightDirection1 = glm::vec3(0.577, 0.577,  0.577);
             renderer->fractalsParameters.lightColor1 = glm::vec3(1.00,0.90,0.70);
             renderer->fractalsParameters.lightIntensity1 = 3.5;
@@ -141,6 +141,12 @@ void FractalController::SetFractalType(FractalType c) {
             renderer->fractalsParameters.lightIntensity2 = 3.5;
             renderer->fractalsParameters.ambientLightColor = glm::vec3(0.35, 0.30, 0.25);
             renderer->fractalsParameters.ambientLightIntensity = 2.5;
+            break;
+        }
+        case FractalType::Julia2: {
+            break;
+        }
+        case FractalType::Julia3: {
             break;
         }
     }

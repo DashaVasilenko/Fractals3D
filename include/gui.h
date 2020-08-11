@@ -24,11 +24,12 @@ public:
 
 private:
     // light parameters
-    float light_direction1[3] = { 0.577, 0.577, -0.577 }; // sun. compute shadows for it
+    float light_direction1[2] = { 55.0, 55.0 }; // sun. compute shadows for it
     float light_color1[3] = { 1.0, 1.0, 0.70 }; 
     float light_intensity1 = 12.0; 
 
-    float light_direction2[3] = { -0.707, 0.000, 0.707 }; // light. compute occlusion for it
+    //float light_direction2[3] = { -0.707, 0.000, 0.707 }; // light. compute occlusion for it
+    float light_direction2[3] = { 135.0, 90.0 }; // light. compute occlusion for it
     float light_color2[3] = { 0.25, 0.20, 0.15 };
     float light_intensity2 = 4.0;
 
@@ -48,7 +49,7 @@ private:
 
     // fractal type
     FractalType currentFractalType = FractalType::Test;
-    const char* fractal_type[4] = { "Test", "Mandelbulb", "Monster", "Julia" };
+    const char* fractal_type[6] = { "Test", "Mandelbulb", "Monster", "Julia1", "Julia2", "Julia3" };
     int current_fractal_type = 0; 
 
     // general fractal parameters
@@ -58,13 +59,14 @@ private:
     float reflection = 0.2;
 
     // coloring types
-    ColoringType currentColoringType = ColoringType::OneColor;
-    const char* coloring_type[2] = { "One color", "Three colors" };
+    ColoringType currentColoringType = ColoringType::Type1;
+    const char* coloring_type[3] = { "Type1", "Type2", "Type3" };
     int current_coloring_type = 0; 
-    float one_color_color[3] = { 1.0, 0.8, 0.7 };
-    float three_colors_color1[3] = { 0.10, 0.20, 0.30 };
-    float three_colors_color2[3] = { 0.02, 0.10, 0.30 };
-    float three_colors_color3[3] = { 0.30, 0.10, 0.02 };
+    float type1_color[3] = { 1.0, 0.8, 0.7 };
+    float type2_color1[3] = { 0.10, 0.20, 0.30 };
+    float type2_color2[3] = { 0.02, 0.10, 0.30 };
+    float type2_color3[3] = { 0.30, 0.10, 0.02 };
+    float type3_color[3] = { 1.0, 0.8, 0.7 };
 
 
     // test fractal parameters
@@ -74,7 +76,16 @@ private:
     float mandelbulb_bailout = 10.0f;
     float mandelbulb_power = 9.0f;
 
-    // julia fractal parameters
+    // julia1 fractal parameters
+    float julia1_offset = 1.0;
+
+    // julia2 fractal parameters
+    float julia2_offset[3] = { 0.1498, 0.4479, 0.4495 };
+    float julia2_w =  0.4491;
+
+    // julia3 fractal parameters
+    float julia3_offset = 1.0;
+    
 
     // export
     bool exportWindowFlag = false;
@@ -131,7 +142,9 @@ private:
 
     void Test();
     void Mandelbulb();
-    void Julia();
+    void Julia1();
+    void Julia2();
+    void Julia3();
 
 };
 
