@@ -39,7 +39,7 @@ uniform float lightIntensity2;
 uniform vec3 ambientLightColor3;
 uniform float ambientLightIntensity3;
 
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_3
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_3 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
 uniform vec3 color;
 #endif
 
@@ -86,11 +86,11 @@ float mandelbulb(vec3 pos, out vec4 resColor) {
 	float r = 0.0;
     float m = dot(point, point);
 
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4
     vec4 trap = vec4(abs(point), m);
 #endif
 
-#ifdef COLORING_TYPE_3
+#if defined COLORING_TYPE_3 || defined COLORING_TYPE_5
     vec2  trap = vec2(1e10);
 #endif
 
@@ -112,20 +112,20 @@ float mandelbulb(vec3 pos, out vec4 resColor) {
 		point = pos + zr*vec3(sin(theta)*cos(phi), sin(phi)*sin(theta), cos(theta));
 
         m = dot(point, point);
-    #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2
+    #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4
         trap = min(trap, vec4(abs(point),m));  // trapping Oxz, Oyz, Oxy, (0,0,0)
     #endif
 
-    #ifdef COLORING_TYPE_3
+    #if defined COLORING_TYPE_3 || defined COLORING_TYPE_5
         trap = min(trap, vec2(m, abs(point.x))); // orbit trapping ( |z|² and z_x  )
     #endif
     }
 
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4
     resColor = vec4(m, trap.yzw);
 #endif
 
-#ifdef COLORING_TYPE_3
+#if defined COLORING_TYPE_3 || defined COLORING_TYPE_5
     resColor = vec4(trap, 1.0, 1.0);
 #endif
 
@@ -276,6 +276,15 @@ float intensity = (lightIntensity1 + lightIntensity2 + ambientLightIntensity3)*0
     #ifdef COLORING_TYPE_3
         vec3 albedo = 0.5 + 0.5*sin(trap.y*4.0 + 4.0 + color + outNormal*0.2).xzy;
     #endif
+    #ifdef COLORING_TYPE_4
+        vec3 albedo = color;
+        albedo *= 0.1;
+        albedo.x = 1.0-10.0*trap.x; 
+    #endif
+    #ifdef COLORING_TYPE_5
+        vec3 albedo = 0.5 + 0.5*sin(trap.y*4.0 + 4.0 + color + outNormal*0.2).xzy;
+        albedo.x = 1.0-10.0*trap.x; 
+    #endif   
         
     #ifdef FLAG_SOFT_SHADOWS
         vec3 shadowRayOrigin = point + 0.001*outNormal;

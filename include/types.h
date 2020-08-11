@@ -22,10 +22,14 @@ enum FractalType {
 // Type1 - one color without traps
 // Type2 - three colors with traps: Oxy, Oyz, Oyz planes and point (0, 0, 0)
 // Type3 - one color with traps: |z|² and z_x
+// Type4 - Type1 + trap: albedo.x = 1.0-10.0*trap.x;
+// Type5 - Type3 + trap: albedo.x = 1.0-10.0*trap.x;
 enum ColoringType {
         Type1,
         Type2,
         Type3,
+        Type4, 
+        Type5,
 };
 
 enum CubemapSide {

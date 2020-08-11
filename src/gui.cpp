@@ -583,6 +583,18 @@ void Gui::FractalColor() {
         }
     }
 
+    if (static_cast<ColoringType>(currentColoringType) == ColoringType::Type4) {
+        if (ImGui::ColorEdit3("Type4 color", type4_color)) {
+            fractalController->SetType4Color(glm::vec3(type4_color[0], type4_color[1], type4_color[2]));
+        }
+    }
+
+    if (static_cast<ColoringType>(currentColoringType) == ColoringType::Type5) {
+        if (ImGui::ColorEdit3("Type5 color", type5_color)) {
+            fractalController->SetType5Color(glm::vec3(type5_color[0], type5_color[1], type5_color[2]));
+        }
+    }
+
     if (MyDragFloat("Shininess", &shininess, 1, 1, 100)) {
         fractalController->SetFractalShininess(shininess);
     }

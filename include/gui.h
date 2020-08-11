@@ -60,13 +60,15 @@ private:
 
     // coloring types
     ColoringType currentColoringType = ColoringType::Type1;
-    const char* coloring_type[3] = { "Type1", "Type2", "Type3" };
+    const char* coloring_type[5] = { "Type1", "Type2", "Type3", "Type4", "Type5" };
     int current_coloring_type = 0; 
     float type1_color[3] = { 1.0, 0.8, 0.7 };
     float type2_color1[3] = { 0.10, 0.20, 0.30 };
     float type2_color2[3] = { 0.02, 0.10, 0.30 };
     float type2_color3[3] = { 0.30, 0.10, 0.02 };
     float type3_color[3] = { 1.0, 0.8, 0.7 };
+    float type4_color[3] = { 1.0, 0.8, 0.7 };
+    float type5_color[3] = { 1.0, 0.8, 0.7 };
 
 
     // test fractal parameters

@@ -311,6 +311,14 @@ void Renderer::Render(int width, int height) {
 			program.SetUniform("color", fractalsParameters.type3_color);
 			break;
 		}
+		case ColoringType::Type4: {
+			program.SetUniform("color", fractalsParameters.type4_color);
+			break;
+		}
+		case ColoringType::Type5: {
+			program.SetUniform("color", fractalsParameters.type5_color);
+			break;
+		}
 	}
 	
 	program.SetUniform("shininess", fractalsParameters.shininess);

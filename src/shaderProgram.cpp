@@ -110,6 +110,14 @@ void ShaderProgram::Load() {
             defines += "#define COLORING_TYPE_3" + std::string("\n");
             break;
         }
+        case ColoringType::Type4: {
+            defines += "#define COLORING_TYPE_4" + std::string("\n");
+            break;
+        }
+        case ColoringType::Type5: {
+            defines += "#define COLORING_TYPE_5" + std::string("\n");
+            break;
+        }
     }
     
     Compile();

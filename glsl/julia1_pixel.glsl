@@ -41,7 +41,7 @@ uniform float lightIntensity2;
 uniform vec3 ambientLightColor3;
 uniform float ambientLightIntensity3;
 
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_3
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_3 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
 uniform vec3 color;
 #endif
 
@@ -90,11 +90,11 @@ float julia(vec3 pos, vec4 c, out vec4 trapColor) {
     float md2 = 1.0;
     float mz2 = dot(z, z);
 
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4
     vec4 trap = vec4(abs(z.xyz), dot(z, z));
 #endif
 
-#ifdef COLORING_TYPE_3
+#if defined COLORING_TYPE_3 || defined COLORING_TYPE_5
     vec2  trap = vec2(1e10);
 #endif
 
@@ -107,11 +107,11 @@ float julia(vec3 pos, vec4 c, out vec4 trapColor) {
         // z  -> z^2 + c
         z = qsqr(z) + c;  
         
-    #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2
+    #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4
         trap = min(trap, vec4(abs(z.xyz), dot(z, z)));  // trapping Oxz, Oyz, Oxy, (0,0,0)
     #endif
 
-    #ifdef COLORING_TYPE_3
+    #if defined COLORING_TYPE_3 || defined COLORING_TYPE_5
         trap = min(trap, vec2(mz2, abs(z.x))); // orbit trapping ( |z|² and z_x  )
     #endif
 
@@ -120,11 +120,11 @@ float julia(vec3 pos, vec4 c, out vec4 trapColor) {
         n += 1.0;
     }
 
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4
     trapColor = trap;
 #endif
 
-#ifdef COLORING_TYPE_3
+#if defined COLORING_TYPE_3 || defined COLORING_TYPE_5
     trapColor = vec4(trap, 1.0, 1.0);
 #endif
 
@@ -264,7 +264,6 @@ float intensity = (lightIntensity1 + lightIntensity2 + ambientLightIntensity3)*0
         // main color
     #ifdef COLORING_TYPE_1
         vec3 albedo = color*0.3;
-        //vec3 albedo = 0.5 + 0.5*sin(trap.y*4.0 + 4.0 + color + outNormal*0.2).xzy;
     #endif
     #ifdef COLORING_TYPE_2
         vec3 albedo = vec3(0.001); // чем больше значение, тем более засвеченный фрактал
@@ -276,9 +275,15 @@ float intensity = (lightIntensity1 + lightIntensity2 + ambientLightIntensity3)*0
     #ifdef COLORING_TYPE_3
         vec3 albedo = 0.5 + 0.5*sin(trap.y*4.0 + 4.0 + color + outNormal*0.2).xzy;
     #endif
-
-        //vec3 albedo = color*0.3;
-		//albedo.x = 1.0-10.0*trap.x; // !!!!!!!!!!!!!!!! добавить еще эту окраску !!!!!!!!!!!!!!!!!!!!!!!
+    #ifdef COLORING_TYPE_4
+        vec3 albedo = color;
+        albedo *= 0.1;
+        albedo.x = 1.0-10.0*trap.x; 
+    #endif
+    #ifdef COLORING_TYPE_5
+        vec3 albedo = 0.5 + 0.5*sin(trap.y*4.0 + 4.0 + color + outNormal*0.2).xzy;
+        albedo.x = 1.0-10.0*trap.x; 
+    #endif 
 
 		float occlusion = clamp(2.5*trap.w - 0.15, 0.0, 1.0);
         vec3 hal = normalize(lightDirection1 - dir);
