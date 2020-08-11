@@ -618,6 +618,9 @@ void Gui::Julia1() {
     if (MyDragFloat("Julia1 offset", &julia1_offset, 0.1, 0, 100)) {
         fractalController->SetJulia1Offset(julia1_offset);
     }
+    if (MyDragFloat("Julia1 smoothness", &julia1_smoothness, 0.1, 0, 45)) {
+        fractalController->SetJulia1Smoothness(julia1_smoothness);
+    }
     ImGui::End();
 }
 
@@ -629,9 +632,11 @@ void Gui::Julia2() {
     if (MyDragFloat3("Julia2 offset", julia2_offset, 0.1, 0, 100)) {
         fractalController->SetJulia2Offset(glm::vec3(julia2_offset[0], julia2_offset[1], julia2_offset[2]));
     }
-    
-    if (MyDragFloat("W", &julia2_w, 0.1, 0, 100)) {
+    if (MyDragFloat("Julia2 W", &julia2_w, 0.1, 0, 100)) {
         fractalController->SetJulia2W(julia2_w);
+    }
+    if (MyDragFloat("Julia2 smoothness", &julia2_smoothness, 0.1, 0, 45)) {
+        fractalController->SetJulia2Smoothness(julia2_smoothness);
     }
     ImGui::End();
 }

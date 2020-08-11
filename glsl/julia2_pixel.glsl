@@ -55,6 +55,7 @@ uniform float shininess; // показатель степени зеркальн
 uniform float reflection; // сила отражения
 
 uniform vec4 offset;
+uniform float smoothness;
 
 //const int MAX_MARCHING_STEPS = 255;
 const int MAX_MARCHING_STEPS = 128;
@@ -101,7 +102,7 @@ float julia(vec3 pos, vec4 c, out vec4 trapColor) {
     for(int i = 0; i < numIterations; i++ ) {
         // dz -> 2·z·dz, meaning |dz| -> 2·|z|·|dz|
         // Now we take the 2.0 out of the loop and do it at the end with an exp2
-        md2 *= 4.0*mz2;
+        md2 *= smoothness*mz2;
         // z  -> z^2 + c
         z = qSquare(z) + c;  
 
@@ -114,7 +115,7 @@ float julia(vec3 pos, vec4 c, out vec4 trapColor) {
     #endif
 
         mz2 = dot(z, z);
-        if (mz2 > 4.0) break;
+        if (mz2 > smoothness) break;
         n += 1.0;
     }
 

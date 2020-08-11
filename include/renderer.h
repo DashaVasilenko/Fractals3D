@@ -83,10 +83,12 @@ private:
 
         // Julia1 fractal parameters
         float julia1_offset = 1.0;
+        float julia1_smoothness = 4.0;
 
         // Julia2 fractal parameters
         glm::vec3 julia2_offset = { 0.1498, 0.4479, 0.4495 };
         float julia2_w = 0.4491;
+        float julia2_smoothness = 4.0;
 
         // Julia3 fractal parameters
         float julia3_offset = 1.0;

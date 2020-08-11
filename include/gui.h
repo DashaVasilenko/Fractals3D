@@ -78,10 +78,13 @@ private:
 
     // julia1 fractal parameters
     float julia1_offset = 1.0;
+    float julia1_smoothness = 4.0;
 
     // julia2 fractal parameters
     float julia2_offset[3] = { 0.1498, 0.4479, 0.4495 };
     float julia2_w =  0.4491;
+    float julia2_smoothness = 4.0;
+
 
     // julia3 fractal parameters
     float julia3_offset = 1.0;
