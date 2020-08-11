@@ -44,7 +44,7 @@ private:
         // Light parameters
         glm::vec3 lightDirection1 = { 0.469846, 0.573576, 0.67101 };
         glm::vec3 lightColor1 = { 1.0, 1.0, 0.70 };
-        float lightIntensity1 = 12.0;
+        float lightIntensity1 = 3.5;
 
         glm::vec3 lightDirection2 = { -0.707, 0.000, 0.707 };
         glm::vec3 lightColor2 = { 0.25, 0.20, 0.15 };
@@ -92,6 +92,13 @@ private:
 
         // Julia3 fractal parameters
         float julia3_offset = 1.0;
+        float julia3_smoothness = 9.0;
+
+        // Julia4 fractal parameters
+        glm::vec3 julia4_offset = { -0.05, -0.052, 0.85 };
+        float julia4_w = -0.151;
+        float julia4_smoothness = 8.7;
+
 
         SkyBoxHDR monsterColorHDR;
 

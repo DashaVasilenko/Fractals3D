@@ -112,6 +112,7 @@ void FractalController::SetFractalType(FractalType c) {
     program->SetFractalType(c); 
     renderer->currentFractalType = c; 
 
+/*
     switch(c) {
         case FractalType::Test: {
             break;
@@ -144,11 +145,42 @@ void FractalController::SetFractalType(FractalType c) {
             break;
         }
         case FractalType::Julia2: {
+            renderer->fractalsParameters.lightDirection1 = glm::vec3(0.577, 0.577,  0.577);
+            renderer->fractalsParameters.lightColor1 = glm::vec3(1.00,0.90,0.70);
+            renderer->fractalsParameters.lightIntensity1 = 3.5;
+            
+            renderer->fractalsParameters.lightDirection2 = glm::vec3(-0.707, 0.000, 0.707);
+            renderer->fractalsParameters.lightColor2 = glm::vec3(1.00,0.90,0.70);
+            renderer->fractalsParameters.lightIntensity2 = 3.5;
+            renderer->fractalsParameters.ambientLightColor = glm::vec3(0.35, 0.30, 0.25);
+            renderer->fractalsParameters.ambientLightIntensity = 2.5;
             break;
         }
         case FractalType::Julia3: {
+            renderer->fractalsParameters.lightDirection1 = glm::vec3(0.577, 0.577,  0.577);
+            renderer->fractalsParameters.lightColor1 = glm::vec3(1.00,0.90,0.70);
+            renderer->fractalsParameters.lightIntensity1 = 3.5;
+            
+            renderer->fractalsParameters.lightDirection2 = glm::vec3(-0.707, 0.000, 0.707);
+            renderer->fractalsParameters.lightColor2 = glm::vec3(1.00,0.90,0.70);
+            renderer->fractalsParameters.lightIntensity2 = 3.5;
+            renderer->fractalsParameters.ambientLightColor = glm::vec3(0.35, 0.30, 0.25);
+            renderer->fractalsParameters.ambientLightIntensity = 2.5;
+            break;
+        }
+        case FractalType::Julia4: {
+            renderer->fractalsParameters.lightDirection1 = glm::vec3(0.577, 0.577,  0.577);
+            renderer->fractalsParameters.lightColor1 = glm::vec3(1.00,0.90,0.70);
+            renderer->fractalsParameters.lightIntensity1 = 3.5;
+            
+            renderer->fractalsParameters.lightDirection2 = glm::vec3(-0.707, 0.000, 0.707);
+            renderer->fractalsParameters.lightColor2 = glm::vec3(1.00,0.90,0.70);
+            renderer->fractalsParameters.lightIntensity2 = 3.5;
+            renderer->fractalsParameters.ambientLightColor = glm::vec3(0.35, 0.30, 0.25);
+            renderer->fractalsParameters.ambientLightIntensity = 2.5;
             break;
         }
     }
+    */
 }
     

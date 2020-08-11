@@ -76,7 +76,12 @@ public:
 
     // Julia3 fractal parameters
     void SetJulia3Offset(float c) { renderer->fractalsParameters.julia3_offset = c; }
+    void SetJulia3Smoothness(float c) { renderer->fractalsParameters.julia3_smoothness = c; }
 
+    // Julia4 fractal parameters
+    void SetJulia4Offset(const glm::vec3& c) { renderer->fractalsParameters.julia4_offset = c; }
+    void SetJulia4W(float c) { renderer->fractalsParameters.julia4_w = c; }
+    void SetJulia4Smoothness(float c) { renderer->fractalsParameters.julia4_smoothness = c; }
 
     
 private:

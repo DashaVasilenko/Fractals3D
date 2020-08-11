@@ -346,6 +346,12 @@ void Renderer::Render(int width, int height) {
         }
 		case FractalType::Julia3: {
 			program.SetUniform("offset", fractalsParameters.julia3_offset);
+			program.SetUniform("smoothness", fractalsParameters.julia3_smoothness);
+            break;
+        }
+		case FractalType::Julia4: {
+            program.SetUniform("offset", glm::vec4(fractalsParameters.julia4_offset, fractalsParameters.julia4_w));
+			program.SetUniform("smoothness", fractalsParameters.julia4_smoothness);
             break;
         }
 

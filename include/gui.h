@@ -26,7 +26,7 @@ private:
     // light parameters
     float light_direction1[2] = { 55.0, 55.0 }; // sun. compute shadows for it
     float light_color1[3] = { 1.0, 1.0, 0.70 }; 
-    float light_intensity1 = 12.0; 
+    float light_intensity1 = 3.5; 
 
     //float light_direction2[3] = { -0.707, 0.000, 0.707 }; // light. compute occlusion for it
     float light_direction2[3] = { 135.0, 90.0 }; // light. compute occlusion for it
@@ -49,7 +49,7 @@ private:
 
     // fractal type
     FractalType currentFractalType = FractalType::Test;
-    const char* fractal_type[6] = { "Test", "Mandelbulb", "Monster", "Julia1", "Julia2", "Julia3" };
+    const char* fractal_type[7] = { "Test", "Mandelbulb", "Monster", "Julia1", "Julia2", "Julia3", "Julia4" };
     int current_fractal_type = 0; 
 
     // general fractal parameters
@@ -85,9 +85,14 @@ private:
     float julia2_w =  0.4491;
     float julia2_smoothness = 4.0;
 
-
     // julia3 fractal parameters
     float julia3_offset = 1.0;
+    float julia3_smoothness = 9.0;
+
+    // julia4 fractal parameters
+    float julia4_offset[3] = { -0.05, -0.052, 0.85 };
+    float julia4_w =  -0.151;
+    float julia4_smoothness = 8.7;
     
 
     // export
@@ -148,6 +153,7 @@ private:
     void Julia1();
     void Julia2();
     void Julia3();
+    void Julia4();
 
 };
 

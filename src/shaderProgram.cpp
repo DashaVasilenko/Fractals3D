@@ -48,6 +48,12 @@ void ShaderProgram::Load() {
 	        //Init(mapSources);
             break;
         }
+        case FractalType::Julia4: {
+            //mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
+ 	        mapSources[GL_FRAGMENT_SHADER] = "glsl/julia4_pixel.glsl";
+	        //Init(mapSources);
+            break;
+        }
     }
     Init(mapSources);
     
@@ -55,6 +61,7 @@ void ShaderProgram::Load() {
     if (shader_parameters)
         defines += "#define FLAG_SOFT_SHADOWS" + std::string("\n");
     
+    /*
     switch(currentFractalType) {
         case FractalType::Test: {
             defines += "#define TEST" + std::string("\n");
@@ -65,7 +72,7 @@ void ShaderProgram::Load() {
             break;
         }
     }
-
+    */
     switch(currentBackgroundType) {
         case BackgroundType::Solid: {
             defines += "#define SOLID_BACKGROUND" + std::string("\n");

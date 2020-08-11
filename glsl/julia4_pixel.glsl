@@ -54,7 +54,7 @@ uniform vec3 color3;
 uniform float shininess; // показатель степени зеркального отражения
 uniform float reflection; // сила отражения
 
-uniform float offset;
+uniform vec4 offset;
 uniform float smoothness;
 
 //const int MAX_MARCHING_STEPS = 255;
@@ -494,7 +494,7 @@ void main() {
     vec3 dir = rayDirection(fieldOfView, iResolution, pixelCoord);
     vec3 eye = viewMatrix[3].xyz;
     vec2  sp = (2.0*pixelCoord-iResolution.xy) / iResolution.y;
-    vec4 c = vec4(-0.1,0.6,0.9,-0.3) + 0.1*sin( vec4(3.0,0.0,1.0,2.0) + 0.5*vec4(1.0,1.3,1.7,2.1)*offset);
+    //vec4 c = vec4(-0.1,0.6,0.9,-0.3) + 0.1*sin( vec4(3.0,0.0,1.0,2.0) + 0.5*vec4(1.0,1.3,1.7,2.1)*offset);
 
     //vec4 col = vec4(calcPixel(pixelCoord, Time), 1.0);
 
@@ -512,7 +512,7 @@ void main() {
         //vec3 rd = normalize( p.x*cu + p.y*cv + 2.0*cw );
         //col += render(ro, rd, c, sp );
 
-        col += render(eye, dir, c, sp );
+        col += render(eye, dir, offset, sp );
     }
     col /= float(AA*AA);
     

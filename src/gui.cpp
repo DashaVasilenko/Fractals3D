@@ -298,6 +298,10 @@ void Gui::Stats() {
             ImGui::Text("Current fractal type: Julia3 fractal");
             break;
         }
+        case FractalType::Julia4: {
+            ImGui::Text("Current fractal type: Julia4 fractal");
+            break;
+        }
     }
 
     ImGui::End();
@@ -539,6 +543,10 @@ void Gui::FractalParameters() {
             Julia3();
             break;
         }
+        case FractalType::Julia4: {
+            Julia4();
+            break;
+        }
     }
     
 }
@@ -648,6 +656,26 @@ void Gui::Julia3() {
 
     if (MyDragFloat("Julia3 offset", &julia3_offset, 0.1, 0, 100)) {
         fractalController->SetJulia3Offset(julia3_offset);
+    }
+    if (MyDragFloat("Julia3 smoothness", &julia3_smoothness, 0.1, 0, 100)) {
+        fractalController->SetJulia3Smoothness(julia3_smoothness);
+    }
+    ImGui::End();
+}
+
+void Gui::Julia4() {
+    ImGui::Begin("Julia4 parameters", NULL, parametersWindowFlags); 
+    FractalColor();
+    ImGui::Separator();
+
+    if (MyDragFloat3("Julia4 offset", julia4_offset, 0.1, -100, 100)) {
+        fractalController->SetJulia4Offset(glm::vec3(julia4_offset[0], julia4_offset[1], julia4_offset[2]));
+    }
+    if (MyDragFloat("Julia4 W", &julia4_w, 0.1, -100, 100)) {
+        fractalController->SetJulia4W(julia4_w);
+    }
+    if (MyDragFloat("Julia4 smoothness", &julia4_smoothness, 0.1, 0, 45)) {
+        fractalController->SetJulia4Smoothness(julia4_smoothness);
     }
     ImGui::End();
 }
