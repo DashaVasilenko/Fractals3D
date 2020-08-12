@@ -71,7 +71,7 @@ const float EPSILON = 0.0005;
 
 //-------------------------------------------------------------------------------------------------------
 // Compute Sierpinski triangle
-float sierpinski(vec3 pos, vec4 c, out vec4 trapColor) {
+float sierpinski(vec3 pos, out vec4 trapColor) {
     vec4 va = vec4(vector1, 0.0);
     vec4 vb = vec4(vector2, 0.0);
     vec4 vc = vec4(vector3, 0.0);
@@ -137,26 +137,26 @@ vec3 rayDirection(float fieldOfView, vec2 size, vec2 fragCoord) {
 // Compute the normal on the surface at point p, using the gradient of the SDF  
 // Compute the normal on the surface at point p, using the Tetrahedron technique
 // https://iquilezles.org/www/articles/normalsSDF/normalsSDF.htm
-vec3 computeNormal(vec3 p, vec4 c) {
+vec3 computeNormal(vec3 p) {
     vec4 trap;
     const float h = 0.0001; // replace by an appropriate value
     const vec2 k = vec2(1,-1)*h;
-    return normalize( k.xyy*sierpinski( p + k.xyy, c, trap) + 
-                      k.yyx*sierpinski( p + k.yyx, c, trap) + 
-                      k.yxy*sierpinski( p + k.yxy, c, trap) + 
-                      k.xxx*sierpinski( p + k.xxx, c, trap) );
+    return normalize( k.xyy*sierpinski( p + k.xyy, trap) + 
+                      k.yyx*sierpinski( p + k.yyx, trap) + 
+                      k.yxy*sierpinski( p + k.yxy, trap) + 
+                      k.xxx*sierpinski( p + k.xxx, trap) );
 }
 
 //-------------------------------------------------------------------------------------------------------
 // w is the size of the light source, and controls how hard/soft the shadows are
 // https://www.iquilezles.org/www/articles/rmshadows/rmshadows.htm
-float softShadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end, float w, vec4 c ) { 
+float softShadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end, float w) { 
     float res = 1.0;
     vec4 trap;
     float iterations = 64;
     for(float t=start; t<end; iterations--) {
         //float h = mandelbulb(shadowRayOrigin + shadowRayDir*t, trap);
-        float h = sierpinski(shadowRayOrigin + shadowRayDir*t, c, trap);
+        float h = sierpinski(shadowRayOrigin + shadowRayDir*t, trap);
         res = min( res, w*h/t );
         if (res < 0.001 || iterations <= 0) break;
         t += h;
@@ -186,7 +186,7 @@ float isphere(vec4 boundingSphere, vec3 point, vec3 direction) {
 // direction: the normalized direction to march in
 // start: the starting distance away from the eye
 // end: the max distance away from the eye to march before giving up
-float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end, vec4 c, out vec4 trapColor) {
+float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end, out vec4 trapColor) {
     vec4 trap;
     float depth = start;
     float res = end;
@@ -199,7 +199,7 @@ float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end
     //dist = min(dist, end);
 
     for (int i = 0; i < MAX_MARCHING_STEPS; i++) {
-        float h = sierpinski(eye + depth*direction, c, trap);
+        float h = sierpinski(eye + depth*direction, trap);
         if (h < EPSILON) break; // We're inside the scene surface!
         //if (depth >= dist) break; // Gone too far; give up
         if (depth >= end) break; // Gone too far; give up
@@ -218,11 +218,10 @@ float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end
 float occlusion(vec3 pos, vec3 normal) {
 	float ao = 0.0;
     float sca = 1.0;
-    vec4 c = vec4(0.0);// фиктивный вектор, остался везде от Julii
     vec4 t;
     for (int i = 0; i < 8; i++) {
         float h = 0.001 + 0.5*pow(i/7.0, 1.5);
-        float d = sierpinski(pos + h*normal, c, t);
+        float d = sierpinski(pos + h*normal, t);
         ao += -(d - h)*sca;
         sca *= 0.95;
     }
@@ -235,12 +234,12 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
 }
 
 //-------------------------------------------------------------------------------------------------------
-vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
+vec4 render(vec3 eye, vec3 dir, vec2 sp ) {
 	vec4 trap;  
-    float dist = shortestDistanceToSurface(eye, dir, MIN_DIST, MAX_DIST, c, trap); // intersect fractal
+    float dist = shortestDistanceToSurface(eye, dir, MIN_DIST, MAX_DIST, trap); // intersect fractal
 
     vec3 point = eye + dist*dir; // The closest point on the surface to the eyepoint along the view ray
-    vec3 outNormal = computeNormal(point, c); // N
+    vec3 outNormal = computeNormal(point); // N
     
     // Didn't hit anything. sky color
     if (dist >= MAX_DIST) {
@@ -303,7 +302,7 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
     #ifdef FLAG_SOFT_SHADOWS
         vec3 shadowRayOrigin = point + 0.001*outNormal;
         vec3 shadowRayDir = normalize(lightDirection1); // луч, направленный на источник света
-        shadow = softShadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, shadowStrength, c);
+        shadow = softShadow(shadowRayOrigin, shadowRayDir, MIN_DIST, MAX_DIST, shadowStrength);
     #endif
 
         float dif1 = clamp(dot(lightDirection1, outNormal), 0.0, 1.0 )*shadow; // sun
@@ -420,7 +419,7 @@ void main() {
         //vec3 rd = normalize( p.x*cu + p.y*cv + 2.0*cw );
         //col += render(ro, rd, c, sp );
 
-        col += render(eye, dir, offset, sp );
+        col += render(eye, dir, sp );
     }
     col /= float(AA*AA);
     
