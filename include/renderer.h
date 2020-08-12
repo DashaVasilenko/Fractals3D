@@ -108,6 +108,13 @@ private:
         glm::vec3 sierpinski1_vector3 = { 1.0, -1.0, -0.57735 };
         glm::vec3 sierpinski1_vector4 = {-1.0, -1.0, -0.57735 };
 
+        // Sierpinski2 fractal parameters
+        glm::vec3 sierpinski2_vector1 = { -1.0f, -1.0f, -1.0f };
+        glm::vec3 sierpinski2_vector2 = {  1.0f,  1.0f, -1.0f };
+        glm::vec3 sierpinski2_vector3 = {  1.0f, -1.0f,  1.0f };
+        glm::vec3 sierpinski2_vector4 = { -1.0f,  1.0f,  1.0f };
+
+
 
         SkyBoxHDR monsterColorHDR;
 

@@ -306,6 +306,10 @@ void Gui::Stats() {
             ImGui::Text("Current fractal type: Sierpinski1 fractal");
             break;
         }
+        case FractalType::Sierpinski2: {
+            ImGui::Text("Current fractal type: Sierpinski2 fractal");
+            break;
+        }
     }
 
     ImGui::End();
@@ -555,6 +559,10 @@ void Gui::FractalParameters() {
             Sierpinski1();
             break;
         }
+        case FractalType::Sierpinski2: {
+            Sierpinski2();
+            break;
+        }
     }
     
 }
@@ -716,6 +724,27 @@ void Gui::Sierpinski1() {
     }
     if (MyDragFloat3("Sierpinski1 v4", sierpinski1_vd, 0.1, -100, 100)) {
         fractalController->SetSierpinski1Vector4(glm::vec3(sierpinski1_vd[0], sierpinski1_vd[1], sierpinski1_vd[2]));
+    }
+    
+    ImGui::End();
+}
+
+void Gui::Sierpinski2() {
+    ImGui::Begin("Sierpinski2 parameters", NULL, parametersWindowFlags); 
+    FractalColor();
+    ImGui::Separator();
+
+    if (MyDragFloat3("Sierpinski2 v1", sierpinski2_va, 0.1, -100, 100)) {
+        fractalController->SetSierpinski2Vector1(glm::vec3(sierpinski2_va[0], sierpinski2_va[1], sierpinski2_va[2]));
+    }
+    if (MyDragFloat3("Sierpinski2 v2", sierpinski2_vb, 0.1, -100, 100)) {
+        fractalController->SetSierpinski2Vector2(glm::vec3(sierpinski2_vb[0], sierpinski2_vb[1], sierpinski2_vb[2]));
+    }
+    if (MyDragFloat3("Sierpinski2 v3", sierpinski2_vc, 0.1, -100, 100)) {
+        fractalController->SetSierpinski2Vector3(glm::vec3(sierpinski2_vc[0], sierpinski2_vc[1], sierpinski2_vc[2]));
+    }
+    if (MyDragFloat3("Sierpinski2 v4", sierpinski2_vd, 0.1, -100, 100)) {
+        fractalController->SetSierpinski2Vector4(glm::vec3(sierpinski2_vd[0], sierpinski2_vd[1], sierpinski2_vd[2]));
     }
     
     ImGui::End();

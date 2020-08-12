@@ -44,6 +44,10 @@ void ShaderProgram::Load() {
             mapSources[GL_FRAGMENT_SHADER] = "glsl/sierpinski1_pixel.glsl";
             break;
         }
+        case FractalType::Sierpinski2: {
+            mapSources[GL_FRAGMENT_SHADER] = "glsl/sierpinski2_pixel.glsl";
+            break;
+        }
     }
     Init(mapSources);
     

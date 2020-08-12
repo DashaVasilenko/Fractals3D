@@ -18,6 +18,7 @@ enum FractalType {
         Julia3,
         Julia4,
         Sierpinski1,
+        Sierpinski2,
 };
 
 // Type1 - one color without traps

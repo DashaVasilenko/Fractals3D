@@ -49,7 +49,7 @@ private:
 
     // fractal type
     FractalType currentFractalType = FractalType::Test;
-    const char* fractal_type[8] = { "Test", "Mandelbulb", "Monster", "Julia1", "Julia2", "Julia3", "Julia4", "Sierpinski1" };
+    const char* fractal_type[9] = { "Test", "Mandelbulb", "Monster", "Julia1", "Julia2", "Julia3", "Julia4", "Sierpinski1", "Sierpinski2" };
     int current_fractal_type = 0; 
 
     // general fractal parameters
@@ -101,6 +101,12 @@ private:
     float sierpinski1_vb[3] = { 0.0, -1.0,  1.15470 };
     float sierpinski1_vc[3] = { 1.0, -1.0, -0.57735 };
     float sierpinski1_vd[3] = {-1.0, -1.0, -0.57735 };
+
+    // Sierpinski2 fractal parameters
+    float sierpinski2_va[3] = { -1.0f, -1.0f, -1.0f };
+    float sierpinski2_vb[3] = {  1.0f,  1.0f, -1.0f };
+    float sierpinski2_vc[3] = {  1.0f, -1.0f,  1.0f };
+    float sierpinski2_vd[3] = { -1.0f,  1.0f,  1.0f };
     
     // export
     bool exportWindowFlag = false;
@@ -162,6 +168,7 @@ private:
     void Julia3();
     void Julia4();
     void Sierpinski1();
+    void Sierpinski2();
 
 };
 

@@ -369,6 +369,13 @@ void Renderer::Render(int width, int height) {
 			program.SetUniform("vector4", fractalsParameters.sierpinski1_vector4);
 			break;
 		}
+		case FractalType::Sierpinski2: {
+			program.SetUniform("vector1", fractalsParameters.sierpinski2_vector1);
+			program.SetUniform("vector2", fractalsParameters.sierpinski2_vector2);
+			program.SetUniform("vector3", fractalsParameters.sierpinski2_vector3);
+			program.SetUniform("vector4", fractalsParameters.sierpinski2_vector4);
+			break;
+		}
 
     }
 	//--------------------------------------------------------------------------

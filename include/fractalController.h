@@ -91,6 +91,12 @@ public:
     void SetSierpinski1Vector3(const glm::vec3& c) { renderer->fractalsParameters.sierpinski1_vector3 = c; }
     void SetSierpinski1Vector4(const glm::vec3& c) { renderer->fractalsParameters.sierpinski1_vector4 = c; }
 
+    // Sierpinski2 fractal parameters
+    void SetSierpinski2Vector1(const glm::vec3& c) { renderer->fractalsParameters.sierpinski2_vector1 = c; }
+    void SetSierpinski2Vector2(const glm::vec3& c) { renderer->fractalsParameters.sierpinski2_vector2 = c; }
+    void SetSierpinski2Vector3(const glm::vec3& c) { renderer->fractalsParameters.sierpinski2_vector3 = c; }
+    void SetSierpinski2Vector4(const glm::vec3& c) { renderer->fractalsParameters.sierpinski2_vector4 = c; }
+
 private:
     Renderer* renderer;
     ShaderProgram* program;
