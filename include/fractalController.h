@@ -101,6 +101,12 @@ public:
     void SetSierpinski2Vector3(const glm::vec3& c) { renderer->fractalsParameters.sierpinski2_vector3 = c; }
     void SetSierpinski2Vector4(const glm::vec3& c) { renderer->fractalsParameters.sierpinski2_vector4 = c; }
 
+    // MengerSponge1 fractal parameters
+    void SetMengerSponge1Offset1(float c) { renderer->fractalsParameters.menger_sponge1_offset1 = c; }
+    void SetMengerSponge1Offset2(float c) { renderer->fractalsParameters.menger_sponge1_offset2 = c; }
+
+
+
 private:
     Renderer* renderer;
     ShaderProgram* program;

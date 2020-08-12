@@ -300,7 +300,7 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp ) {
         albedo.x = 1.0-10.0*trap.x; 
     #endif 
     #ifdef COLORING_TYPE_6
-        vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.x + color);
+        vec3 albedo = 0.5 + 0.5*sin(trap.z*4.0 + 4.0 + color + outNormal*0.2).xzy;
     #endif
         		
 		//float occlusion = clamp(2.5*trap.w - 0.15, 0.0, 1.0);

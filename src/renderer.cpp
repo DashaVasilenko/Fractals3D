@@ -382,6 +382,11 @@ void Renderer::Render(int width, int height) {
 			program.SetUniform("vector4", fractalsParameters.sierpinski2_vector4);
 			break;
 		}
+		case FractalType::MengerSponge1: {
+			program.SetUniform("offset1", fractalsParameters.menger_sponge1_offset1);
+			program.SetUniform("offset2", fractalsParameters.menger_sponge1_offset2);
+			break;
+		}
 
     }
 	//--------------------------------------------------------------------------

@@ -49,12 +49,8 @@ uniform vec3 color3;
 uniform float shininess; // показатель степени зеркального отражения
 uniform float reflection; // сила отражения
 
-//uniform vec4 offset;
-//uniform float smoothness;
-//uniform vec3 vector1;
-//uniform vec3 vector2;
-//uniform vec3 vector3;
-//uniform vec3 vector4;
+uniform float offset1;
+uniform float offset2;
 
 //const int MAX_MARCHING_STEPS = 255;
 const int MAX_MARCHING_STEPS = 128;
@@ -67,8 +63,6 @@ const float EPSILON = 0.0005;
 //#else
 //#define AA 2  // Set AA to 1 if your machine is too slow
 //#endif
-
-//const int numIterations = 11;
 
 float maxcomp(vec3 p) { return max(p.x,max(p.y,p.z));}
 
@@ -85,13 +79,15 @@ const mat3 ma = mat3( 0.60, 0.00,  0.80,
 //-------------------------------------------------------------------------------------------------------
 // Compute Menger sponge
 // https://www.iquilezles.org/www/articles/menger/menger.htm
-float sierpinski(vec3 pos, out vec4 trapColor) {
+float mengerSponge(vec3 pos, out vec4 trapColor) {
 
     float d = sdBox(pos, vec3(1.0));
     vec4 res = vec4(d, 1.0, 0.0, 0.0);
 
-    float ani = smoothstep(-0.2, 0.2, -cos(0.5*Time));
-	float off = 1.5*sin(0.01*Time);
+    //float ani = smoothstep(-0.2, 0.2, -cos(0.5*Time));
+	//float off = 1.5*sin(0.01*Time);
+    float ani = offset2;
+	float off = offset1;
 	
     float s = 1.0;
 
@@ -104,7 +100,8 @@ float sierpinski(vec3 pos, out vec4 trapColor) {
 #endif
 
     for (int m = 0; m < 4; m++) {
-        pos = mix(pos, ma*(pos+off), ani);
+        //pos = mix(pos, ma*(pos+off), ani);
+        pos = mix(pos, pos+off, ani);
 	   
         vec3 a = mod(pos*s, 2.0) - 1.0;
         s *= 3.0;
@@ -160,10 +157,10 @@ vec3 computeNormal(vec3 p) {
     vec4 trap;
     const float h = 0.0001; // replace by an appropriate value
     const vec2 k = vec2(1,-1)*h;
-    return normalize( k.xyy*sierpinski( p + k.xyy, trap) + 
-                      k.yyx*sierpinski( p + k.yyx, trap) + 
-                      k.yxy*sierpinski( p + k.yxy, trap) + 
-                      k.xxx*sierpinski( p + k.xxx, trap) );
+    return normalize( k.xyy*mengerSponge( p + k.xyy, trap) + 
+                      k.yyx*mengerSponge( p + k.yyx, trap) + 
+                      k.yxy*mengerSponge( p + k.yxy, trap) + 
+                      k.xxx*mengerSponge( p + k.xxx, trap) );
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -175,7 +172,7 @@ float softShadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end
     float iterations = 64;
     for(float t=start; t<end; iterations--) {
         //float h = mandelbulb(shadowRayOrigin + shadowRayDir*t, trap);
-        float h = sierpinski(shadowRayOrigin + shadowRayDir*t, trap);
+        float h = mengerSponge(shadowRayOrigin + shadowRayDir*t, trap);
         res = min( res, w*h/t );
         if (res < 0.001 || iterations <= 0) break;
         t += h;
@@ -218,7 +215,7 @@ float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end
     //dist = min(dist, end);
 
     for (int i = 0; i < MAX_MARCHING_STEPS; i++) {
-        float h = sierpinski(eye + depth*direction, trap);
+        float h = mengerSponge(eye + depth*direction, trap);
         if (h < EPSILON) break; // We're inside the scene surface!
         //if (depth >= dist) break; // Gone too far; give up
         if (depth >= end) break; // Gone too far; give up
@@ -240,7 +237,7 @@ float occlusion(vec3 pos, vec3 normal) {
     vec4 t;
     for (int i = 0; i < 8; i++) {
         float h = 0.001 + 0.5*pow(i/7.0, 1.5);
-        float d = sierpinski(pos + h*normal, t);
+        float d = mengerSponge(pos + h*normal, t);
         ao += -(d - h)*sca;
         sca *= 0.95;
     }
@@ -296,7 +293,6 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp ) {
         vec3 albedo = vec3(0.5+0.5*cos(0.0+2.0*trap.w),
                            0.5+0.5*cos(1.0+2.0*trap.w),
                            0.5+0.5*cos(2.0+2.0*trap.w) );
-        //vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.z + vec3(0.0,1.0,2.0));
         vec3 c  = color;
     #endif
     #ifdef COLORING_TYPE_4
@@ -314,14 +310,9 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp ) {
         vec3 c = color;
     #endif 
     #ifdef COLORING_TYPE_6
-        //vec3 albedo = 0.5 + 0.5*sin(trap.y*4.0 + 4.0 + color + outNormal*0.2).xzy;
-        //vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.z + color);
-        vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.x + color);
+        vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.z + color);
     #endif
         		
-		//float occlusion = clamp(2.5*trap.w - 0.15, 0.0, 1.0);
-        //float occlusion = clamp(trap.x*0.5 + 0.5*(trap.x*trap.x), 0.0, 1.0) * (1.0 + 0.1*outNormal.y);
-
         //float occlusion = occlusion(point, outNormal);
         float occlusion = trap.z;
         vec3 hal = normalize(lightDirection1 - dir);

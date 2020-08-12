@@ -111,6 +111,12 @@ private:
     float sierpinski2_vb[3] = {  1.0f,  1.0f, -1.0f };
     float sierpinski2_vc[3] = {  1.0f, -1.0f,  1.0f };
     float sierpinski2_vd[3] = { -1.0f,  1.0f,  1.0f };
+
+    // MengerSponge1 fractal parameters
+    float menger_sponge1_offset1 = 1.0;
+    float menger_sponge1_offset2 = 1.0;
+
+
     
     // export
     bool exportWindowFlag = false;

@@ -773,6 +773,12 @@ void Gui::MengerSponge1() {
     FractalColor();
     ImGui::Separator();
 
+    if (MyDragFloat("MengerSponge1 offset1", &menger_sponge1_offset1, 0.1, -30, 30)) {
+        fractalController->SetMengerSponge1Offset1(menger_sponge1_offset1);
+    }
+    if (MyDragFloat("MengerSponge1 ofset2", &menger_sponge1_offset2, 0.1, -30, 30)) {
+        fractalController->SetMengerSponge1Offset2(menger_sponge1_offset2);
+    }
 
     ImGui::End();
 }
