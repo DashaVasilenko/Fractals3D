@@ -13,45 +13,35 @@ void ShaderProgram::Load() {
     mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
     switch(currentFractalType) {
         case FractalType::Test: {
-            //mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
  	        mapSources[GL_FRAGMENT_SHADER] = "glsl/quad_pixel.glsl";
-	        //Init(mapSources);
             break;
         }
         case FractalType::Mandelbulb: {
-            //mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
  	        mapSources[GL_FRAGMENT_SHADER] = "glsl/mandelbulb_pixel.glsl";
-	        //Init(mapSources);
             break;
         }
         case FractalType::Monster: {
-            //mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
  	        mapSources[GL_FRAGMENT_SHADER] = "glsl/monster_pixel.glsl";
-	        //Init(mapSources);
             break;
         }
         case FractalType::Julia1: {
-            //mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
  	        mapSources[GL_FRAGMENT_SHADER] = "glsl/julia1_pixel.glsl";
-	        //Init(mapSources);
             break;
         }
         case FractalType::Julia2: {
-            //mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
  	        mapSources[GL_FRAGMENT_SHADER] = "glsl/julia2_pixel.glsl";
-	        //Init(mapSources);
             break;
         }
         case FractalType::Julia3: {
-            //mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
  	        mapSources[GL_FRAGMENT_SHADER] = "glsl/julia3_pixel.glsl";
-	        //Init(mapSources);
             break;
         }
         case FractalType::Julia4: {
-            //mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
  	        mapSources[GL_FRAGMENT_SHADER] = "glsl/julia4_pixel.glsl";
-	        //Init(mapSources);
+            break;
+        }
+        case FractalType::Sierpinski1: {
+            mapSources[GL_FRAGMENT_SHADER] = "glsl/sierpinski1_pixel.glsl";
             break;
         }
     }

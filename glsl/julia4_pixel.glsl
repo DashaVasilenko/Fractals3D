@@ -1,9 +1,3 @@
-// Related shaders
-//
-// Julia - Quaternion 1 : https://www.shadertoy.com/view/MsfGRr
-// Julia - Quaternion 2 : https://www.shadertoy.com/view/lsl3W2
-// Julia - Quaternion 3 : https://www.shadertoy.com/view/3tsyzl
-
 in mat4 viewMatrix;
 out vec4 outColor;
 
@@ -239,75 +233,6 @@ float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end
     }
     return res;
 }
-
-/*
-vec3 calcPixel(vec2 pi, float time ) {
-    vec4 c = vec4(-0.1,0.6,0.9,-0.3) + 0.1*sin( vec4(3.0,0.0,1.0,2.0) + 0.5*vec4(1.0,1.3,1.7,2.1)*iTime);
-
-	vec2 q = pi / iResolution.xy;
-    vec2 p = -1.0 + 2.0*q;
-    p.x *= iResolution.x/iResolution.y;
-    vec2 m = vec2(0.5);
-	//if(iMouse.z > 0.0) m = iMouse.xy/iResolution.xy;
-
-    // camera
-	float an = -2.4 + 0.2*time - 6.2*m.x;
-    vec3 ro = 4.0*vec3(sin(an),0.25,cos(an));
-    vec3 ta = vec3( 0.0, 0.08, 0.0 );
-    vec3 ww = normalize( ta - ro );
-    vec3 uu = normalize( cross(ww,vec3(0.0,1.0,0.0) ) );
-    vec3 vv = normalize( cross(uu,ww));
-    vec3 rd = normalize( p.x*uu + p.y*vv + 4.1*ww );
-
-	// raymarch
-    vec3 tmat = raycast(ro,rd,c);
-	
-	// shade
-    vec3 col = vec3(0.0);
-    if( tmat.z>-0.5 )
-    {
-        // geometry
-        vec3 pos = ro + tmat.x*rd;
-        vec3 nor = calcNormal(pos, 0.001,c);
-        vec3 sor = calcNormal(pos, 0.01,c);
-
-        // material		
-		vec3 mate = 0.5 + 0.5*sin( tmat.z*4.0 + 4.0 + vec3(3.0,1.5,2.0)  + nor*0.2 ).xzy;
-		
-        // lighting		
-		float occ = clamp( tmat.y*0.5 + 0.5*(tmat.y*tmat.y), 0.0, 1.0 ) * (1.0 + 0.1*nor.y);
-		
-        // diffuse		
-		col = vec3(0.0);
-		for( int i=0; i<32; i++ )
-		{
-			vec3 rr = normalize(-1.0 + 2.0*hash3(float(i)*123.5463));
-			rr = normalize( nor + 8.0*rr );
-			rr = rr * sign(dot(nor,rr));							  
-            col += pow( texture( iChannel0, rr ).xyz, vec3(2.2) ) * dot(rr,nor);
-		}
-        col = 5.0 * occ * (col/32.0);
-
-        // rim		
-		col *= 1.0 + 1.0*pow(clamp(1.0+dot(rd,sor),0.0,1.0),1.0)*vec3(1.0);
-
-        // specular		 
-		float fre = pow( clamp(1.0+dot(rd,sor),0.0,1.0), 5.0 );
-		vec3  ref = reflect( rd, nor );
-		col *= 1.0 - 0.5*fre; 
-		col += 1.5 * (0.5 + 0.5*fre) * pow( texture( iChannel0, ref ).xyz, vec3(2.0) ) * occ;
-
-        col *= mate;
-    }
-	else {
-        // background		
-		col = pow( texture( iChannel0, rd ).xyz, vec3(2.2) );
-	}
-
-	col = pow( clamp( col, 0.0, 1.0 ), vec3(0.45) ); // gamma
-    return col;
-}
-*/
 
 //-------------------------------------------------------------------------------------------------------
 vec3 fresnelSchlick(float cosTheta, vec3 F0) {

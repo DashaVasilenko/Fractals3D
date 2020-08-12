@@ -337,9 +337,9 @@ void Renderer::Render(int width, int height) {
             break;
         }
 		case FractalType::Monster: {
-			program.SetUniform("color", 2);
-			GLCall(glActiveTexture(GL_TEXTURE2));
-			GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, fractalsParameters.monsterColorHDR.GetCubemap()));
+			//program.SetUniform("color", 2);
+			//GLCall(glActiveTexture(GL_TEXTURE2));
+			//GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, fractalsParameters.monsterColorHDR.GetCubemap()));
 			break;
 		}
 		case FractalType::Julia1: {
@@ -362,6 +362,13 @@ void Renderer::Render(int width, int height) {
 			program.SetUniform("smoothness", fractalsParameters.julia4_smoothness);
             break;
         }
+		case FractalType::Sierpinski1: {
+			program.SetUniform("vector1", fractalsParameters.sierpinski1_vector1);
+			program.SetUniform("vector2", fractalsParameters.sierpinski1_vector2);
+			program.SetUniform("vector3", fractalsParameters.sierpinski1_vector3);
+			program.SetUniform("vector4", fractalsParameters.sierpinski1_vector4);
+			break;
+		}
 
     }
 	//--------------------------------------------------------------------------

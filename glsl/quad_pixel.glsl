@@ -57,7 +57,16 @@ const int MAX_MARCHING_STEPS = 255;
 const float MIN_DIST = 0.0;
 const float MAX_DIST = 50.0;
 const float EPSILON = 0.005;
- 
+
+
+vec2 hash2( float n ){
+    return fract(sin(vec2(n, n+1.0))*vec2(13.5453123, 31.1459123));
+}
+
+vec3 hash3( float n ) {
+    return fract(sin(vec3(n, n+1.0, n+2.0))*vec3(43758.5453123, 22578.1459123, 19642.3490423));
+}
+
 //Signed distance function for a sphere centered at the origin with radius 1.0;
 float sphereSDF(vec3 point, float radius) {
     return length(point) - radius;
@@ -317,8 +326,7 @@ float intensity = (lightIntensity1 + lightIntensity2 + ambientLightIntensity3)*0
         vec3 albedo = 0.5 + 0.5*sin(trap.y*4.0 + 4.0 + color + outNormal*0.2).xzy;
         albedo.x = 1.0-10.0*trap.x; 
     #endif    
-
-        
+		
     #ifdef FLAG_SOFT_SHADOWS
         vec3 shadowRayOrigin = point + 0.001*outNormal;
         vec3 shadowRayDir = normalize(lightDirection1); // луч, направленный на источник света

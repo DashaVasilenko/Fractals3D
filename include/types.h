@@ -17,6 +17,7 @@ enum FractalType {
         Julia2,
         Julia3,
         Julia4,
+        Sierpinski1,
 };
 
 // Type1 - one color without traps
@@ -24,6 +25,7 @@ enum FractalType {
 // Type3 - one color with traps: |z|² and z_x
 // Type4 - Type1 + trap: albedo.x = 1.0-10.0*trap.x;
 // Type5 - Type3 + trap: albedo.x = 1.0-10.0*trap.x;
+// Type6 - as color use Texture
 enum ColoringType {
         Type1,
         Type2,

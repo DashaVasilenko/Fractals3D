@@ -1,9 +1,3 @@
-// Related shaders
-//
-// Julia - Quaternion 1 : https://www.shadertoy.com/view/MsfGRr
-// Julia - Quaternion 2 : https://www.shadertoy.com/view/lsl3W2
-// Julia - Quaternion 3 : https://www.shadertoy.com/view/3tsyzl
-
 in mat4 viewMatrix;
 out vec4 outColor;
 

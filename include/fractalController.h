@@ -85,7 +85,12 @@ public:
     void SetJulia4W(float c) { renderer->fractalsParameters.julia4_w = c; }
     void SetJulia4Smoothness(float c) { renderer->fractalsParameters.julia4_smoothness = c; }
 
-    
+    // Sierpinski1 fractal parameters
+    void SetSierpinski1Vector1(const glm::vec3& c) { renderer->fractalsParameters.sierpinski1_vector1 = c; }
+    void SetSierpinski1Vector2(const glm::vec3& c) { renderer->fractalsParameters.sierpinski1_vector2 = c; }
+    void SetSierpinski1Vector3(const glm::vec3& c) { renderer->fractalsParameters.sierpinski1_vector3 = c; }
+    void SetSierpinski1Vector4(const glm::vec3& c) { renderer->fractalsParameters.sierpinski1_vector4 = c; }
+
 private:
     Renderer* renderer;
     ShaderProgram* program;

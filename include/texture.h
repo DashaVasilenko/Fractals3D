@@ -25,6 +25,12 @@ protected:
     int cnt;
 };
 
+class Texture2D : public Texture {
+public:
+    void Load(const std::string& filename);
+    void Init();
+};
+
 class RenderTexture : public Texture {
 public:
     void CreateAttachment(GLenum slot) const;

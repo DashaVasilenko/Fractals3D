@@ -302,6 +302,10 @@ void Gui::Stats() {
             ImGui::Text("Current fractal type: Julia4 fractal");
             break;
         }
+        case FractalType::Sierpinski1: {
+            ImGui::Text("Current fractal type: Sierpinski1 fractal");
+            break;
+        }
     }
 
     ImGui::End();
@@ -547,6 +551,10 @@ void Gui::FractalParameters() {
             Julia4();
             break;
         }
+        case FractalType::Sierpinski1: {
+            Sierpinski1();
+            break;
+        }
     }
     
 }
@@ -689,6 +697,27 @@ void Gui::Julia4() {
     if (MyDragFloat("Julia4 smoothness", &julia4_smoothness, 0.1, 0, 45)) {
         fractalController->SetJulia4Smoothness(julia4_smoothness);
     }
+    ImGui::End();
+}
+
+void Gui::Sierpinski1() {
+    ImGui::Begin("Sierpinski1 parameters", NULL, parametersWindowFlags); 
+    FractalColor();
+    ImGui::Separator();
+
+    if (MyDragFloat3("Sierpinski1 v1", sierpinski1_va, 0.1, -100, 100)) {
+        fractalController->SetSierpinski1Vector1(glm::vec3(sierpinski1_va[0], sierpinski1_va[1], sierpinski1_va[2]));
+    }
+    if (MyDragFloat3("Sierpinski1 v2", sierpinski1_vb, 0.1, -100, 100)) {
+        fractalController->SetSierpinski1Vector2(glm::vec3(sierpinski1_vb[0], sierpinski1_vb[1], sierpinski1_vb[2]));
+    }
+    if (MyDragFloat3("Sierpinski1 v3", sierpinski1_vc, 0.1, -100, 100)) {
+        fractalController->SetSierpinski1Vector3(glm::vec3(sierpinski1_vc[0], sierpinski1_vc[1], sierpinski1_vc[2]));
+    }
+    if (MyDragFloat3("Sierpinski1 v4", sierpinski1_vd, 0.1, -100, 100)) {
+        fractalController->SetSierpinski1Vector4(glm::vec3(sierpinski1_vd[0], sierpinski1_vd[1], sierpinski1_vd[2]));
+    }
+    
     ImGui::End();
 }
 

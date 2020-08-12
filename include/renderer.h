@@ -6,6 +6,7 @@
 #include "camera.h"
 #include "framebuffer.h"
 #include "skybox.h"
+#include "texture.h"
 
 class Renderer {
 public:
@@ -100,6 +101,12 @@ private:
         glm::vec3 julia4_offset = { -0.05, -0.052, 0.85 };
         float julia4_w = -0.151;
         float julia4_smoothness = 8.7;
+
+        // Sierpinski1 fractal parameters
+        glm::vec3 sierpinski1_vector1 = { 0.0, 0.57735,   0.0 };
+        glm::vec3 sierpinski1_vector2 = { 0.0, -1.0,  1.15470 };
+        glm::vec3 sierpinski1_vector3 = { 1.0, -1.0, -0.57735 };
+        glm::vec3 sierpinski1_vector4 = {-1.0, -1.0, -0.57735 };
 
 
         SkyBoxHDR monsterColorHDR;
