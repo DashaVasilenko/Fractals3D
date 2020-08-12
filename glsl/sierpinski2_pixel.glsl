@@ -5,6 +5,7 @@ uniform vec2 iResolution;
 uniform float fieldOfView;
 
 #if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
+    uniform float backgroundBrightness;
     uniform samplerCube skyBox; // сэмплер для кубической карты
 #endif
 
@@ -35,7 +36,7 @@ uniform float lightIntensity2;
 uniform vec3 ambientLightColor3;
 uniform float ambientLightIntensity3;
 
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_3 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_3 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_6
 uniform vec3 color;
 #endif
 
@@ -72,50 +73,38 @@ const float EPSILON = 0.0005;
 //-------------------------------------------------------------------------------------------------------
 // Compute Sierpinski triangle
 float sierpinski(vec3 pos, out vec4 trapColor) {
-    vec3 va = vector1;
-    vec3 vb = vector2;
-    vec3 vc = vector3;
-    vec3 vd = vector4;
 
     const float scale = 2.0;
     vec4 z = vec4(pos, 0.0);
 	float a = 0.0;
     float s = 1.0;
-    //float r = 1.0;
-    //float dm;
-    //vec4 v;
+    vec3 c;
 
 #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4
     vec4 trap = vec4(abs(z.xyz), dot(z, z));
 #endif
-
-#if defined COLORING_TYPE_3 || defined COLORING_TYPE_5
+ 
+#if defined COLORING_TYPE_3 || defined COLORING_TYPE_5 || defined COLORING_TYPE_6
     vec2  trap = vec2(1e10);
 #endif
 
     for (int i = 0; i < 15; ++i) {
-        float d = distance(pos, va);
-        vec3 c = va;
-        float h = 0.0;
-        
-        float t = distance(pos, vb);
-        if (t < d) { c = vb; d = t; h = 1.0; }
-        
-        t = distance(pos, vc);
-        if (t < d) { c = vc; d = t; h = 2.0; }
-        
-        t = distance(pos, vd);
-        if (t < d) { c = vd; d = t; h = 3.0; }
+        float t, d, h; 
+
+        d = distance(pos, vector1);              c = vector1;        h = 0.0; 
+        t = distance(pos, vector2); if (t < d) { c = vector2; d = t; h = 1.0; }
+        t = distance(pos, vector3); if (t < d) { c = vector3; d = t; h = 2.0; }
+        t = distance(pos, vector4); if (t < d) { c = vector4; d = t; h = 3.0; }
         
         pos = (pos - c)*scale;
         a = h + 4.0*a; s *= 4.0;
 
     #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4
-        trap = min(trap, vec4(abs(z.xyz), dot(z, z)));  // trapping Oxz, Oyz, Oxy, (0,0,0)
+        trap = min(trap, vec4(abs(pos.xyz), dot(pos, pos)));  // trapping Oxz, Oyz, Oxy, (0,0,0)
     #endif
 
-    #if defined COLORING_TYPE_3 || defined COLORING_TYPE_5
-        trap = min(trap, vec2(dot(z, z), abs(z.x))); // orbit trapping ( |z|² and z_x  )
+    #if defined COLORING_TYPE_3 || defined COLORING_TYPE_5 || defined COLORING_TYPE_6
+        trap = min(trap, vec2(dot(pos, pos), abs(pos.x))); // orbit trapping ( |z|² and z_x  )
     #endif	
     }
 
@@ -123,7 +112,7 @@ float sierpinski(vec3 pos, out vec4 trapColor) {
     trapColor = trap;
 #endif
 
-#if defined COLORING_TYPE_3 || defined COLORING_TYPE_5
+#if defined COLORING_TYPE_3 || defined COLORING_TYPE_5 || defined COLORING_TYPE_6
     trapColor = vec4(trap, a/s, 1.0);
 #endif
 
@@ -267,17 +256,12 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp ) {
     
     // Didn't hit anything. sky color
     if (dist >= MAX_DIST) {
-        float intensity = (lightIntensity1 + lightIntensity2 + ambientLightIntensity3)*0.1;
-#if defined SKYBOX_BACKGROUND_HDR && defined IRRADIANCE_CUBEMAP
-    intensity += 0.5;
-#endif
-
 #if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
-        return texture(skyBox, dir)*intensity;
+        return texture(skyBox, dir)*backgroundBrightness;
 #endif
 
 #ifdef SOLID_BACKGROUND
-        return vec4(reflectedColor - (dir.y * 0.7), 1.0)*intensity; // Skybox color
+        return vec4(reflectedColor - (dir.y * 0.7), 1.0); // Skybox color
 #endif
 
 #ifdef SOLID_BACKGROUND_WITH_SUN
@@ -315,6 +299,9 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp ) {
         vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.z + color);
         albedo.x = 1.0-10.0*trap.x; 
     #endif 
+    #ifdef COLORING_TYPE_6
+        vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.x + color);
+    #endif
         		
 		//float occlusion = clamp(2.5*trap.w - 0.15, 0.0, 1.0);
         //float occlusion = clamp(trap.x*0.5 + 0.5*(trap.x*trap.x), 0.0, 1.0) * (1.0 + 0.1*outNormal.y);

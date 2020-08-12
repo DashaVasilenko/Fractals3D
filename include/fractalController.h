@@ -18,6 +18,8 @@ public:
     void SetBackgroundType(BackgroundType c) { program->SetBackgroundType(c); renderer->fractalsParameters.background_type = c; }
     void SetBackgroundColor(const glm::vec3& c) { renderer->fractalsParameters.background_color = c; }
     void SetSunColor(const glm::vec3& c) { renderer->fractalsParameters.sun_color = c; }
+    void SetBackgroundBrightness(float c) { renderer->fractalsParameters.background_brightness = c; }
+        
 
     // Textures
     void SetSkyboxTexture(SkyboxTexture skyboxTexture);
@@ -37,6 +39,8 @@ public:
     void SetType3Color(const glm::vec3& c) { renderer->fractalsParameters.type3_color = c; }
     void SetType4Color(const glm::vec3& c) { renderer->fractalsParameters.type4_color = c; }
     void SetType5Color(const glm::vec3& c) { renderer->fractalsParameters.type5_color = c; }
+    void SetType6Color(const glm::vec3& c) { renderer->fractalsParameters.type6_color = c; }
+
 
 
     // General fractal parameters

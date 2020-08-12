@@ -310,6 +310,10 @@ void Gui::Stats() {
             ImGui::Text("Current fractal type: Sierpinski2 fractal");
             break;
         }
+        case FractalType::MengerSponge1: {
+            ImGui::Text("Current fractal type: MengerSponge1 fractal");
+            break;
+        }
     }
 
     ImGui::End();
@@ -336,7 +340,6 @@ void Gui::MainParameters() {
     //-------------------------------------------------------------------
 
     //--------------------------Light parameters-------------------------
-    ImGui::NewLine();
     ImGui::Separator();
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + parametersSize[0]/2.0 - 57.0);
     ImGui::Text("Light parameters");
@@ -411,6 +414,9 @@ void Gui::MainParameters() {
 
     // Texture background
     if (current_background_type == 2) {
+        if (MyDragFloat("Brightness", &background_brightness, 0.1, 0, 30)) {
+            fractalController->SetBackgroundBrightness(background_brightness);
+        }
         if (ImGui::Combo("Texture", &current_skybox_texture, skybox_texture, IM_ARRAYSIZE(skybox_texture))) {
             if (static_cast<SkyboxTexture>(current_skybox_texture) != SkyboxTexture::Other)
                 fractalController->SetSkyboxTexture(static_cast<SkyboxTexture>(current_skybox_texture));
@@ -473,6 +479,9 @@ void Gui::MainParameters() {
 
     // HDR Texture background
     if (current_background_type == 3) {
+        if (MyDragFloat("Brightness", &background_brightness, 0.1, 0, 30)) {
+            fractalController->SetBackgroundBrightness(background_brightness);
+        }
         if (ImGui::Combo("HDR Texture", &current_skybox_texture_hdr, skybox_texture_hdr, IM_ARRAYSIZE(skybox_texture_hdr))) {
             if (static_cast<SkyboxTextureHDR>(current_skybox_texture_hdr) != SkyboxTextureHDR::OtherHDR)
                 fractalController->SetSkyboxTextureHDR(static_cast<SkyboxTextureHDR>(current_skybox_texture_hdr));
@@ -563,6 +572,10 @@ void Gui::FractalParameters() {
             Sierpinski2();
             break;
         }
+        case FractalType::MengerSponge1: {
+            MengerSponge1();
+            break;
+        }
     }
     
 }
@@ -611,13 +624,18 @@ void Gui::FractalColor() {
         }
     }
 
+    if (static_cast<ColoringType>(currentColoringType) == ColoringType::Type6) {
+        if (ImGui::ColorEdit3("Type6 color", type6_color)) {
+            fractalController->SetType6Color(glm::vec3(type6_color[0], type6_color[1], type6_color[2]));
+        }
+    }
+
     if (MyDragFloat("Shininess", &shininess, 1, 1, 100)) {
         fractalController->SetFractalShininess(shininess);
     }
     if (MyDragFloat("Reflection", &reflection, 0.1, 0, 1)) {
         fractalController->SetFractalReflect(reflection);
     }
-    ImGui::Separator();
 }
 
 void Gui::Test() {
@@ -747,6 +765,15 @@ void Gui::Sierpinski2() {
         fractalController->SetSierpinski2Vector4(glm::vec3(sierpinski2_vd[0], sierpinski2_vd[1], sierpinski2_vd[2]));
     }
     
+    ImGui::End();
+}
+
+void Gui::MengerSponge1() {
+    ImGui::Begin("MengerSponge1 parameters", NULL, parametersWindowFlags); 
+    FractalColor();
+    ImGui::Separator();
+
+
     ImGui::End();
 }
 

@@ -61,6 +61,7 @@ private:
         SkyboxTexture skybox_texture = SkyboxTexture::Orbital;
         SkyboxTextureHDR skybox_texture_hdr = SkyboxTextureHDR::WinterForest;
         bool irradianceCubemap = true;
+        float background_brightness = 1.0;
 
         // General fractal parameters
         float shadow_strength = 32.0f;
@@ -76,6 +77,8 @@ private:
         glm::vec3 type3_color = { 1.0, 0.8, 0.7 };
         glm::vec3 type4_color = { 1.0, 0.8, 0.7 };
         glm::vec3 type5_color = { 1.0, 0.8, 0.7 };
+        glm::vec3 type6_color = { 1.0, 0.8, 0.7 };
+
 
         // Test fractal parameters
 

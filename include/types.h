@@ -19,6 +19,7 @@ enum FractalType {
         Julia4,
         Sierpinski1,
         Sierpinski2,
+        MengerSponge1,
 };
 
 // Type1 - one color without traps
@@ -26,13 +27,15 @@ enum FractalType {
 // Type3 - one color with traps: |z|² and z_x
 // Type4 - Type1 + trap: albedo.x = 1.0-10.0*trap.x;
 // Type5 - Type3 + trap: albedo.x = 1.0-10.0*trap.x;
-// Type6 - as color use Texture
+// в menger и serpinski они отличаются от этих
+// Type6 - во всех щейдерах разный
 enum ColoringType {
         Type1,
         Type2,
         Type3,
         Type4, 
         Type5,
+        Type6,
 };
 
 enum CubemapSide {

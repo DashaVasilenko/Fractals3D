@@ -37,6 +37,7 @@ private:
     float ambient_light_intensity = 2.5;
 
     // background parameters
+    float background_brightness = 1.0f;
     const char* background_types[4] = { "Solid color", "Solid with sun", "Texture", "HDRTexture" };
     int current_background_type = 3; // If the selection isn't within 0..count, Combo won't display a preview
     float background_color[3] = { 0.30, 0.36, 0.60 };
@@ -49,7 +50,8 @@ private:
 
     // fractal type
     FractalType currentFractalType = FractalType::Test;
-    const char* fractal_type[9] = { "Test", "Mandelbulb", "Monster", "Julia1", "Julia2", "Julia3", "Julia4", "Sierpinski1", "Sierpinski2" };
+    const char* fractal_type[10] = { "Test", "Mandelbulb", "Monster", "Julia1", "Julia2", "Julia3", "Julia4", "Sierpinski1", "Sierpinski2",
+                                      "MengerSponge1" };
     int current_fractal_type = 0; 
 
     // general fractal parameters
@@ -60,7 +62,7 @@ private:
 
     // coloring types
     ColoringType currentColoringType = ColoringType::Type1;
-    const char* coloring_type[5] = { "Type1", "Type2", "Type3", "Type4", "Type5" };
+    const char* coloring_type[6] = { "Type1", "Type2", "Type3", "Type4", "Type5", "Type6" };
     int current_coloring_type = 0; 
     float type1_color[3] = { 1.0, 0.8, 0.7 };
     float type2_color1[3] = { 0.10, 0.20, 0.30 };
@@ -69,6 +71,8 @@ private:
     float type3_color[3] = { 1.0, 0.8, 0.7 };
     float type4_color[3] = { 1.0, 0.8, 0.7 };
     float type5_color[3] = { 1.0, 0.8, 0.7 };
+    float type6_color[3] = { 1.0, 0.8, 0.7 };
+
 
 
     // test fractal parameters
@@ -169,6 +173,7 @@ private:
     void Julia4();
     void Sierpinski1();
     void Sierpinski2();
+    void MengerSponge1();
 
 };
 

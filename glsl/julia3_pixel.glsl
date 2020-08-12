@@ -5,6 +5,7 @@ uniform vec2 iResolution;
 uniform float fieldOfView;
 
 #if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
+    uniform float backgroundBrightness;
     uniform samplerCube skyBox; // сэмплер для кубической карты
 #endif
 
@@ -35,7 +36,7 @@ uniform float lightIntensity2;
 uniform vec3 ambientLightColor3;
 uniform float ambientLightIntensity3;
 
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_3 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_3 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_6
 uniform vec3 color;
 #endif
 
@@ -104,7 +105,7 @@ float julia( vec3 pos, vec4 c, out vec4 trapColor) {
     vec4 trap = vec4(abs(z.xyz), dot(z, z));
 #endif
 
-#if defined COLORING_TYPE_3 || defined COLORING_TYPE_5
+#if defined COLORING_TYPE_3 || defined COLORING_TYPE_5 || defined COLORING_TYPE_6
     vec2  trap = vec2(1e10);
 #endif
 
@@ -124,7 +125,7 @@ float julia( vec3 pos, vec4 c, out vec4 trapColor) {
         trap = min(trap, vec4(abs(z.xyz), dot(z, z)));  // trapping Oxz, Oyz, Oxy, (0,0,0)
     #endif
 
-    #if defined COLORING_TYPE_3 || defined COLORING_TYPE_5
+    #if defined COLORING_TYPE_3 || defined COLORING_TYPE_5 || defined COLORING_TYPE_6
         trap = min(trap, vec2(m2, abs(z.x))); // orbit trapping ( |z|² and z_x  )
     #endif			 
 
@@ -134,7 +135,7 @@ float julia( vec3 pos, vec4 c, out vec4 trapColor) {
     trapColor = trap;
 #endif
 
-#if defined COLORING_TYPE_3 || defined COLORING_TYPE_5
+#if defined COLORING_TYPE_3 || defined COLORING_TYPE_5 || defined COLORING_TYPE_6
     trapColor = vec4(trap, 1.0, 1.0);
 #endif
 
@@ -340,17 +341,12 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
     
     // Didn't hit anything. sky color
     if (dist >= MAX_DIST) {
-        float intensity = (lightIntensity1 + lightIntensity2 + ambientLightIntensity3)*0.1;
-#if defined SKYBOX_BACKGROUND_HDR && defined IRRADIANCE_CUBEMAP
-    intensity += 0.5;
-#endif
-
 #if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
-        return texture(skyBox, dir)*intensity;
+        return texture(skyBox, dir)*backgroundBrightness;
 #endif
 
 #ifdef SOLID_BACKGROUND
-        return vec4(reflectedColor - (dir.y * 0.7), 1.0)*intensity; // Skybox color
+        return vec4(reflectedColor - (dir.y * 0.7), 1.0); // Skybox color
 #endif
 
 #ifdef SOLID_BACKGROUND_WITH_SUN
@@ -385,6 +381,9 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
         vec3 albedo = 0.5 + 0.5*sin(trap.y*4.0 + 4.0 + color + outNormal*0.2).xzy;
         albedo.x = 1.0-10.0*trap.x; 
     #endif 
+    #ifdef COLORING_TYPE_6
+        vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.x + color);
+    #endif
         
 		//float occlusion = clamp(2.5*trap.w - 0.15, 0.0, 1.0);
         float occlusion = clamp(trap.x*0.5 + 0.5*(trap.x*trap.x), 0.0, 1.0) * (1.0 + 0.1*outNormal.y);

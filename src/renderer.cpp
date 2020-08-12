@@ -277,11 +277,13 @@ void Renderer::Render(int width, int height) {
             break;
         }
         case BackgroundType::Skybox: {
+			program.SetUniform("backgroundBrightness", fractalsParameters.background_brightness);
 			GLCall(glActiveTexture(GL_TEXTURE0));
 			GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, skyBox.GetDescriptor()));
             break;
         }
 		case BackgroundType::SkyboxHDR: {
+			program.SetUniform("backgroundBrightness", fractalsParameters.background_brightness);
 			GLCall(glActiveTexture(GL_TEXTURE0));
 			GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxHDR.GetCubemap()));
 			//if (fractalsParameters.irradianceCubemap) {
@@ -317,6 +319,10 @@ void Renderer::Render(int width, int height) {
 		}
 		case ColoringType::Type5: {
 			program.SetUniform("color", fractalsParameters.type5_color);
+			break;
+		}
+		case ColoringType::Type6: {
+            program.SetUniform("color", fractalsParameters.type6_color);
 			break;
 		}
 	}

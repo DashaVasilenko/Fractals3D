@@ -48,6 +48,10 @@ void ShaderProgram::Load() {
             mapSources[GL_FRAGMENT_SHADER] = "glsl/sierpinski2_pixel.glsl";
             break;
         }
+        case FractalType::MengerSponge1: {
+            mapSources[GL_FRAGMENT_SHADER] = "glsl/menger_sponge1_pixel.glsl";
+            break;
+        }
     }
     Init(mapSources);
     
@@ -109,6 +113,10 @@ void ShaderProgram::Load() {
             break;
         }
         case ColoringType::Type5: {
+            defines += "#define COLORING_TYPE_5" + std::string("\n");
+            break;
+        }
+        case ColoringType::Type6: {
             defines += "#define COLORING_TYPE_5" + std::string("\n");
             break;
         }
