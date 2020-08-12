@@ -40,6 +40,10 @@ uniform float ambientLightIntensity3;
 uniform vec3 color;
 #endif
 
+#ifdef COLORING_TYPE_3
+uniform float coef;
+#endif
+
 #ifdef COLORING_TYPE_2
 uniform vec3 color1;
 uniform vec3 color2;
@@ -262,7 +266,7 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
         albedo *= 0.5;
     #endif
     #ifdef COLORING_TYPE_3
-        vec3 albedo = 0.5 + 0.5*sin(trap.y*4.0 + 4.0 + color + outNormal*0.2).xzy;
+        vec3 albedo = color + color*sin(trap.y*coef + coef + color + outNormal*0.2).xzy;
     #endif
     #ifdef COLORING_TYPE_4
         vec3 albedo = color;

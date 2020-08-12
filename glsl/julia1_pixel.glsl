@@ -40,6 +40,10 @@ uniform float ambientLightIntensity3;
 uniform vec3 color;
 #endif
 
+#ifdef COLORING_TYPE_3
+uniform float coef;
+#endif
+
 #ifdef COLORING_TYPE_2
 uniform vec3 color1;
 uniform vec3 color2;
@@ -273,7 +277,7 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
         albedo *= 0.5;
     #endif
     #ifdef COLORING_TYPE_3
-        vec3 albedo = 0.5 + 0.5*sin(trap.y*4.0 + 4.0 + color + outNormal*0.2).xzy;
+        vec3 albedo = color + color*sin(trap.y*coef + coef + color + outNormal*0.2).xzy;
     #endif
     #ifdef COLORING_TYPE_4
         vec3 albedo = color;
@@ -285,7 +289,10 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
         albedo.x = 1.0-10.0*trap.x; 
     #endif 
     #ifdef COLORING_TYPE_6
-        vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.x + color);
+        vec3 albedo = vec3(0.001); // чем больше значение, тем более засвеченный фрактал
+        albedo = mix(albedo, color, clamp(trap.y*trap.y, 0.0, 1.0));
+	 	albedo = mix(albedo, vec3(0.5, 1.0, 0.5), clamp(trap.x*trap.x, 0.0, 1.0));
+        //vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.x + color);
     #endif
 
 		float occlusion = clamp(2.5*trap.w - 0.15, 0.0, 1.0);

@@ -68,32 +68,33 @@ const float EPSILON = 0.0005;
 //#define AA 2  // Set AA to 1 if your machine is too slow
 //#endif
 
-float maxcomp(vec3 p) { return max(p.x,max(p.y,p.z));}
-
-float sdBox(vec3 pos, vec3 b) {
-  vec3  di = abs(pos) - b;
-  float mc = maxcomp(di);
-  return min(mc,length(max(di,0.0)));
+float cylinderUnion(vec3 p){
+    float xy = dot(p.xy, p.xy);
+    float xz = dot(p.xz, p.xz);
+    float yz = dot(p.yz, p.yz);
+    return sqrt(min(xy, min(xz, yz))) - 1.0;
 }
 
-const mat3 ma = mat3( 0.60, 0.00,  0.80,
-                      0.00, 1.00,  0.00,
-                     -0.80, 0.00,  0.60 );
-                     
+float cylinderIntersection(vec3 p){
+    float xy = dot(p.xy, p.xy);
+    float xz = dot(p.xz, p.xz);
+    float yz = dot(p.yz, p.yz);
+    return sqrt(max(xy, max(xz, yz))) - 1.0;
+}
+             
 //-------------------------------------------------------------------------------------------------------
 // Compute Menger sponge
 // https://www.iquilezles.org/www/articles/menger/menger.htm
 float mengerSponge(vec3 pos, out vec4 trapColor) {
-
-    float d = sdBox(pos, vec3(1.0));
+    float d = cylinderIntersection(pos);
+    float s = 1.0;
     vec4 res = vec4(d, 1.0, 0.0, 0.0);
+
+    float ani = offset2;
+	float off = offset1;
 
     //float ani = smoothstep(-0.2, 0.2, -cos(0.5*Time));
 	//float off = 1.5*sin(0.01*Time);
-    float ani = offset2;
-	float off = offset1;
-	
-    float s = 1.0;
 
 #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4
     vec4 trap = vec4(abs(pos), dot(pos, pos));
@@ -103,17 +104,12 @@ float mengerSponge(vec3 pos, out vec4 trapColor) {
     vec2  trap = vec2(1e10);
 #endif
 
-    for (int m = 0; m < 4; m++) {
-        //pos = mix(pos, ma*(pos+off), ani);
+    for (int i = 0; i < 5; i++) {
         pos = mix(pos, pos+off, ani);
-	   
         vec3 a = mod(pos*s, 2.0) - 1.0;
-        s *= 3.0;
+    	s *= 3.0;
         vec3 r = abs(1.0 - 3.0*abs(a));
-        float da = max(r.x, r.y);
-        float db = max(r.y, r.z);
-        float dc = max(r.z, r.x);
-        float c = (min(da, min(db, dc)) - 1.0)/s;
+    	float c = cylinderUnion(r)/s;
 
     #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4
         trap = min(trap, vec4(abs(pos), dot(pos, pos)));  // trapping Oxz, Oyz, Oxy, (0,0,0)
@@ -122,14 +118,15 @@ float mengerSponge(vec3 pos, out vec4 trapColor) {
     #if defined COLORING_TYPE_3 || defined COLORING_TYPE_5 || defined COLORING_TYPE_6
         trap = min(trap, vec2(dot(pos, pos), abs(pos.x))); // orbit trapping ( |z|² and z_x  )
     #endif
-
+        
         if (c > d) {
           d = c;
-          res = vec4(d, min(res.y, 0.2*da*db*dc), (1.0+float(m))/4.0, 0.0 );
-        }
-
+          float da = max(r.x, r.y);
+          float db = max(r.y, r.z);
+          float dc = max(r.z, r.x);
+          res = vec4(d, min(res.y, 0.2*da*db*dc), (1.0+float(i))/4.0, 0.0 );
+        }	
     }
-
 #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4
     trapColor = trap;
 #endif
@@ -138,7 +135,7 @@ float mengerSponge(vec3 pos, out vec4 trapColor) {
     trapColor = vec4(trap, res.y, res.z);
 #endif
 
-    return res.x;
+    return d;
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -306,13 +303,14 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp ) {
     #ifdef COLORING_TYPE_5
         //vec3 albedo = 0.5 + 0.5*sin(trap.y*4.0 + 4.0 + color + outNormal*0.2).xzy;
         //vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.z + color);
-        vec3 albedo = vec3(0.5+0.5*cos(color.x+2.0*trap.w),
-                           0.5+0.5*cos(color.y+2.0*trap.w),
-                           0.5+0.5*cos(color.z+2.0*trap.w) );
+        vec3 albedo = vec3(0.5+0.5*cos(0.0+2.0*trap.w),
+                           0.5+0.5*cos(1.0+2.0*trap.w),
+                           0.5+0.5*cos(2.0+2.0*trap.w) );
         albedo.x = 1.0-10.0*trap.x; 
+        vec3 c = color;
     #endif 
     #ifdef COLORING_TYPE_6
-        vec3 albedo = color + color*cos(6.2831*trap.z);
+        vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.z + color);
     #endif
         		
         //float occlusion = occlusion(point, outNormal);

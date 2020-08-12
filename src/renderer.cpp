@@ -311,6 +311,7 @@ void Renderer::Render(int width, int height) {
 		}
 		case ColoringType::Type3: {
 			program.SetUniform("color", fractalsParameters.type3_color);
+			program.SetUniform("coef", fractalsParameters.type3_coef);
 			break;
 		}
 		case ColoringType::Type4: {
@@ -385,6 +386,11 @@ void Renderer::Render(int width, int height) {
 		case FractalType::MengerSponge1: {
 			program.SetUniform("offset1", fractalsParameters.menger_sponge1_offset1);
 			program.SetUniform("offset2", fractalsParameters.menger_sponge1_offset2);
+			break;
+		}
+		case FractalType::MengerSponge2: {
+			program.SetUniform("offset1", fractalsParameters.menger_sponge2_offset1);
+			program.SetUniform("offset2", fractalsParameters.menger_sponge2_offset2);
 			break;
 		}
 

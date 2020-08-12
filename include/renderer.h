@@ -75,6 +75,7 @@ private:
         glm::vec3 type2_color2 = { 0.02, 0.10, 0.30 };
         glm::vec3 type2_color3 = { 0.30, 0.10, 0.02 };
         glm::vec3 type3_color = { 1.0, 0.8, 0.7 };
+        float type3_coef = 2.0;
         glm::vec3 type4_color = { 1.0, 0.8, 0.7 };
         glm::vec3 type5_color = { 1.0, 0.8, 0.7 };
         glm::vec3 type6_color = { 1.0, 0.8, 0.7 };
@@ -120,6 +121,10 @@ private:
         // MengerSponge1 fractal parameters
         float menger_sponge1_offset1 = 1.0f;
         float menger_sponge1_offset2 = 1.0f;
+
+        // MengerSponge2 fractal parameters
+        float menger_sponge2_offset1 = 1.0f;
+        float menger_sponge2_offset2 = 1.0f;
 
 
         SkyBoxHDR monsterColorHDR;

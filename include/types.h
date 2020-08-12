@@ -20,6 +20,7 @@ enum FractalType {
         Sierpinski1,
         Sierpinski2,
         MengerSponge1,
+        MengerSponge2,
 };
 
 // Type1 - one color without traps

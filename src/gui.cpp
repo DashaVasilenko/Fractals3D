@@ -314,6 +314,10 @@ void Gui::Stats() {
             ImGui::Text("Current fractal type: MengerSponge1 fractal");
             break;
         }
+        case FractalType::MengerSponge2: {
+            ImGui::Text("Current fractal type: MengerSponge2 fractal");
+            break;
+        }
     }
 
     ImGui::End();
@@ -576,6 +580,10 @@ void Gui::FractalParameters() {
             MengerSponge1();
             break;
         }
+        case FractalType::MengerSponge2: {
+            MengerSponge2();
+            break;
+        }
     }
     
 }
@@ -610,6 +618,9 @@ void Gui::FractalColor() {
         if (ImGui::ColorEdit3("Type3 color", type3_color)) {
             fractalController->SetType3Color(glm::vec3(type3_color[0], type3_color[1], type3_color[2]));
         }
+        if (MyDragFloat("Type3 a", &type3_coef, 0.1, -10.0, 10.0)) {
+            fractalController->SetType3Coef(type3_coef);
+    }
     }
 
     if (static_cast<ColoringType>(currentColoringType) == ColoringType::Type4) {
@@ -773,11 +784,26 @@ void Gui::MengerSponge1() {
     FractalColor();
     ImGui::Separator();
 
-    if (MyDragFloat("MengerSponge1 offset1", &menger_sponge1_offset1, 0.1, -30, 30)) {
+    if (MyDragFloat("MengerSponge1 offset1", &menger_sponge1_offset1, 0.01, -30, 30)) {
         fractalController->SetMengerSponge1Offset1(menger_sponge1_offset1);
     }
-    if (MyDragFloat("MengerSponge1 ofset2", &menger_sponge1_offset2, 0.1, -30, 30)) {
+    if (MyDragFloat("MengerSponge1 ofset2", &menger_sponge1_offset2, 0.01, -30, 30)) {
         fractalController->SetMengerSponge1Offset2(menger_sponge1_offset2);
+    }
+
+    ImGui::End();
+}
+
+void Gui::MengerSponge2() {
+    ImGui::Begin("MengerSponge2 parameters", NULL, parametersWindowFlags); 
+    FractalColor();
+    ImGui::Separator();
+
+    if (MyDragFloat("MengerSponge2 offset1", &menger_sponge2_offset1, 0.01, -30, 30)) {
+        fractalController->SetMengerSponge2Offset1(menger_sponge2_offset1);
+    }
+    if (MyDragFloat("MengerSponge2 ofset2", &menger_sponge2_offset2, 0.01, -30, 30)) {
+        fractalController->SetMengerSponge2Offset2(menger_sponge2_offset2);
     }
 
     ImGui::End();

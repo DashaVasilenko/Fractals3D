@@ -37,6 +37,7 @@ public:
     void SetType2Color2(const glm::vec3& c) { renderer->fractalsParameters.type2_color2 = c; }
     void SetType2Color3(const glm::vec3& c) { renderer->fractalsParameters.type2_color3 = c; }
     void SetType3Color(const glm::vec3& c) { renderer->fractalsParameters.type3_color = c; }
+    void SetType3Coef(float c) { renderer->fractalsParameters.type3_coef = c; }
     void SetType4Color(const glm::vec3& c) { renderer->fractalsParameters.type4_color = c; }
     void SetType5Color(const glm::vec3& c) { renderer->fractalsParameters.type5_color = c; }
     void SetType6Color(const glm::vec3& c) { renderer->fractalsParameters.type6_color = c; }
@@ -104,6 +105,10 @@ public:
     // MengerSponge1 fractal parameters
     void SetMengerSponge1Offset1(float c) { renderer->fractalsParameters.menger_sponge1_offset1 = c; }
     void SetMengerSponge1Offset2(float c) { renderer->fractalsParameters.menger_sponge1_offset2 = c; }
+
+    // MengerSponge2 fractal parameters
+    void SetMengerSponge2Offset1(float c) { renderer->fractalsParameters.menger_sponge2_offset1 = c; }
+    void SetMengerSponge2Offset2(float c) { renderer->fractalsParameters.menger_sponge2_offset2 = c; }
 
 
 

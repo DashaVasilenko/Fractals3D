@@ -50,8 +50,8 @@ private:
 
     // fractal type
     FractalType currentFractalType = FractalType::Test;
-    const char* fractal_type[10] = { "Test", "Mandelbulb", "Monster", "Julia1", "Julia2", "Julia3", "Julia4", "Sierpinski1", "Sierpinski2",
-                                      "MengerSponge1" };
+    const char* fractal_type[11] = { "Test", "Mandelbulb", "Monster", "Julia1", "Julia2", "Julia3", "Julia4", "Sierpinski1", "Sierpinski2",
+                                      "MengerSponge1", "MengerSponge2" };
     int current_fractal_type = 0; 
 
     // general fractal parameters
@@ -69,6 +69,7 @@ private:
     float type2_color2[3] = { 0.02, 0.10, 0.30 };
     float type2_color3[3] = { 0.30, 0.10, 0.02 };
     float type3_color[3] = { 1.0, 0.8, 0.7 };
+    float type3_coef = 2.0;
     float type4_color[3] = { 1.0, 0.8, 0.7 };
     float type5_color[3] = { 1.0, 0.8, 0.7 };
     float type6_color[3] = { 1.0, 0.8, 0.7 };
@@ -115,6 +116,11 @@ private:
     // MengerSponge1 fractal parameters
     float menger_sponge1_offset1 = 1.0;
     float menger_sponge1_offset2 = 1.0;
+
+    // MengerSponge2 fractal parameters
+    float menger_sponge2_offset1 = 1.0;
+    float menger_sponge2_offset2 = 1.0;
+
 
 
     
@@ -180,6 +186,7 @@ private:
     void Sierpinski1();
     void Sierpinski2();
     void MengerSponge1();
+    void MengerSponge2();
 
 };
 

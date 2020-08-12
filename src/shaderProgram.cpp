@@ -52,6 +52,10 @@ void ShaderProgram::Load() {
             mapSources[GL_FRAGMENT_SHADER] = "glsl/menger_sponge1_pixel.glsl";
             break;
         }
+        case FractalType::MengerSponge2: {
+            mapSources[GL_FRAGMENT_SHADER] = "glsl/menger_sponge2_pixel.glsl";
+            break;
+        }
     }
     Init(mapSources);
     
