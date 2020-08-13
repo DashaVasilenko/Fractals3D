@@ -91,20 +91,25 @@ private:
     // julia1 fractal parameters
     float julia1_offset = 1.0;
     float julia1_smoothness = 4.0;
+    int julia1_iterations = 11;
+
 
     // julia2 fractal parameters
     float julia2_offset[3] = { 0.1498, 0.4479, 0.4495 };
     float julia2_w =  0.4491;
     float julia2_smoothness = 4.0;
+    int julia2_iterations = 11;
 
     // julia3 fractal parameters
     float julia3_offset = 1.0;
     float julia3_smoothness = 9.0;
+    int julia3_iterations = 11;
 
     // julia4 fractal parameters
     float julia4_offset[3] = { -0.05, -0.052, 0.85 };
     float julia4_w =  -0.151;
     float julia4_smoothness = 8.7;
+    int julia4_iterations = 11;
     
     // sierpinski1 fractal parameters
     float sierpinski1_va[3] = { 0.0, 0.57735,   0.0 };
@@ -122,10 +127,12 @@ private:
     // MengerSponge1 fractal parameters
     float menger_sponge1_offset1 = 1.0;
     float menger_sponge1_offset2 = 1.0;
+    int menger_sponge1_iterations = 4;
 
     // MengerSponge2 fractal parameters
     float menger_sponge2_offset1 = 1.0;
     float menger_sponge2_offset2 = 1.0;
+    int menger_sponge2_iterations = 5;
 
 
 

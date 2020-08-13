@@ -660,7 +660,7 @@ void Gui::FractalColor() {
     if (MyDragFloat("Shininess", &shininess, 1, 1, 100)) {
         fractalController->SetFractalShininess(shininess);
     }
-    if (MyDragFloat("Reflection", &reflection, 0.1, 0, 1)) {
+    if (MyDragFloat("Reflection", &reflection, 0.01, 0, 1)) {
         fractalController->SetFractalReflect(reflection);
     }
 }
@@ -676,18 +676,15 @@ void Gui::Mandelbulb() {
     FractalColor();
     ImGui::Separator();
 
-    if (MyDragInt("Iterations", &mandelbulb_iterations, 1, 1, 15)) {
+    if (MyDragInt("Iterations", &mandelbulb_iterations, 0.1, 1, 15)) {
         fractalController->SetMandelbulbIterations(mandelbulb_iterations);
     }
-
-    if (MyDragFloat("Bailout", &mandelbulb_bailout, 1, 1, 30)) {
+    if (MyDragFloat("Bailout", &mandelbulb_bailout, 0.1, 1, 30)) {
         fractalController->SetMandelbulbBailout(mandelbulb_bailout);
     }
-
-    if (MyDragFloat("Power", &mandelbulb_power, 1, 1, 30)) {
+    if (MyDragFloat("Power", &mandelbulb_power, 0.1, 1, 30)) {
         fractalController->SetMandelbulbPower(mandelbulb_power);
     }
-
     ImGui::End();
 }
 
@@ -702,7 +699,7 @@ void Gui::Juliabulb1() {
     if (MyDragFloat("Juliabulb1 smoothness", &juliabulb1_smoothness, 0.1, 0, 45)) {
         fractalController->SetJuliabulb1Smoothness(juliabulb1_smoothness);
     }
-    if (MyDragInt("Juliabulb1 i", &juliabulb1_iterations, 0.1, 0, 15)) {
+    if (MyDragInt("Juliabulb1 i", &juliabulb1_iterations, 0.1, 0, 10)) {
         fractalController->SetJuliabulb1Iterations(juliabulb1_iterations);
     }
     ImGui::End();
@@ -718,6 +715,9 @@ void Gui::Julia1() {
     }
     if (MyDragFloat("Julia1 smoothness", &julia1_smoothness, 0.1, 0, 45)) {
         fractalController->SetJulia1Smoothness(julia1_smoothness);
+    }
+    if (MyDragInt("Julia1 i", &julia1_iterations, 0.1, 0, 10)) {
+        fractalController->SetJulia1Iterations(julia1_iterations);
     }
     ImGui::End();
 }
@@ -736,6 +736,9 @@ void Gui::Julia2() {
     if (MyDragFloat("Julia2 smoothness", &julia2_smoothness, 0.1, 0, 45)) {
         fractalController->SetJulia2Smoothness(julia2_smoothness);
     }
+    if (MyDragInt("Julia2 i", &julia2_iterations, 0.1, 0, 10)) {
+        fractalController->SetJulia2Iterations(julia2_iterations);
+    }
     ImGui::End();
 }
 
@@ -749,6 +752,9 @@ void Gui::Julia3() {
     }
     if (MyDragFloat("Julia3 smoothness", &julia3_smoothness, 0.1, 0, 100)) {
         fractalController->SetJulia3Smoothness(julia3_smoothness);
+    }
+    if (MyDragInt("Julia3 i", &julia3_iterations, 0.1, 0, 10)) {
+        fractalController->SetJulia3Iterations(julia3_iterations);
     }
     ImGui::End();
 }
@@ -766,6 +772,9 @@ void Gui::Julia4() {
     }
     if (MyDragFloat("Julia4 smoothness", &julia4_smoothness, 0.1, 0, 45)) {
         fractalController->SetJulia4Smoothness(julia4_smoothness);
+    }
+    if (MyDragInt("Julia4 i", &julia4_iterations, 0.1, 0, 10)) {
+        fractalController->SetJulia4Iterations(julia4_iterations);
     }
     ImGui::End();
 }
@@ -826,6 +835,9 @@ void Gui::MengerSponge1() {
     if (MyDragFloat("MengerSponge1 ofset2", &menger_sponge1_offset2, 0.01, -30, 30)) {
         fractalController->SetMengerSponge1Offset2(menger_sponge1_offset2);
     }
+    if (MyDragInt("MengerSponge1 i", &menger_sponge1_iterations, 0.1, 0, 10)) {
+        fractalController->SetMengerSponge1Iterations(menger_sponge1_iterations);
+    }
 
     ImGui::End();
 }
@@ -840,6 +852,9 @@ void Gui::MengerSponge2() {
     }
     if (MyDragFloat("MengerSponge2 ofset2", &menger_sponge2_offset2, 0.01, -30, 30)) {
         fractalController->SetMengerSponge2Offset2(menger_sponge2_offset2);
+    }
+    if (MyDragInt("MengerSponge2 i", &menger_sponge2_iterations, 0.1, 0, 10)) {
+        fractalController->SetMengerSponge2Iterations(menger_sponge2_iterations);
     }
 
     ImGui::End();

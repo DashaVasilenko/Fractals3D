@@ -360,21 +360,25 @@ void Renderer::Render(int width, int height) {
 		case FractalType::Julia1: {
 			program.SetUniform("offset", fractalsParameters.julia1_offset);
 			program.SetUniform("smoothness", fractalsParameters.julia1_smoothness);
+			program.SetUniform("iterations", fractalsParameters.julia1_iterations);
             break;
         }
 		case FractalType::Julia2: {
             program.SetUniform("offset", glm::vec4(fractalsParameters.julia2_offset, fractalsParameters.julia2_w));
 			program.SetUniform("smoothness", fractalsParameters.julia2_smoothness);
+			program.SetUniform("iterations", fractalsParameters.julia2_iterations);
             break;
         }
 		case FractalType::Julia3: {
 			program.SetUniform("offset", fractalsParameters.julia3_offset);
 			program.SetUniform("smoothness", fractalsParameters.julia3_smoothness);
+			program.SetUniform("iterations", fractalsParameters.julia3_iterations);
             break;
         }
 		case FractalType::Julia4: {
             program.SetUniform("offset", glm::vec4(fractalsParameters.julia4_offset, fractalsParameters.julia4_w));
 			program.SetUniform("smoothness", fractalsParameters.julia4_smoothness);
+			program.SetUniform("iterations", fractalsParameters.julia4_iterations);
             break;
         }
 		case FractalType::Sierpinski1: {
@@ -395,11 +399,13 @@ void Renderer::Render(int width, int height) {
 		case FractalType::MengerSponge1: {
 			program.SetUniform("offset1", fractalsParameters.menger_sponge1_offset1);
 			program.SetUniform("offset2", fractalsParameters.menger_sponge1_offset2);
+			program.SetUniform("iterations", fractalsParameters.menger_sponge1_iterations);
 			break;
 		}
 		case FractalType::MengerSponge2: {
 			program.SetUniform("offset1", fractalsParameters.menger_sponge2_offset1);
 			program.SetUniform("offset2", fractalsParameters.menger_sponge2_offset2);
+			program.SetUniform("iterations", fractalsParameters.menger_sponge2_iterations);
 			break;
 		}
 

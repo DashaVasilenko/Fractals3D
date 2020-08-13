@@ -55,6 +55,7 @@ uniform float reflection; // сила отражения
 
 uniform vec4 offset;
 uniform float smoothness;
+uniform int iterations;
 
 //const int MAX_MARCHING_STEPS = 255;
 const int MAX_MARCHING_STEPS = 128;
@@ -92,9 +93,6 @@ vec4 qCube(vec4 a) {
 	return a*(4.0*a.x*a.x - dot(a,a)*vec4(3.0,1.0,1.0,1.0));
 }
 
-
-const int numIterations = 11;
-
 //-------------------------------------------------------------------------------------------------------
 // Compute Julia set
 // http://iquilezles.org/www/articles/juliasets3d/juliasets3d.htm
@@ -114,7 +112,7 @@ float julia( vec3 pos, vec4 c, out vec4 trapColor) {
 #endif
 
 
-	for( int i = 0; i < numIterations; i++ ) {
+	for( int i = 0; i < iterations; i++ ) {
         vec4 q = qSquare(z);
         // dz2 *= 9.0*dot(q, q); // |dz|² = |3z²|²	
 		dz2 *= smoothness*dot(q, q); // |dz|² = |3z²|²		

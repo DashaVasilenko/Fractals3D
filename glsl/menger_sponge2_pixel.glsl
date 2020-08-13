@@ -55,6 +55,7 @@ uniform float reflection; // сила отражения
 
 uniform float offset1;
 uniform float offset2;
+uniform int iterations;
 
 //const int MAX_MARCHING_STEPS = 255;
 const int MAX_MARCHING_STEPS = 128;
@@ -104,7 +105,7 @@ float mengerSponge(vec3 pos, out vec4 trapColor) {
     vec2  trap = vec2(1e10);
 #endif
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < iterations; i++) {
         pos = mix(pos, pos+off, ani);
         vec3 a = mod(pos*s, 2.0) - 1.0;
     	s *= 3.0;

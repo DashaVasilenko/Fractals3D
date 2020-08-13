@@ -82,20 +82,24 @@ public:
     // Julia1 fractal parameters
     void SetJulia1Offset(float c) { renderer->fractalsParameters.julia1_offset = c; }
     void SetJulia1Smoothness(float c) { renderer->fractalsParameters.julia1_smoothness = c; }
+    void SetJulia1Iterations(int c) { renderer->fractalsParameters.julia1_iterations = c; }
 
     // Julia2 fractal parameters
     void SetJulia2Offset(const glm::vec3& c) { renderer->fractalsParameters.julia2_offset = c; }
     void SetJulia2W(float c) { renderer->fractalsParameters.julia2_w = c; }
     void SetJulia2Smoothness(float c) { renderer->fractalsParameters.julia2_smoothness = c; }
+    void SetJulia2Iterations(int c) { renderer->fractalsParameters.julia2_iterations = c; }
 
     // Julia3 fractal parameters
     void SetJulia3Offset(float c) { renderer->fractalsParameters.julia3_offset = c; }
     void SetJulia3Smoothness(float c) { renderer->fractalsParameters.julia3_smoothness = c; }
+    void SetJulia3Iterations(int c) { renderer->fractalsParameters.julia3_iterations = c; }
 
     // Julia4 fractal parameters
     void SetJulia4Offset(const glm::vec3& c) { renderer->fractalsParameters.julia4_offset = c; }
     void SetJulia4W(float c) { renderer->fractalsParameters.julia4_w = c; }
     void SetJulia4Smoothness(float c) { renderer->fractalsParameters.julia4_smoothness = c; }
+    void SetJulia4Iterations(int c) { renderer->fractalsParameters.julia4_iterations = c; }
 
     // Sierpinski1 fractal parameters
     void SetSierpinski1Vector1(const glm::vec3& c) { renderer->fractalsParameters.sierpinski1_vector1 = c; }
@@ -110,16 +114,15 @@ public:
     void SetSierpinski2Vector3(const glm::vec3& c) { renderer->fractalsParameters.sierpinski2_vector3 = c; }
     void SetSierpinski2Iterations(int c) { renderer->fractalsParameters.sierpinski2_iterations = c; }
 
-
     // MengerSponge1 fractal parameters
     void SetMengerSponge1Offset1(float c) { renderer->fractalsParameters.menger_sponge1_offset1 = c; }
     void SetMengerSponge1Offset2(float c) { renderer->fractalsParameters.menger_sponge1_offset2 = c; }
+    void SetMengerSponge1Iterations(int c) { renderer->fractalsParameters.menger_sponge1_iterations = c; }
 
     // MengerSponge2 fractal parameters
     void SetMengerSponge2Offset1(float c) { renderer->fractalsParameters.menger_sponge2_offset1 = c; }
     void SetMengerSponge2Offset2(float c) { renderer->fractalsParameters.menger_sponge2_offset2 = c; }
-
-
+    void SetMengerSponge2Iterations(int c) { renderer->fractalsParameters.menger_sponge2_iterations = c; }
 
 private:
     Renderer* renderer;
