@@ -36,7 +36,7 @@ uniform float lightIntensity2;
 uniform vec3 ambientLightColor3;
 uniform float ambientLightIntensity3;
 
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_3 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_6
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_3 || defined COLORING_TYPE_4 || defined COLORING_TYPE_6
 uniform vec3 color;
 #endif
 
@@ -44,7 +44,7 @@ uniform vec3 color;
 uniform float coef;
 #endif
 
-#ifdef COLORING_TYPE_2
+#if defined COLORING_TYPE_2 || defined COLORING_TYPE_5
 uniform vec3 color1;
 uniform vec3 color2;
 uniform vec3 color3;
@@ -96,11 +96,11 @@ float mengerSponge(vec3 pos, out vec4 trapColor) {
     //float ani = smoothstep(-0.2, 0.2, -cos(0.5*Time));
 	//float off = 1.5*sin(0.01*Time);
 
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
     vec4 trap = vec4(abs(pos), dot(pos, pos));
 #endif
 
-#if defined COLORING_TYPE_3 || defined COLORING_TYPE_5 || defined COLORING_TYPE_6
+#if defined COLORING_TYPE_3 || defined COLORING_TYPE_6
     vec2  trap = vec2(1e10);
 #endif
 
@@ -111,11 +111,11 @@ float mengerSponge(vec3 pos, out vec4 trapColor) {
         vec3 r = abs(1.0 - 3.0*abs(a));
     	float c = cylinderUnion(r)/s;
 
-    #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4
+    #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
         trap = min(trap, vec4(abs(pos), dot(pos, pos)));  // trapping Oxz, Oyz, Oxy, (0,0,0)
     #endif
  
-    #if defined COLORING_TYPE_3 || defined COLORING_TYPE_5 || defined COLORING_TYPE_6
+    #if defined COLORING_TYPE_3 || defined COLORING_TYPE_6
         trap = min(trap, vec2(dot(pos, pos), abs(pos.x))); // orbit trapping ( |z|² and z_x  )
     #endif
         
@@ -127,11 +127,11 @@ float mengerSponge(vec3 pos, out vec4 trapColor) {
           res = vec4(d, min(res.y, 0.2*da*db*dc), (1.0+float(i))/4.0, 0.0 );
         }	
     }
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
     trapColor = trap;
 #endif
 
-#if defined COLORING_TYPE_3 || defined COLORING_TYPE_5 || defined COLORING_TYPE_6
+#if defined COLORING_TYPE_3 || defined COLORING_TYPE_6
     trapColor = vec4(trap, res.y, res.z);
 #endif
 
@@ -301,13 +301,11 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp ) {
         albedo.x = 1.0-10.0*trap.x; 
     #endif
     #ifdef COLORING_TYPE_5
-        //vec3 albedo = 0.5 + 0.5*sin(trap.y*4.0 + 4.0 + color + outNormal*0.2).xzy;
-        //vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.z + color);
-        vec3 albedo = vec3(0.5+0.5*cos(0.0+2.0*trap.w),
-                           0.5+0.5*cos(1.0+2.0*trap.w),
-                           0.5+0.5*cos(2.0+2.0*trap.w) );
-        albedo.x = 1.0-10.0*trap.x; 
-        vec3 c = color;
+        vec3 albedo = vec3(0.0);
+        albedo = mix(albedo, color1, sqrt(trap.x) );
+		albedo = mix(albedo, color2, sqrt(trap.y) );
+		albedo = mix(albedo, color3, trap.z );
+        //albedo *= 0.4;
     #endif 
     #ifdef COLORING_TYPE_6
         vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.z + color);

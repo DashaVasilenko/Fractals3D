@@ -36,7 +36,7 @@ uniform float lightIntensity2;
 uniform vec3 ambientLightColor3;
 uniform float ambientLightIntensity3;
 
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_3 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_6
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_3 || defined COLORING_TYPE_4 || defined COLORING_TYPE_6
 uniform vec3 color;
 #endif
 
@@ -44,7 +44,7 @@ uniform vec3 color;
 uniform float coef;
 #endif
 
-#ifdef COLORING_TYPE_2
+#if defined COLORING_TYPE_2 || defined COLORING_TYPE_5
 uniform vec3 color1;
 uniform vec3 color2;
 uniform vec3 color3;
@@ -53,18 +53,17 @@ uniform vec3 color3;
 uniform float shininess; // показатель степени зеркального отражения
 uniform float reflection; // сила отражения
 
-//uniform vec4 offset;
-//uniform float smoothness;
 uniform vec3 vector1;
 uniform vec3 vector2;
 uniform vec3 vector3;
-uniform vec3 vector4;
+uniform int iterations;
 
 //const int MAX_MARCHING_STEPS = 255;
 const int MAX_MARCHING_STEPS = 128;
 const float MIN_DIST = 0.0;
 const float MAX_DIST = 10.0; //50
 const float EPSILON = 0.0005;
+const float PI = 3.1415926;
 
 // antialias level (1, 2, 3...)
 #define AA 1
@@ -72,70 +71,121 @@ const float EPSILON = 0.0005;
 //#define AA 2  // Set AA to 1 if your machine is too slow
 //#endif
 
-//const int numIterations = 11;
 
 //-------------------------------------------------------------------------------------------------------
 // Compute Sierpinski triangle
 float sierpinski(vec3 pos, out vec4 trapColor) {
-
-    const float scale = 2.0;
     vec4 z = vec4(pos, 0.0);
-	float a = 0.0;
+    float a = 0.0;
     float s = 1.0;
-    vec3 c;
+    float r = 1.0;
+    float dm;
+    vec3 v;
 
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
     vec4 trap = vec4(abs(z.xyz), dot(z, z));
 #endif
  
-#if defined COLORING_TYPE_3 || defined COLORING_TYPE_5 || defined COLORING_TYPE_6
+#if defined COLORING_TYPE_3 || defined COLORING_TYPE_6
     vec2  trap = vec2(1e10);
 #endif
 
-    for (int i = 0; i < 15; ++i) {
-        float t, d, h; 
-
-        d = distance(pos, vector1);              c = vector1;        h = 0.0; 
-        t = distance(pos, vector2); if (t < d) { c = vector2; d = t; h = 1.0; }
-        t = distance(pos, vector3); if (t < d) { c = vector3; d = t; h = 2.0; }
-        t = distance(pos, vector4); if (t < d) { c = vector4; d = t; h = 3.0; }
-        
-        pos = (pos - c)*scale;
-        a = h + 4.0*a; s *= 4.0;
-
-    #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4
+    for (int i = 0; i < 8; ++i) {
+/*
+        pos.xy = (pos.x + pos.y > 0.0) ? pos.xy : - pos.yx; 
+        pos.yz = (pos.y + pos.z > 0.0) ? pos.yz : - pos.zy; 
+        pos.zx = (pos.z + pos.x > 0.0) ? pos.zx : - pos.xz; 
+        pos = 2.0*pos - 1.0;
+        s *= 0.5;
+ */       
+  /*
+        float d, t;
+		d = dot(pos-vector1, pos-vector1);               v = vector1; dm = d; t = 0.0;
+        d = dot(pos-vector2, pos-vector2); if (d < dm) { v = vector2; dm = d; t = 1.0; }
+        d = dot(pos-vector3, pos-vector3); if (d < dm) { v = vector3; dm = d; t = 2.0; }
+        d = dot(pos-vector4, pos-vector4); if (d < dm) { v = vector4; dm = d; t = 3.0; }
+		pos = v + 2.0*(pos - v); r *= 2.0;
+		a = t + 4.0*a; s*= 4.0;
+ */   
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
         trap = min(trap, vec4(abs(pos.xyz), dot(pos, pos)));  // trapping Oxz, Oyz, Oxy, (0,0,0)
     #endif
 
-    #if defined COLORING_TYPE_3 || defined COLORING_TYPE_5 || defined COLORING_TYPE_6
+    #if defined COLORING_TYPE_3 || defined COLORING_TYPE_6
         trap = min(trap, vec2(dot(pos, pos), abs(pos.x))); // orbit trapping ( |z|² and z_x  )
     #endif	
     }
 
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
     trapColor = trap;
 #endif
 
-#if defined COLORING_TYPE_3 || defined COLORING_TYPE_5 || defined COLORING_TYPE_6
+#if defined COLORING_TYPE_3 || defined COLORING_TYPE_6
     trapColor = vec4(trap, a/s, 1.0);
 #endif
 
-    return length(pos) * pow(scale, float(-15)); 
-    // return length(p) * pow(scale, float(-maxit)) - pixsize; // let the leaves be one pixel in size
-    /*
+    //return s*(length(pos) - 2.5);
 
-    for(int i = 0; i < 8; i++) {
-	    float d, t;
-		d = dot(z-va,z-va);              v=va; dm=d; t=0.0;
-        d = dot(z-vb,z-vb); if( d<dm ) { v=vb; dm=d; t=1.0; }
-        d = dot(z-vc,z-vc); if( d<dm ) { v=vc; dm=d; t=2.0; }
-        d = dot(z-vd,z-vd); if( d<dm ) { v=vd; dm=d; t=3.0; }
-		z = v + 2.0*(z - v); r*= 2.0;
-		a = t + 4.0*a; s*= 4.0;
-
-	}
     return (sqrt(dm)-1.0)/r;
-*/
+}
+
+//-------------------------------------------------------------------------------------------------------
+// Compute Sierpinski dodecahedron
+float sierpinskiDodecahedron(vec3 pos, out vec4 trapColor) {
+    vec3 v1 = normalize(vector1);
+    vec3 v2 = normalize(vector2);
+    vec3 v3 = normalize(vector3);
+
+    float scale = 2.618;
+    float s = 1.0;
+    float orbit = 1e20;
+
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
+    vec4 trap = vec4(abs(pos.xyz), dot(pos, pos));
+#endif
+ 
+#if defined COLORING_TYPE_3 || defined COLORING_TYPE_6
+    vec2  trap = vec2(1e10);
+#endif
+
+
+    for(int i = 0; i < iterations; i++) {
+		//orbit = min(orbit, dot(pos, pos));
+        
+       	//dodecahedron folding
+       	pos -= 2.*min(0.,dot(pos,v1))*v1; 
+       	pos -= 2.*min(0.,dot(pos,v2))*v2; 
+       	pos -= 2.*min(0.,dot(pos,v3))*v3; 
+        
+       	pos -= 2.*min(0.,dot(pos,v2))*v2;
+        
+        pos -= 2.*min(0.,dot(pos,v1))*v1;
+       	pos -= 2.*min(0.,dot(pos,v2))*v2;
+        pos -= 2.*min(0.,dot(pos,v3))*v3; 
+        
+       	//scaling
+       	pos = pos*scale-1.0;
+       	s *= scale;
+
+    #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
+        trap = min(trap, vec4(abs(pos.xyz), dot(pos, pos)));  // trapping Oxz, Oyz, Oxy, (0,0,0)
+    #endif
+
+    #if defined COLORING_TYPE_3 || defined COLORING_TYPE_6
+        trap = min(trap, vec2(dot(pos, pos), abs(pos.x))); // orbit trapping ( |z|² and z_x  )
+    #endif
+    }
+
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
+    trapColor = trap;
+#endif
+
+#if defined COLORING_TYPE_3 || defined COLORING_TYPE_6
+    trapColor = vec4(trap, 1.0, 1.0);
+#endif
+    
+    //dis & descale
+    return (length(pos)-1.0)/s; 
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -158,10 +208,10 @@ vec3 computeNormal(vec3 p) {
     vec4 trap;
     const float h = 0.0001; // replace by an appropriate value
     const vec2 k = vec2(1,-1)*h;
-    return normalize( k.xyy*sierpinski( p + k.xyy, trap) + 
-                      k.yyx*sierpinski( p + k.yyx, trap) + 
-                      k.yxy*sierpinski( p + k.yxy, trap) + 
-                      k.xxx*sierpinski( p + k.xxx, trap) );
+    return normalize( k.xyy*sierpinskiDodecahedron( p + k.xyy, trap) + 
+                      k.yyx*sierpinskiDodecahedron( p + k.yyx, trap) + 
+                      k.yxy*sierpinskiDodecahedron( p + k.yxy, trap) + 
+                      k.xxx*sierpinskiDodecahedron( p + k.xxx, trap) );
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -173,7 +223,7 @@ float softShadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end
     float iterations = 64;
     for(float t=start; t<end; iterations--) {
         //float h = mandelbulb(shadowRayOrigin + shadowRayDir*t, trap);
-        float h = sierpinski(shadowRayOrigin + shadowRayDir*t, trap);
+        float h = sierpinskiDodecahedron(shadowRayOrigin + shadowRayDir*t, trap);
         res = min( res, w*h/t );
         if (res < 0.001 || iterations <= 0) break;
         t += h;
@@ -216,7 +266,7 @@ float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end
     //dist = min(dist, end);
 
     for (int i = 0; i < MAX_MARCHING_STEPS; i++) {
-        float h = sierpinski(eye + depth*direction, trap);
+        float h = sierpinskiDodecahedron(eye + depth*direction, trap);
         if (h < EPSILON) break; // We're inside the scene surface!
         //if (depth >= dist) break; // Gone too far; give up
         if (depth >= end) break; // Gone too far; give up
@@ -238,7 +288,7 @@ float occlusion(vec3 pos, vec3 normal) {
     vec4 t;
     for (int i = 0; i < 8; i++) {
         float h = 0.001 + 0.5*pow(i/7.0, 1.5);
-        float d = sierpinski(pos + h*normal, t);
+        float d = sierpinskiDodecahedron(pos + h*normal, t);
         ao += -(d - h)*sca;
         sca *= 0.95;
     }
@@ -299,12 +349,23 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp ) {
         albedo.x = 1.0-10.0*trap.x; 
     #endif
     #ifdef COLORING_TYPE_5
-        //vec3 albedo = 0.5 + 0.5*sin(trap.y*4.0 + 4.0 + color + outNormal*0.2).xzy;
-        vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.z + color);
-        albedo.x = 1.0-10.0*trap.x; 
+        vec3 albedo = vec3(0.0);
+        albedo = mix(albedo, color1, sqrt(trap.x) );
+		albedo = mix(albedo, color2, sqrt(trap.y) );
+		albedo = mix(albedo, color3, trap.z );
+        //albedo *= 0.4;
     #endif 
     #ifdef COLORING_TYPE_6
-        vec3 albedo = 0.5 + 0.5*sin(trap.z*4.0 + 4.0 + color + outNormal*0.2).xzy;
+        vec3 albedo = color*0.3;
+        //vec3 albedo = 0.5 + 0.5*sin(trap.z*4.0 + 4.0 + color + outNormal*0.2).xzy;
+        //#define PALETTE_BIAS        vec3(0.5)
+        //#define PALETTE_AMPLITUDE   vec3(0.5)
+        //#define PALETTE_FREQUENCIES vec3(1,.2,.3)
+	    //#define PALETTE_OFFSET      vec3(.4,.15,.2)
+	    //#define PALETTE_G_FREQUENCY 1.
+	    //#define PALETTE_G_OFFSET    .1
+        //vec3 albedo = vec3(0.5) + vec3(0.5)*cos(6.28318*(0.1*vec3(1, 0.2, 0.3)*trap.z + vec3(0.4, 0.15, 0.2) + 0.1));
+        //if (trap.x > 0.1) albedo = vec3(1.0) - color;
     #endif
         		
 		//float occlusion = clamp(2.5*trap.w - 0.15, 0.0, 1.0);

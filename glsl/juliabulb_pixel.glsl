@@ -53,8 +53,9 @@ uniform vec3 color3;
 uniform float shininess; // показатель степени зеркального отражения
 uniform float reflection; // сила отражения
 
-uniform vec4 offset;
+uniform float offset;
 uniform float smoothness;
+uniform int iterations;
 
 //const int MAX_MARCHING_STEPS = 255;
 const int MAX_MARCHING_STEPS = 128;
@@ -70,7 +71,7 @@ const float EPSILON = 0.0005;
 
 //-------------------------------------------------------------------------------------------------------
 // square a quaterion
-vec4 qSquare(vec4 a)  {
+vec4 qsqr(vec4 a)  {
     return vec4( a.x*a.x - a.y*a.y - a.z*a.z - a.w*a.w,
                  2.0*a.x*a.y,
                  2.0*a.x*a.z,
@@ -80,15 +81,16 @@ vec4 qSquare(vec4 a)  {
 const int numIterations = 11;
 
 //-------------------------------------------------------------------------------------------------------
-// Compute Julia set
+// Compute Juliabulb set
 // http://iquilezles.org/www/articles/juliasets3d/juliasets3d.htm
 // https://iquilezles.org/www/articles/distancefractals/distancefractals.htm
-// https://www.shadertoy.com/view/MsfGRr
-float julia(vec3 pos, vec4 c, out vec4 trapColor) {
-    vec4 z = vec4(pos, 0.0);
-    float md2 = 1.0;
-    float mz2 = dot(z, z);
-
+// https://www.shadertoy.com/view/MdfGRr
+float juliabulb(vec3 pos, vec4 c, out vec4 trapColor) {
+    vec3 z = pos;
+    float m = dot(z, z);
+    //vec4 trap = vec4(abs(z), m);
+	float dz = 1.0;
+    
 #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
     vec4 trap = vec4(abs(z.xyz), dot(z, z));
 #endif
@@ -97,25 +99,26 @@ float julia(vec3 pos, vec4 c, out vec4 trapColor) {
     vec2  trap = vec2(1e10);
 #endif
 
-    float n = 1.0;
-    for(int i = 0; i < numIterations; i++ ) {
-        // dz -> 2·z·dz, meaning |dz| -> 2·|z|·|dz|
-        // Now we take the 2.0 out of the loop and do it at the end with an exp2
-        md2 *= smoothness*mz2;
-        // z  -> z^2 + c
-        z = qSquare(z) + c;  
-
+    for( int i = 0; i < iterations; i++ ) {
+		dz = smoothness*pow(m, 3.5)*dz; // dz = 8.0*pow(m, 3.5)*dz;
+        
+        float r = length(z);
+        float b = 8.0*acos( clamp(z.y/r, -1.0, 1.0));
+        float a = 8.0*atan( z.x, z.z );
+        z = c.xyz + pow(r,8.0) * vec3( sin(b)*sin(a), cos(b), sin(b)*cos(a) );
+        
     #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
         trap = min(trap, vec4(abs(z.xyz), dot(z, z)));  // trapping Oxz, Oyz, Oxy, (0,0,0)
     #endif
 
     #if defined COLORING_TYPE_3 || defined COLORING_TYPE_6
-        trap = min(trap, vec2(mz2, abs(z.x))); // orbit trapping ( |z|² and z_x  )
+        trap = min(trap, vec2(m, abs(z.x))); // orbit trapping ( |z|² and z_x  )
     #endif
 
-        mz2 = dot(z, z);
-        if (mz2 > smoothness) break;
-        n += 1.0;
+        m = dot(z,z);
+		if( m > 2.0 ) // if (mz2 > smoothness) break;
+            break;
+
     }
 
 #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
@@ -126,7 +129,7 @@ float julia(vec3 pos, vec4 c, out vec4 trapColor) {
     trapColor = vec4(trap, 1.0, 1.0);
 #endif
 
-    return 0.25*sqrt(mz2/md2)*log(mz2);  // d = 0.5·|z|·log|z|/|z'|
+    return 0.25*log(m)*sqrt(m)/dz;
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -149,10 +152,20 @@ vec3 computeNormal(vec3 p, vec4 c) {
     vec4 trap;
     const float h = 0.0001; // replace by an appropriate value
     const vec2 k = vec2(1,-1)*h;
-    return normalize( k.xyy*julia( p + k.xyy, c, trap) + 
-                      k.yyx*julia( p + k.yyx, c, trap) + 
-                      k.yxy*julia( p + k.yxy, c, trap) + 
-                      k.xxx*julia( p + k.xxx, c, trap) );
+    return normalize( k.xyy*juliabulb( p + k.xyy, c, trap) + 
+                      k.yyx*juliabulb( p + k.yyx, c, trap) + 
+                      k.yxy*juliabulb( p + k.yxy, c, trap) + 
+                      k.xxx*juliabulb( p + k.xxx, c, trap) );
+}
+
+vec3 computeNormal2(vec3 p, vec4 c) {
+    vec4 trap;
+    const float h = 0.001; // replace by an appropriate value
+    const vec2 k = vec2(1,-1)*h;
+    return normalize( k.xyy*juliabulb( p + k.xyy, c, trap) + 
+                      k.yyx*juliabulb( p + k.yyx, c, trap) + 
+                      k.yxy*juliabulb( p + k.yxy, c, trap) + 
+                      k.xxx*juliabulb( p + k.xxx, c, trap) );
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -164,7 +177,7 @@ float softShadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end
     float iterations = 64;
     for(float t=start; t<end; iterations--) {
         //float h = mandelbulb(shadowRayOrigin + shadowRayDir*t, trap);
-        float h = julia(shadowRayOrigin + shadowRayDir*t, c, trap);
+        float h = juliabulb(shadowRayOrigin + shadowRayDir*t, c, trap);
         res = min( res, w*h/t );
         if (res < 0.001 || iterations <= 0) break;
         t += h;
@@ -207,7 +220,7 @@ float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end
     dist = min(dist, end);
 
     for (int i = 0; i < MAX_MARCHING_STEPS; i++) {
-        float h = julia(eye + depth*direction, c, trap);
+        float h = juliabulb(eye + depth*direction, c, trap);
         if (h < EPSILON) break; // We're inside the scene surface!
         if (depth >= dist) break; // Gone too far; give up
         //if (depth >= end) break; // Gone too far; give up
@@ -236,7 +249,7 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
     vec3 outNormal = computeNormal(point, c); // N
     
     // Didn't hit anything. sky color
-    if (dist >= MAX_DIST) {
+    if (dist > MAX_DIST - EPSILON) {
 #if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
         return texture(skyBox, dir)*backgroundBrightness;
 #endif
@@ -249,7 +262,7 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
         vec3 col  = reflectedColor*(0.6+0.4*dir.y); 
         col += lightIntensity1*sunColor*pow( clamp(dot(dir, lightDirection1),0.0,1.0), 32.0); 
         return vec4(col, 1.0);
-#endif	
+#endif
 	}
     // color fractal
 	else {
@@ -281,10 +294,14 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
         //albedo *= 0.4;
     #endif 
     #ifdef COLORING_TYPE_6
-        vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.x + color);
+        vec3 albedo = vec3(0.001); // чем больше значение, тем более засвеченный фрактал
+        albedo = mix(albedo, color, clamp(trap.y*trap.y, 0.0, 1.0));
+	 	albedo = mix(albedo, vec3(0.5, 1.0, 0.5), clamp(trap.x*trap.x, 0.0, 1.0));
+        //vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.x + color);
     #endif
 
-		float occlusion = clamp(2.5*trap.w - 0.15, 0.0, 1.0);
+		//float occlusion = clamp(2.5*trap.w - 0.15, 0.0, 1.0);
+        float occlusion = clamp(1.2*trap.w - 0.6, 0.0, 1.0);
         vec3 hal = normalize(lightDirection1 - dir);
         float shadow = 1.0;
 
@@ -306,7 +323,8 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
 		col = pow(col, vec3(0.7, 0.9, 1.0));
         //col += spe1*15.0;
         col += spe1*lightIntensity1;
-        
+
+
         // sky
         vec4 color; 
         float intensity = (lightIntensity1 + lightIntensity2 + ambientLightIntensity3)*0.05;
@@ -415,7 +433,10 @@ void main() {
     vec3 dir = rayDirection(fieldOfView, iResolution, pixelCoord);
     vec3 eye = viewMatrix[3].xyz;
     vec2  sp = (2.0*pixelCoord-iResolution.xy) / iResolution.y;
-    //vec4 c = 0.45*cos( vec4(0.5,3.9,1.4,1.1) + offset*vec4(1.2,1.7,1.3,2.5) ) - vec4(0.3,0.0,0.0,0.0);
+    //vec4 c = vec4(0.9*cos(3.9 + 1.2*Time) - 0.3, 0.8*cos(2.5 + 1.1*Time), 0.8*cos(3.4 + 1.3*Time), 0.0);
+    vec4 c = vec4(0.9*cos(3.9 + 1.2*offset) - 0.3, 0.8*cos(2.5 + 1.1*offset), 0.8*cos(3.4 + 1.3*offset), 0.0);
+	if (length(c) < 0.50) c = 0.50*normalize(c);
+	if (length(c) > 0.95) c = 0.95*normalize(c);
     
     // render
     vec4 col = vec4(0.0);
@@ -430,7 +451,7 @@ void main() {
         //vec3 rd = normalize( p.x*cu + p.y*cv + 2.0*cw );
         //col += render(ro, rd, c, sp );
 
-        col += render(eye, dir, offset, sp );
+        col += render(eye, dir, c, sp );
     }
     col /= float(AA*AA);
     

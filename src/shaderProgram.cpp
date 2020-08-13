@@ -20,6 +20,10 @@ void ShaderProgram::Load() {
  	        mapSources[GL_FRAGMENT_SHADER] = "glsl/mandelbulb_pixel.glsl";
             break;
         }
+        case FractalType::Juliabulb1: {
+ 	        mapSources[GL_FRAGMENT_SHADER] = "glsl/juliabulb_pixel.glsl";
+            break;
+        }
         case FractalType::Monster: {
  	        mapSources[GL_FRAGMENT_SHADER] = "glsl/monster_pixel.glsl";
             break;

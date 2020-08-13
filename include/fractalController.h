@@ -39,7 +39,9 @@ public:
     void SetType3Color(const glm::vec3& c) { renderer->fractalsParameters.type3_color = c; }
     void SetType3Coef(float c) { renderer->fractalsParameters.type3_coef = c; }
     void SetType4Color(const glm::vec3& c) { renderer->fractalsParameters.type4_color = c; }
-    void SetType5Color(const glm::vec3& c) { renderer->fractalsParameters.type5_color = c; }
+    void SetType5Color1(const glm::vec3& c) { renderer->fractalsParameters.type5_color1 = c; }
+    void SetType5Color2(const glm::vec3& c) { renderer->fractalsParameters.type5_color2 = c; }
+    void SetType5Color3(const glm::vec3& c) { renderer->fractalsParameters.type5_color3 = c; }
     void SetType6Color(const glm::vec3& c) { renderer->fractalsParameters.type6_color = c; }
 
 
@@ -72,6 +74,11 @@ public:
     void SetMandelbulbBailout(const float c) { renderer->fractalsParameters.mandelbulb_bailout = c; }
     void SetMandelbulbPower(float c) { renderer->fractalsParameters.mandelbulb_power = c; }
 
+    // Juliabulb1 fractal parameters
+    void SetJuliabulb1Offset(float c) { renderer->fractalsParameters.juliabulb1_offset = c; }
+    void SetJuliabulb1Smoothness(float c) { renderer->fractalsParameters.juliabulb1_smoothness = c; }
+    void SetJuliabulb1Iterations(int c) { renderer->fractalsParameters.juliabulb1_iterations = c; }
+
     // Julia1 fractal parameters
     void SetJulia1Offset(float c) { renderer->fractalsParameters.julia1_offset = c; }
     void SetJulia1Smoothness(float c) { renderer->fractalsParameters.julia1_smoothness = c; }
@@ -95,12 +102,14 @@ public:
     void SetSierpinski1Vector2(const glm::vec3& c) { renderer->fractalsParameters.sierpinski1_vector2 = c; }
     void SetSierpinski1Vector3(const glm::vec3& c) { renderer->fractalsParameters.sierpinski1_vector3 = c; }
     void SetSierpinski1Vector4(const glm::vec3& c) { renderer->fractalsParameters.sierpinski1_vector4 = c; }
+    void SetSierpinski1Iterations(int c) { renderer->fractalsParameters.sierpinski1_iterations = c; }
 
     // Sierpinski2 fractal parameters
     void SetSierpinski2Vector1(const glm::vec3& c) { renderer->fractalsParameters.sierpinski2_vector1 = c; }
     void SetSierpinski2Vector2(const glm::vec3& c) { renderer->fractalsParameters.sierpinski2_vector2 = c; }
     void SetSierpinski2Vector3(const glm::vec3& c) { renderer->fractalsParameters.sierpinski2_vector3 = c; }
-    void SetSierpinski2Vector4(const glm::vec3& c) { renderer->fractalsParameters.sierpinski2_vector4 = c; }
+    void SetSierpinski2Iterations(int c) { renderer->fractalsParameters.sierpinski2_iterations = c; }
+
 
     // MengerSponge1 fractal parameters
     void SetMengerSponge1Offset1(float c) { renderer->fractalsParameters.menger_sponge1_offset1 = c; }

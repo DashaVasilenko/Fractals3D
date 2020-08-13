@@ -39,7 +39,7 @@ uniform float lightIntensity2;
 uniform vec3 ambientLightColor3;
 uniform float ambientLightIntensity3;
 
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_3 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_6
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_3 || defined COLORING_TYPE_4 || defined COLORING_TYPE_6
 uniform vec3 color;
 #endif
 
@@ -47,7 +47,7 @@ uniform vec3 color;
 uniform float coef;
 #endif
 
-#ifdef COLORING_TYPE_2
+#if defined COLORING_TYPE_2 || defined COLORING_TYPE_5
 uniform vec3 color1;
 uniform vec3 color2;
 uniform vec3 color3;
@@ -169,11 +169,11 @@ float sceneSDF(vec3 point, out vec4 resColor) {
     float time = Time;
     float m = dot(point, point);
 
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
     vec4 trap = vec4(abs(point), m);
 #endif
 
-#if defined COLORING_TYPE_3 || defined COLORING_TYPE_5 || defined COLORING_TYPE_6
+#if defined COLORING_TYPE_3 || defined COLORING_TYPE_6
     vec2  trap = vec2(1e10);
 #endif
 
@@ -182,11 +182,11 @@ float sceneSDF(vec3 point, out vec4 resColor) {
     t = unionSDF(t, sphereSDF(point-vec3(0, 0, 10), 2.5));
     t = unionSDF(t, planeSDF(point, vec4(0, 1, 0, 5.5)));
 
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
     resColor = vec4(m, trap.yzw); // trapping Oxz, Oyz, Oxy, (0,0,0)
 #endif
 
-#if defined COLORING_TYPE_3 || defined COLORING_TYPE_5 || defined COLORING_TYPE_6
+#if defined COLORING_TYPE_3 || defined COLORING_TYPE_6
     trap = min(trap, vec2(m, abs(point.x))); // orbit trapping ( |z|² and z_x  )
     resColor = vec4(trap, 1.0, 1.0);
 #endif
@@ -323,9 +323,12 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
         albedo.x = 1.0-10.0*trap.x; 
     #endif
     #ifdef COLORING_TYPE_5
-        vec3 albedo = 0.5 + 0.5*sin(trap.y*4.0 + 4.0 + color + outNormal*0.2).xzy;
-        albedo.x = 1.0-10.0*trap.x; 
-    #endif    
+        vec3 albedo = vec3(0.0);
+        albedo = mix(albedo, color1, sqrt(trap.x) );
+		albedo = mix(albedo, color2, sqrt(trap.y) );
+		albedo = mix(albedo, color3, trap.z );
+        albedo *= 0.09;
+    #endif   
     #ifdef COLORING_TYPE_6
         vec3 albedo = color + 0.5*cos(6.2831*trap.x + color);
     #endif

@@ -50,8 +50,8 @@ private:
 
     // fractal type
     FractalType currentFractalType = FractalType::Test;
-    const char* fractal_type[11] = { "Test", "Mandelbulb", "Monster", "Julia1", "Julia2", "Julia3", "Julia4", "Sierpinski1", "Sierpinski2",
-                                      "MengerSponge1", "MengerSponge2" };
+    const char* fractal_type[12] = { "Test", "Mandelbulb", "Juliabulb1", "Monster", "Julia1", "Julia2", "Julia3", "Julia4", "Sierpinski1",
+                                     "Sierpinski2", "MengerSponge1", "MengerSponge2" };
     int current_fractal_type = 0; 
 
     // general fractal parameters
@@ -71,10 +71,10 @@ private:
     float type3_color[3] = { 1.0, 0.8, 0.7 };
     float type3_coef = 2.0;
     float type4_color[3] = { 1.0, 0.8, 0.7 };
-    float type5_color[3] = { 1.0, 0.8, 0.7 };
+    float type5_color1[3] = { 1.0, 0.0, 0.0 };
+    float type5_color2[3] = { 0.0, 1.0, 0.0 };
+    float type5_color3[3] = { 0.0, 0.0, 1.0 };
     float type6_color[3] = { 1.0, 0.8, 0.7 };
-
-
 
     // test fractal parameters
 
@@ -82,6 +82,11 @@ private:
     int mandelbulb_iterations = 8;
     float mandelbulb_bailout = 10.0f;
     float mandelbulb_power = 9.0f;
+
+    // Juliabulb1 fractal parameters
+    float juliabulb1_offset = 1.6;
+    float juliabulb1_smoothness = 8.0;
+    int juliabulb1_iterations = 4;
 
     // julia1 fractal parameters
     float julia1_offset = 1.0;
@@ -106,12 +111,13 @@ private:
     float sierpinski1_vb[3] = { 0.0, -1.0,  1.15470 };
     float sierpinski1_vc[3] = { 1.0, -1.0, -0.57735 };
     float sierpinski1_vd[3] = {-1.0, -1.0, -0.57735 };
+    int sierpinski1_iterations = 8;
 
     // Sierpinski2 fractal parameters
-    float sierpinski2_va[3] = { -1.0f, -1.0f, -1.0f };
-    float sierpinski2_vb[3] = {  1.0f,  1.0f, -1.0f };
-    float sierpinski2_vc[3] = {  1.0f, -1.0f,  1.0f };
-    float sierpinski2_vd[3] = { -1.0f,  1.0f,  1.0f };
+    float sierpinski2_va[3] = {  -1.0, 0.618, 1.618 };
+    float sierpinski2_vb[3] = { 0.618, 1.618,  -1.0 };
+    float sierpinski2_vc[3] = { 1.618,  -1.0, 0.618 };
+    int sierpinski2_iterations = 6;
 
     // MengerSponge1 fractal parameters
     float menger_sponge1_offset1 = 1.0;
@@ -157,6 +163,7 @@ private:
 
     // Other
     ImGuiWindowFlags parametersWindowFlags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse ;
+    ImGuiWindowFlags fractalParametersWindowFlags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     bool show_demo_window = true; // потом надо удалить
     bool show_another_window = false; // потом надо удалить
@@ -179,6 +186,7 @@ private:
 
     void Test();
     void Mandelbulb();
+    void Juliabulb1();
     void Julia1();
     void Julia2();
     void Julia3();

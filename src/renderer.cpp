@@ -319,7 +319,9 @@ void Renderer::Render(int width, int height) {
 			break;
 		}
 		case ColoringType::Type5: {
-			program.SetUniform("color", fractalsParameters.type5_color);
+			program.SetUniform("color1", fractalsParameters.type5_color1);
+			program.SetUniform("color2", fractalsParameters.type5_color2);
+			program.SetUniform("color3", fractalsParameters.type5_color3);
 			break;
 		}
 		case ColoringType::Type6: {
@@ -341,6 +343,12 @@ void Renderer::Render(int width, int height) {
 			program.SetUniform("Iterations", fractalsParameters.mandelbulb_iterations);
 			program.SetUniform("Bailout", fractalsParameters.mandelbulb_bailout);
 			program.SetUniform("Power", fractalsParameters.mandelbulb_power);
+            break;
+        }
+		case FractalType::Juliabulb1: {
+			program.SetUniform("offset", fractalsParameters.juliabulb1_offset);
+			program.SetUniform("smoothness", fractalsParameters.juliabulb1_smoothness);
+			program.SetUniform("iterations", fractalsParameters.juliabulb1_iterations);
             break;
         }
 		case FractalType::Monster: {
@@ -374,13 +382,14 @@ void Renderer::Render(int width, int height) {
 			program.SetUniform("vector2", fractalsParameters.sierpinski1_vector2);
 			program.SetUniform("vector3", fractalsParameters.sierpinski1_vector3);
 			program.SetUniform("vector4", fractalsParameters.sierpinski1_vector4);
+			program.SetUniform("iterations", fractalsParameters.sierpinski1_iterations);
 			break;
 		}
 		case FractalType::Sierpinski2: {
 			program.SetUniform("vector1", fractalsParameters.sierpinski2_vector1);
 			program.SetUniform("vector2", fractalsParameters.sierpinski2_vector2);
 			program.SetUniform("vector3", fractalsParameters.sierpinski2_vector3);
-			program.SetUniform("vector4", fractalsParameters.sierpinski2_vector4);
+			program.SetUniform("iterations", fractalsParameters.sierpinski2_iterations);
 			break;
 		}
 		case FractalType::MengerSponge1: {

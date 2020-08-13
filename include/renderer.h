@@ -77,7 +77,9 @@ private:
         glm::vec3 type3_color = { 1.0, 0.8, 0.7 };
         float type3_coef = 2.0;
         glm::vec3 type4_color = { 1.0, 0.8, 0.7 };
-        glm::vec3 type5_color = { 1.0, 0.8, 0.7 };
+        glm::vec3 type5_color1 = { 1.0, 0.0, 0.0 };
+        glm::vec3 type5_color2 = { 0.0, 1.0, 0.0 };
+        glm::vec3 type5_color3 = { 0.0, 0.0, 1.0 };
         glm::vec3 type6_color = { 1.0, 0.8, 0.7 };
 
 
@@ -87,6 +89,11 @@ private:
         int mandelbulb_iterations = 8;
         float mandelbulb_bailout = 10.0f;
         float mandelbulb_power = 9.0f;
+
+        // Juliabulb1 fractal parameters
+        float juliabulb1_offset = 1.6;
+        float juliabulb1_smoothness = 8.0;
+        int juliabulb1_iterations = 4;
 
         // Julia1 fractal parameters
         float julia1_offset = 1.0;
@@ -111,12 +118,13 @@ private:
         glm::vec3 sierpinski1_vector2 = { 0.0, -1.0,  1.15470 };
         glm::vec3 sierpinski1_vector3 = { 1.0, -1.0, -0.57735 };
         glm::vec3 sierpinski1_vector4 = {-1.0, -1.0, -0.57735 };
+        int sierpinski1_iterations = 8;
 
         // Sierpinski2 fractal parameters
-        glm::vec3 sierpinski2_vector1 = { -1.0f, -1.0f, -1.0f };
-        glm::vec3 sierpinski2_vector2 = {  1.0f,  1.0f, -1.0f };
-        glm::vec3 sierpinski2_vector3 = {  1.0f, -1.0f,  1.0f };
-        glm::vec3 sierpinski2_vector4 = { -1.0f,  1.0f,  1.0f };
+        glm::vec3 sierpinski2_vector1 = {  -1.0, 0.618, 1.618 };
+        glm::vec3 sierpinski2_vector2 = { 0.618, 1.618,  -1.0 };
+        glm::vec3 sierpinski2_vector3 = { 1.618,  -1.0, 0.618 };
+        int sierpinski2_iterations = 6;
 
         // MengerSponge1 fractal parameters
         float menger_sponge1_offset1 = 1.0f;

@@ -282,6 +282,10 @@ void Gui::Stats() {
             ImGui::Text("Current fractal type: Mandelbulb fractal");
             break;
         }
+        case FractalType::Juliabulb1: {
+            ImGui::Text("Current fractal type: Juliabulb1 fractal");
+            break;
+        }
         case FractalType::Monster: {
             ImGui::Text("Current fractal type: Monster fractal");
             break;
@@ -548,6 +552,10 @@ void Gui::FractalParameters() {
             Mandelbulb();
             break;
         }
+        case FractalType::Juliabulb1: {
+            Juliabulb1();
+            break;
+        }
         case FractalType::Monster: {
 
             break;
@@ -630,8 +638,16 @@ void Gui::FractalColor() {
     }
 
     if (static_cast<ColoringType>(currentColoringType) == ColoringType::Type5) {
-        if (ImGui::ColorEdit3("Type5 color", type5_color)) {
-            fractalController->SetType5Color(glm::vec3(type5_color[0], type5_color[1], type5_color[2]));
+        if (ImGui::ColorEdit3("Type5 color1", type5_color1)) {
+            fractalController->SetType5Color1(glm::vec3(type5_color1[0], type5_color1[1], type5_color1[2]));
+        }
+
+        if (ImGui::ColorEdit3("Type5 color2", type5_color2)) {
+            fractalController->SetType5Color2(glm::vec3(type5_color2[0], type5_color2[1], type5_color2[2]));
+        }
+
+        if (ImGui::ColorEdit3("Type5 color3", type5_color3)) {
+            fractalController->SetType5Color3(glm::vec3(type5_color3[0], type5_color3[1], type5_color3[2])); 
         }
     }
 
@@ -672,6 +688,23 @@ void Gui::Mandelbulb() {
         fractalController->SetMandelbulbPower(mandelbulb_power);
     }
 
+    ImGui::End();
+}
+
+void Gui::Juliabulb1() {
+    ImGui::Begin("Juliabulb1 parameters", NULL, parametersWindowFlags); 
+    FractalColor();
+    ImGui::Separator();
+
+    if (MyDragFloat("Juliabulb1 offset", &juliabulb1_offset, 0.1, 0, 50)) {
+        fractalController->SetJuliabulb1Offset(juliabulb1_offset);
+    }
+    if (MyDragFloat("Juliabulb1 smoothness", &juliabulb1_smoothness, 0.1, 0, 45)) {
+        fractalController->SetJuliabulb1Smoothness(juliabulb1_smoothness);
+    }
+    if (MyDragInt("Juliabulb1 i", &juliabulb1_iterations, 0.1, 0, 15)) {
+        fractalController->SetJuliabulb1Iterations(juliabulb1_iterations);
+    }
     ImGui::End();
 }
 
@@ -738,7 +771,7 @@ void Gui::Julia4() {
 }
 
 void Gui::Sierpinski1() {
-    ImGui::Begin("Sierpinski1 parameters", NULL, parametersWindowFlags); 
+    ImGui::Begin("Sierpinski1 parameters", NULL, fractalParametersWindowFlags); 
     FractalColor();
     ImGui::Separator();
 
@@ -753,6 +786,9 @@ void Gui::Sierpinski1() {
     }
     if (MyDragFloat3("Sierpinski1 v4", sierpinski1_vd, 0.1, -100, 100)) {
         fractalController->SetSierpinski1Vector4(glm::vec3(sierpinski1_vd[0], sierpinski1_vd[1], sierpinski1_vd[2]));
+    }
+    if (MyDragInt("Sierpinski1 i", &sierpinski1_iterations, 0.1, 1, 15)) {
+        fractalController->SetSierpinski1Iterations(sierpinski1_iterations);
     }
     
     ImGui::End();
@@ -772,8 +808,8 @@ void Gui::Sierpinski2() {
     if (MyDragFloat3("Sierpinski2 v3", sierpinski2_vc, 0.1, -100, 100)) {
         fractalController->SetSierpinski2Vector3(glm::vec3(sierpinski2_vc[0], sierpinski2_vc[1], sierpinski2_vc[2]));
     }
-    if (MyDragFloat3("Sierpinski2 v4", sierpinski2_vd, 0.1, -100, 100)) {
-        fractalController->SetSierpinski2Vector4(glm::vec3(sierpinski2_vd[0], sierpinski2_vd[1], sierpinski2_vd[2]));
+    if (MyDragInt("Sierpinski2 i", &sierpinski2_iterations, 0.1, 0, 10)) {
+        fractalController->SetSierpinski2Iterations(sierpinski2_iterations);
     }
     
     ImGui::End();

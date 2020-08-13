@@ -12,6 +12,7 @@ enum ExportType {
 enum FractalType {
         Test,
         Mandelbulb,
+        Juliabulb1,
         Monster,
         Julia1,
         Julia2,
