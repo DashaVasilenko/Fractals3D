@@ -251,7 +251,7 @@ void Renderer::Render(int width, int height) {
 	program.SetUniform("iResolution", glm::vec2(width, height));
 	program.SetUniform("fieldOfView", fov);
 	program.SetUniform("Time", (float)glfwGetTime());
-	if (currentFractalType != FractalType::Apollonian1) {
+	if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2) {
 		program.SetUniform("shadowStrength", fractalsParameters.shadow_strength);
 	}
 
@@ -268,7 +268,7 @@ void Renderer::Render(int width, int height) {
 	//--------------------------------------------------------------------------
 
 	//-------------------------set background type------------------------------
-	if (currentFractalType != FractalType::Apollonian1) {
+	if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2) {
 		switch(fractalsParameters.background_type) {
     	    case BackgroundType::Solid: {
 				program.SetUniform("reflectedColor", fractalsParameters.background_color);
@@ -339,9 +339,10 @@ void Renderer::Render(int width, int height) {
 			break;
 		}
 	}
-	
-	program.SetUniform("shininess", fractalsParameters.shininess);
-	program.SetUniform("reflection", fractalsParameters.reflection);
+	if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2) {
+		program.SetUniform("shininess", fractalsParameters.shininess);
+		program.SetUniform("reflection", fractalsParameters.reflection);
+	}
 	//--------------------------------------------------------------------------
 
 	//-------------------------set fractal parameters---------------------------

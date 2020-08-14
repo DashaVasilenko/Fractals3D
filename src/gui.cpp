@@ -326,6 +326,10 @@ void Gui::Stats() {
             ImGui::Text("Current fractal type: Apollonian1 fractal");
             break;
         }
+        case FractalType::Apollonian2: {
+            ImGui::Text("Current fractal type: Apollonian2 fractal");
+            break;
+        }
     }
 
     ImGui::End();
@@ -343,7 +347,7 @@ void Gui::MainParameters() {
     bool flag = false;
 
     //-----------------------------Shadows-------------------------------
-    if (currentFractalType != FractalType::Apollonian1) {
+    if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2) {
         if (ImGui::Checkbox("Soft shadows", &soft_shadows)) { 
             flag = true; 
         }
@@ -399,7 +403,7 @@ void Gui::MainParameters() {
     //-------------------------------------------------------------------
 
     //---------------------Background parameters-------------------------
-    if (currentFractalType != FractalType::Apollonian1) {
+    if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2) {
         ImGui::NewLine();
         ImGui::Separator();
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + parametersSize[0]/2.0 - 80.0);
@@ -534,11 +538,11 @@ void Gui::MainParameters() {
         currentFractalType = static_cast<FractalType>(current_fractal_type);
         fractalController->SetFractalType(currentFractalType);
         flag = true;
-        if (currentFractalType == FractalType::Apollonian1 && currentCameraType == CameraType::SphericalCamera) {
+        if ( (currentFractalType == FractalType::Apollonian1 || currentFractalType == FractalType::Apollonian2) && currentCameraType == CameraType::SphericalCamera) {
             currentCameraType = CameraType::CartesianCamera;
             fractalController->SetCameraType(currentCameraType);
         }
-        else if (currentFractalType != FractalType::Apollonian1 && currentCameraType == CameraType::CartesianCamera) {
+        else if ( (currentFractalType != FractalType::Apollonian1 && currentFractalType == FractalType::Apollonian2) && currentCameraType == CameraType::CartesianCamera) {
             currentCameraType = CameraType::SphericalCamera;
             fractalController->SetCameraType(currentCameraType);
         }
@@ -611,6 +615,10 @@ void Gui::FractalParameters() {
         }
         case FractalType::Apollonian1: {
             Apollonian1();
+            break;
+        }
+        case FractalType::Apollonian2: {
+            Apollonian2();
             break;
         }
     }
@@ -692,11 +700,13 @@ void Gui::FractalColor() {
         }
     }
 
-    if (MyDragFloat("Shininess", &shininess, 1, 1, 100)) {
-        fractalController->SetFractalShininess(shininess);
-    }
-    if (MyDragFloat("Reflection", &reflection, 0.01, 0, 1)) {
-        fractalController->SetFractalReflect(reflection);
+    if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2) {
+        if (MyDragFloat("Shininess", &shininess, 1, 1, 100)) {
+            fractalController->SetFractalShininess(shininess);
+        }
+        if (MyDragFloat("Reflection", &reflection, 0.01, 0, 1)) {
+            fractalController->SetFractalReflect(reflection);
+        }
     }
 }
 
@@ -909,6 +919,24 @@ void Gui::Apollonian1() {
     if (MyDragInt("Apollonian1 i", &apollonian1_iterations, 0.1, 1, 15)) {
         fractalController->SetApollonian1Iterations(apollonian1_iterations);
     }
+    ImGui::End();
+}
+
+void Gui::Apollonian2() {
+    ImGui::Begin("Apollonian2 parameters", NULL, parametersWindowFlags); 
+    FractalColor();
+    ImGui::Separator();
+/*
+    if (MyDragFloat("Apollonian2 a1", &apollonian2_offset1, 0.1, 12, 20)) {
+        fractalController->SetApollonian2Offset1(apollonian2_offset1);
+    }
+    if (MyDragFloat("Apollonian2 a2", &apollonian2_offset2, 0.1, 0, 3)) {
+        fractalController->SetApollonian2Offset2(apollonian2_offset2);
+    }
+    if (MyDragInt("Apollonian2 i", &apollonian2_iterations, 0.1, 1, 15)) {
+        fractalController->SetApollonian2Iterations(apollonian2_iterations);
+    }
+*/
     ImGui::End();
 }
 

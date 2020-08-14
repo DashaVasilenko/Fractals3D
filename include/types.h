@@ -28,6 +28,7 @@ enum FractalType {
         MengerSponge1,
         MengerSponge2,
         Apollonian1,
+        Apollonian2,
 };
 
 // Type1 - one color without traps
