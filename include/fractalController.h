@@ -127,7 +127,8 @@ public:
     void SetMengerSponge2Iterations(int c) { renderer->fractalsParameters.menger_sponge2_iterations = c; }
 
     // Apollonian1 fractal parameters
-    void SetApollonian1Offset(float c) { renderer->fractalsParameters.apollonian1_offset = c; }
+    void SetApollonian1Offset1(float c) { renderer->fractalsParameters.apollonian1_offset1 = c; }
+    void SetApollonian1Offset2(float c) { renderer->fractalsParameters.apollonian1_offset2 = c; }
     void SetApollonian1Iterations(int c) { renderer->fractalsParameters.apollonian1_iterations = c; }
 
 private:

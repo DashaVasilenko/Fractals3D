@@ -144,7 +144,8 @@ private:
         int menger_sponge2_iterations = 5;
 
         // Apollonian1 fractal parameters
-        float apollonian1_offset = 12.0f;
+        float apollonian1_offset1 = 12.0f;
+        float apollonian1_offset2 = 1.1f;
         int apollonian1_iterations = 8;
 
         SkyBoxHDR monsterColorHDR;

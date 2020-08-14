@@ -34,7 +34,8 @@ uniform vec3 color3;
 uniform float shininess; // показатель степени зеркального отражения
 uniform float reflection; // сила отражения
 
-uniform float offset;
+uniform float offset1;
+uniform float offset2;
 uniform int iterations;
 
 //const int MAX_MARCHING_STEPS = 255;
@@ -233,7 +234,7 @@ void main() {
 
     //float time = Time*0.25;
     //float c = 1.1 + 0.5*smoothstep( -0.3, 0.3, cos(0.1*time) );
-    float c = 1.1 + 0.5*smoothstep( -0.3, 0.3, cos(0.1*offset) );
+    float c = offset2 + 0.5*smoothstep( -0.3, 0.3, cos(0.1*offset1) );
     
     // render
     vec4 col = vec4(0.0);
