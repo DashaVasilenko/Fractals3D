@@ -60,6 +60,10 @@ void ShaderProgram::Load() {
             mapSources[GL_FRAGMENT_SHADER] = "glsl/menger_sponge2_pixel.glsl";
             break;
         }
+        case FractalType::Apollonian1: {
+            mapSources[GL_FRAGMENT_SHADER] = "glsl/apollonian1_pixel.glsl";
+            break;
+        }
     }
     Init(mapSources);
     
@@ -125,7 +129,7 @@ void ShaderProgram::Load() {
             break;
         }
         case ColoringType::Type6: {
-            defines += "#define COLORING_TYPE_5" + std::string("\n");
+            defines += "#define COLORING_TYPE_6" + std::string("\n");
             break;
         }
     }

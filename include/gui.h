@@ -50,8 +50,8 @@ private:
 
     // fractal type
     FractalType currentFractalType = FractalType::Test;
-    const char* fractal_type[12] = { "Test", "Mandelbulb", "Juliabulb1", "Monster", "Julia1", "Julia2", "Julia3", "Julia4", "Sierpinski1",
-                                     "Sierpinski2", "MengerSponge1", "MengerSponge2" };
+    const char* fractal_type[13] = { "Test", "Mandelbulb", "Juliabulb1", "Monster", "Julia1", "Julia2", "Julia3", "Julia4", "Sierpinski1",
+                                     "Sierpinski2", "MengerSponge1", "MengerSponge2", "Apollonian1" };
     int current_fractal_type = 0; 
 
     // general fractal parameters
@@ -202,6 +202,7 @@ private:
     void Sierpinski2();
     void MengerSponge1();
     void MengerSponge2();
+    void Apollonian1();
 
 };
 

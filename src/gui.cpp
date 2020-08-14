@@ -322,6 +322,10 @@ void Gui::Stats() {
             ImGui::Text("Current fractal type: MengerSponge2 fractal");
             break;
         }
+        case FractalType::Apollonian1: {
+            ImGui::Text("Current fractal type: Apollonian1 fractal");
+            break;
+        }
     }
 
     ImGui::End();
@@ -339,11 +343,13 @@ void Gui::MainParameters() {
     bool flag = false;
 
     //-----------------------------Shadows-------------------------------
-    if (ImGui::Checkbox("Soft shadows", &soft_shadows)) { 
-        flag = true; 
-    }
-    if (MyDragFloat("Shadow strength", &shadow_strength, 1, 1, 128)) {
-        fractalController->SetShadowStrength(shadow_strength);
+    if (currentFractalType != FractalType::Apollonian1) {
+        if (ImGui::Checkbox("Soft shadows", &soft_shadows)) { 
+            flag = true; 
+        }
+        if (MyDragFloat("Shadow strength", &shadow_strength, 1, 1, 128)) {
+            fractalController->SetShadowStrength(shadow_strength);
+        }
     }
     //-------------------------------------------------------------------
 
@@ -393,125 +399,128 @@ void Gui::MainParameters() {
     //-------------------------------------------------------------------
 
     //---------------------Background parameters-------------------------
-    ImGui::NewLine();
-    ImGui::Separator();
-    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + parametersSize[0]/2.0 - 80.0);
-    ImGui::Text("Background parameters");
-    ImGui::Separator();
-    if (ImGui::Combo("Type", &current_background_type, background_types, IM_ARRAYSIZE(background_types))) {
-        flag = true;
-        fractalController->SetBackgroundType(static_cast<BackgroundType>(current_background_type));
-    }
+    if (currentFractalType != FractalType::Apollonian1) {
+        ImGui::NewLine();
+        ImGui::Separator();
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + parametersSize[0]/2.0 - 80.0);
+        ImGui::Text("Background parameters");
+        ImGui::Separator();
+        if (ImGui::Combo("Type", &current_background_type, background_types, IM_ARRAYSIZE(background_types))) {
+            flag = true;
+            fractalController->SetBackgroundType(static_cast<BackgroundType>(current_background_type));
+        }
 
-    // Solid background
-    if (current_background_type == 0) {
-        if (ImGui::ColorEdit3("Solid color", background_color)) {
-            fractalController->SetBackgroundColor(glm::vec3(background_color[0], background_color[1], background_color[2]));
-        }
-    }
-
-    // Solid background with sun
-    if (current_background_type == 1) {
-        if (ImGui::ColorEdit3("Solid color", background_color)) {
-            fractalController->SetBackgroundColor(glm::vec3(background_color[0], background_color[1], background_color[2]));
-        }
-        if (ImGui::ColorEdit3("Sun color", sun_color)) {
-            fractalController->SetSunColor(glm::vec3(sun_color[0], sun_color[1], sun_color[2]));
-        }
-    }
-
-    // Texture background
-    if (current_background_type == 2) {
-        if (MyDragFloat("Brightness", &background_brightness, 0.1, 0, 30)) {
-            fractalController->SetBackgroundBrightness(background_brightness);
-        }
-        if (ImGui::Combo("Texture", &current_skybox_texture, skybox_texture, IM_ARRAYSIZE(skybox_texture))) {
-            if (static_cast<SkyboxTexture>(current_skybox_texture) != SkyboxTexture::Other)
-                fractalController->SetSkyboxTexture(static_cast<SkyboxTexture>(current_skybox_texture));
-        }
-        if (static_cast<SkyboxTexture>(current_skybox_texture) == SkyboxTexture::Other) {
-            std::string text = "";
-            if (ImGui::Button("Front(+Z):")) {
-                cubemapSide = CubemapSide::Front;
-                fileBrowserSetupSkybox.Open();
+        // Solid background
+        if (current_background_type == 0) {
+            if (ImGui::ColorEdit3("Solid color", background_color)) {
+                fractalController->SetBackgroundColor(glm::vec3(background_color[0], background_color[1], background_color[2]));
             }
-            ImGui::SameLine();
-            text = skybox_roots[0] + "..." + skybox_names[0];
-            ImGui::Text("%s", text.c_str());
+        }
 
-            if (ImGui::Button("Back(-Z):")) {
-                cubemapSide = CubemapSide::Back;
-                fileBrowserSetupSkybox.Open();
+        // Solid background with sun
+        if (current_background_type == 1) {
+            if (ImGui::ColorEdit3("Solid color", background_color)) {
+                fractalController->SetBackgroundColor(glm::vec3(background_color[0], background_color[1], background_color[2]));
             }
-            ImGui::SameLine();
-            text = skybox_roots[1] + "..." + skybox_names[1];
-            ImGui::Text("%s", text.c_str());
+            if (ImGui::ColorEdit3("Sun color", sun_color)) {
+                fractalController->SetSunColor(glm::vec3(sun_color[0], sun_color[1], sun_color[2]));
+            }
+        }
+
+        // Texture background
+        if (current_background_type == 2) {
+            if (MyDragFloat("Brightness", &background_brightness, 0.1, 0, 30)) {
+                fractalController->SetBackgroundBrightness(background_brightness);
+            }
+            if (ImGui::Combo("Texture", &current_skybox_texture, skybox_texture, IM_ARRAYSIZE(skybox_texture))) {
+                if (static_cast<SkyboxTexture>(current_skybox_texture) != SkyboxTexture::Other)
+                    fractalController->SetSkyboxTexture(static_cast<SkyboxTexture>(current_skybox_texture));
+            }
+            if (static_cast<SkyboxTexture>(current_skybox_texture) == SkyboxTexture::Other) {
+                std::string text = "";
+                if (ImGui::Button("Front(+Z):")) {
+                    cubemapSide = CubemapSide::Front;
+                    fileBrowserSetupSkybox.Open();
+                }
+                ImGui::SameLine();
+                text = skybox_roots[0] + "..." + skybox_names[0];
+                ImGui::Text("%s", text.c_str());
+
+                if (ImGui::Button("Back(-Z):")) {
+                    cubemapSide = CubemapSide::Back;
+                    fileBrowserSetupSkybox.Open();
+                }
+                ImGui::SameLine();
+                text = skybox_roots[1] + "..." + skybox_names[1];
+                ImGui::Text("%s", text.c_str());
             
-            if (ImGui::Button("Up(+Y):")) {
-                cubemapSide = CubemapSide::Up;
-                fileBrowserSetupSkybox.Open();
-            }
-            ImGui::SameLine();
-            text = skybox_roots[2] + "..." + skybox_names[2];
-            ImGui::Text("%s", text.c_str());
+                if (ImGui::Button("Up(+Y):")) {
+                    cubemapSide = CubemapSide::Up;
+                    fileBrowserSetupSkybox.Open();
+                }
+                ImGui::SameLine();
+                text = skybox_roots[2] + "..." + skybox_names[2];
+                ImGui::Text("%s", text.c_str());
 
-            if (ImGui::Button("Down(-Y):")) {
-                cubemapSide = CubemapSide::Down;
-                fileBrowserSetupSkybox.Open();
-            }
-            ImGui::SameLine();
-            text = skybox_roots[3] + "..." + skybox_names[3];
-            ImGui::Text("%s", text.c_str());
+                if (ImGui::Button("Down(-Y):")) {
+                    cubemapSide = CubemapSide::Down;
+                    fileBrowserSetupSkybox.Open();
+                }
+                ImGui::SameLine();
+                text = skybox_roots[3] + "..." + skybox_names[3];
+                ImGui::Text("%s", text.c_str());
 
-            if (ImGui::Button("Left(-X):")) {
-                cubemapSide = CubemapSide::Left;
-                fileBrowserSetupSkybox.Open();
-            }
-            ImGui::SameLine();
-            text = skybox_roots[4] + "..." + skybox_names[4];
-            ImGui::Text("%s", text.c_str());
+                if (ImGui::Button("Left(-X):")) {
+                    cubemapSide = CubemapSide::Left;
+                    fileBrowserSetupSkybox.Open();
+                }
+                ImGui::SameLine();
+                text = skybox_roots[4] + "..." + skybox_names[4];
+                ImGui::Text("%s", text.c_str());
 
-            if (ImGui::Button("Right(+X):")) {
-                cubemapSide = CubemapSide::Right;
-                fileBrowserSetupSkybox.Open();
-            }
-            ImGui::SameLine();
-            text = skybox_roots[5] + "..." + skybox_names[5];
-            ImGui::Text("%s", text.c_str());
+                if (ImGui::Button("Right(+X):")) {
+                    cubemapSide = CubemapSide::Right;
+                    fileBrowserSetupSkybox.Open();
+                }
+                ImGui::SameLine();
+                text = skybox_roots[5] + "..." + skybox_names[5];
+                ImGui::Text("%s", text.c_str());
 
-            if (ImGui::Button("Use")) {
-                fractalController->SetSkyboxTexture(skybox_paths);
-            }   
-        }  
-    }
-
-    // HDR Texture background
-    if (current_background_type == 3) {
-        if (MyDragFloat("Brightness", &background_brightness, 0.1, 0, 30)) {
-            fractalController->SetBackgroundBrightness(background_brightness);
+                if (ImGui::Button("Use")) {
+                    fractalController->SetSkyboxTexture(skybox_paths);
+                }   
+            }  
         }
-        if (ImGui::Combo("HDR Texture", &current_skybox_texture_hdr, skybox_texture_hdr, IM_ARRAYSIZE(skybox_texture_hdr))) {
-            if (static_cast<SkyboxTextureHDR>(current_skybox_texture_hdr) != SkyboxTextureHDR::OtherHDR)
-                fractalController->SetSkyboxTextureHDR(static_cast<SkyboxTextureHDR>(current_skybox_texture_hdr));
-        }
-        if (ImGui::Checkbox("Use irradiance cubemap", &irradiance_cubemap)) { 
-            fractalController->SetIrradianceMap(irradiance_cubemap);
-            flag = true; 
-        }
+    
 
-        if (static_cast<SkyboxTextureHDR>(current_skybox_texture_hdr) == SkyboxTextureHDR::OtherHDR) {
-            if (ImGui::Button("File name:")) {
-                fileBrowserSetupSkyboxHDR.Open();
+        // HDR Texture background
+        if (current_background_type == 3) {
+            if (MyDragFloat("Brightness", &background_brightness, 0.1, 0, 30)) {
+                fractalController->SetBackgroundBrightness(background_brightness);
             }
-            ImGui::SameLine();
-            std::string t = skybox_hdr_root + "..." + skybox_hdr_name;
-            ImGui::Text("%s", t.c_str());
-
-            if (ImGui::Button("Use")) {
-                fractalController->SetSkyboxTextureHDR(skybox_hdr_path);
+            if (ImGui::Combo("HDR Texture", &current_skybox_texture_hdr, skybox_texture_hdr, IM_ARRAYSIZE(skybox_texture_hdr))) {
+                if (static_cast<SkyboxTextureHDR>(current_skybox_texture_hdr) != SkyboxTextureHDR::OtherHDR)
+                    fractalController->SetSkyboxTextureHDR(static_cast<SkyboxTextureHDR>(current_skybox_texture_hdr));
             }
-        }
+            if (ImGui::Checkbox("Use irradiance cubemap", &irradiance_cubemap)) { 
+                fractalController->SetIrradianceMap(irradiance_cubemap);
+                flag = true; 
+            }
 
+            if (static_cast<SkyboxTextureHDR>(current_skybox_texture_hdr) == SkyboxTextureHDR::OtherHDR) {
+                if (ImGui::Button("File name:")) {
+                    fileBrowserSetupSkyboxHDR.Open();
+                }
+                ImGui::SameLine();
+                std::string t = skybox_hdr_root + "..." + skybox_hdr_name;
+                ImGui::Text("%s", t.c_str());
+
+                if (ImGui::Button("Use")) {
+                    fractalController->SetSkyboxTextureHDR(skybox_hdr_path);
+                }
+            }
+
+        }
     }
     //-------------------------------------------------------------------
 
@@ -590,6 +599,10 @@ void Gui::FractalParameters() {
         }
         case FractalType::MengerSponge2: {
             MengerSponge2();
+            break;
+        }
+        case FractalType::Apollonian1: {
+            Apollonian1();
             break;
         }
     }
@@ -857,6 +870,25 @@ void Gui::MengerSponge2() {
         fractalController->SetMengerSponge2Iterations(menger_sponge2_iterations);
     }
 
+    ImGui::End();
+}
+
+void Gui::Apollonian1() {
+    ImGui::Begin("Apollonian1 parameters", NULL, parametersWindowFlags); 
+    FractalColor();
+    ImGui::Separator();
+
+/*
+    if (MyDragInt("Iterations", &Apollonian1_iterations, 0.1, 1, 15)) {
+        fractalController->SetApollonian1Iterations(Apollonian1_iterations);
+    }
+    if (MyDragFloat("Bailout", &Apollonian1_bailout, 0.1, 1, 30)) {
+        fractalController->SetApollonian1Bailout(Apollonian1_bailout);
+    }
+    if (MyDragFloat("Power", &Apollonian1_power, 0.1, 1, 30)) {
+        fractalController->SetApollonian1Power(Apollonian1_power);
+    }
+*/
     ImGui::End();
 }
 

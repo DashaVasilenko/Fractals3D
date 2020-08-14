@@ -251,7 +251,9 @@ void Renderer::Render(int width, int height) {
 	program.SetUniform("iResolution", glm::vec2(width, height));
 	program.SetUniform("fieldOfView", fov);
 	program.SetUniform("Time", (float)glfwGetTime());
-	program.SetUniform("shadowStrength", fractalsParameters.shadow_strength);
+	if (currentFractalType != FractalType::Apollonian1) {
+		program.SetUniform("shadowStrength", fractalsParameters.shadow_strength);
+	}
 
 	program.SetUniform("lightDirection1", fractalsParameters.lightDirection1);
 	program.SetUniform("lightColor1", fractalsParameters.lightColor1);
@@ -266,35 +268,37 @@ void Renderer::Render(int width, int height) {
 	//--------------------------------------------------------------------------
 
 	//-------------------------set background type------------------------------
-	switch(fractalsParameters.background_type) {
-        case BackgroundType::Solid: {
-			program.SetUniform("reflectedColor", fractalsParameters.background_color);
-            break;
-        }
-		case BackgroundType::SolidWithSun: {
-			program.SetUniform("reflectedColor", fractalsParameters.background_color);
-			program.SetUniform("sunColor", fractalsParameters.sun_color);
-            break;
-        }
-        case BackgroundType::Skybox: {
-			program.SetUniform("backgroundBrightness", fractalsParameters.background_brightness);
-			GLCall(glActiveTexture(GL_TEXTURE0));
-			GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, skyBox.GetDescriptor()));
-            break;
-        }
-		case BackgroundType::SkyboxHDR: {
-			program.SetUniform("backgroundBrightness", fractalsParameters.background_brightness);
-			GLCall(glActiveTexture(GL_TEXTURE0));
-			GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxHDR.GetCubemap()));
-			//if (fractalsParameters.irradianceCubemap) {
-			//	program.SetUniform("irradianceMap", 1);
-				GLCall(glActiveTexture(GL_TEXTURE1));
-				GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxHDR.GetIrradiance()));
-			//}
-			//std::cout << "vre" << std::endl;
-            break;
-        }
-    }
+	if (currentFractalType != FractalType::Apollonian1) {
+		switch(fractalsParameters.background_type) {
+    	    case BackgroundType::Solid: {
+				program.SetUniform("reflectedColor", fractalsParameters.background_color);
+    	        break;
+    	    }
+			case BackgroundType::SolidWithSun: {
+				program.SetUniform("reflectedColor", fractalsParameters.background_color);
+				program.SetUniform("sunColor", fractalsParameters.sun_color);
+    	        break;
+    	    }
+    	    case BackgroundType::Skybox: {
+				program.SetUniform("backgroundBrightness", fractalsParameters.background_brightness);
+				GLCall(glActiveTexture(GL_TEXTURE0));
+				GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, skyBox.GetDescriptor()));
+    	        break;
+    	    }
+			case BackgroundType::SkyboxHDR: {
+				program.SetUniform("backgroundBrightness", fractalsParameters.background_brightness);
+				GLCall(glActiveTexture(GL_TEXTURE0));
+				GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxHDR.GetCubemap()));
+				//if (fractalsParameters.irradianceCubemap) {
+				//	program.SetUniform("irradianceMap", 1);
+					GLCall(glActiveTexture(GL_TEXTURE1));
+					GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxHDR.GetIrradiance()));
+				//}
+				//std::cout << "vre" << std::endl;
+    	        break;
+    	    }
+    	}
+	}
 	//--------------------------------------------------------------------------
 	
 	//-----------------------set color fractal parameters-----------------------

@@ -293,16 +293,13 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp ) {
         albedo *= 0.5;
     #endif
     #ifdef COLORING_TYPE_3
-        //vec3 albedo = 0.5 + 0.5*sin(trap.y*4.0 + 4.0 + color + outNormal*0.2).xzy;
-        //vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.z + color);
         vec3 albedo = vec3(color.x+color.x*cos(color.x+coef*trap.w),
                            color.y+color.y*cos(color.y+coef*trap.w),
                            color.z+color.z*cos(color.z+coef*trap.w) );
     #endif
     #ifdef COLORING_TYPE_4
-        vec3 albedo = color;
-        albedo *= 0.1;
-        albedo.x = 1.0-10.0*trap.x; 
+        //vec3 albedo = 0.5 + 0.5*sin(trap.y*4.0 + 4.0 + color + outNormal*0.2).xzy;
+        vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.z + color); 
     #endif
     #ifdef COLORING_TYPE_5
         vec3 albedo = vec3(0.0);
