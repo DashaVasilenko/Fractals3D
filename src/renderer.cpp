@@ -418,6 +418,11 @@ void Renderer::Render(int width, int height) {
 			program.SetUniform("iterations", fractalsParameters.menger_sponge2_iterations);
 			break;
 		}
+		case FractalType::Apollonian1: {
+			program.SetUniform("offset", fractalsParameters.apollonian1_offset);
+			program.SetUniform("iterations", fractalsParameters.apollonian1_iterations);
+			break;
+		}
 
     }
 	//--------------------------------------------------------------------------

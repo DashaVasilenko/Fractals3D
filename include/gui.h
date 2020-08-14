@@ -137,6 +137,10 @@ private:
     float menger_sponge2_offset2 = 1.0;
     int menger_sponge2_iterations = 5;
 
+    // Apollonian1 fractal parameters
+    float apollonian1_offset = 12.0;
+    int apollonian1_iterations = 8;
+
 
 
     

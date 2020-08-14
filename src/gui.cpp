@@ -892,17 +892,12 @@ void Gui::Apollonian1() {
     FractalColor();
     ImGui::Separator();
 
-/*
-    if (MyDragInt("Iterations", &Apollonian1_iterations, 0.1, 1, 15)) {
-        fractalController->SetApollonian1Iterations(Apollonian1_iterations);
+    if (MyDragFloat("Apollonian1 offset", &apollonian1_offset, 0.1, 12, 20)) {
+        fractalController->SetApollonian1Offset(apollonian1_offset);
     }
-    if (MyDragFloat("Bailout", &Apollonian1_bailout, 0.1, 1, 30)) {
-        fractalController->SetApollonian1Bailout(Apollonian1_bailout);
+    if (MyDragInt("Apollonian1 i", &apollonian1_iterations, 0.1, 1, 15)) {
+        fractalController->SetApollonian1Iterations(apollonian1_iterations);
     }
-    if (MyDragFloat("Power", &Apollonian1_power, 0.1, 1, 30)) {
-        fractalController->SetApollonian1Power(Apollonian1_power);
-    }
-*/
     ImGui::End();
 }
 
