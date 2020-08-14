@@ -48,7 +48,7 @@ uniform vec3 color;
 uniform float coef;
 #endif
 
-#if defined COLORING_TYPE_2 || defined COLORING_TYPE_5
+#if defined COLORING_TYPE_2 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
 uniform vec3 color1;
 uniform vec3 color2;
 uniform vec3 color3;
@@ -91,7 +91,7 @@ float mandelbulb(vec3 pos, out vec4 resColor) {
 	float r = 0.0;
     float m = dot(point, point);
 
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
     vec4 trap = vec4(abs(point), m);
 #endif
 
@@ -117,7 +117,7 @@ float mandelbulb(vec3 pos, out vec4 resColor) {
 		point = pos + zr*vec3(sin(theta)*cos(phi), sin(phi)*sin(theta), cos(theta));
 
         m = dot(point, point);
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
         trap = min(trap, vec4(abs(point),m));  // trapping Oxz, Oyz, Oxy, (0,0,0)
     #endif
 
@@ -126,7 +126,7 @@ float mandelbulb(vec3 pos, out vec4 resColor) {
     #endif
     }
 
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
     resColor = vec4(m, trap.yzw);
 #endif
 
@@ -290,6 +290,11 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
     #endif   
     #ifdef COLORING_TYPE_6
         vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.x + color);
+    #endif
+    #ifdef COLORING_TYPE_7
+        vec3 albedo = color1;
+        albedo = mix(albedo, color2, clamp(6.0*trap.y, 0.0, 1.0));
+        albedo = mix(albedo, color3, pow(clamp(1.0 - 2.0*trap.z, 0.0, 1.0), 8.0));
     #endif
         
     #ifdef FLAG_SOFT_SHADOWS

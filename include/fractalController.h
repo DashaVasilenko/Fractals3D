@@ -43,7 +43,9 @@ public:
     void SetType5Color2(const glm::vec3& c) { renderer->fractalsParameters.type5_color2 = c; }
     void SetType5Color3(const glm::vec3& c) { renderer->fractalsParameters.type5_color3 = c; }
     void SetType6Color(const glm::vec3& c) { renderer->fractalsParameters.type6_color = c; }
-
+    void SetType7Color1(const glm::vec3& c) { renderer->fractalsParameters.type7_color1 = c; }
+    void SetType7Color2(const glm::vec3& c) { renderer->fractalsParameters.type7_color2 = c; }
+    void SetType7Color3(const glm::vec3& c) { renderer->fractalsParameters.type7_color3 = c; }
 
 
     // General fractal parameters

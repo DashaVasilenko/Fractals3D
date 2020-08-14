@@ -39,6 +39,7 @@ enum ColoringType {
         Type4, 
         Type5,
         Type6,
+        Type7,
 };
 
 enum CubemapSide {

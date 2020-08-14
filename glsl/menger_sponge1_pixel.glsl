@@ -44,7 +44,7 @@ uniform vec3 color;
 uniform float coef;
 #endif
 
-#if defined COLORING_TYPE_2 || defined COLORING_TYPE_5
+#if defined COLORING_TYPE_2 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
 uniform vec3 color1;
 uniform vec3 color2;
 uniform vec3 color3;
@@ -96,7 +96,7 @@ float mengerSponge(vec3 pos, out vec4 trapColor) {
 	
     float s = 1.0;
 
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
     vec4 trap = vec4(abs(pos), dot(pos, pos));
 #endif
 
@@ -116,7 +116,7 @@ float mengerSponge(vec3 pos, out vec4 trapColor) {
         float dc = max(r.z, r.x);
         float c = (min(da, min(db, dc)) - 1.0)/s;
 
-    #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
+    #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
         trap = min(trap, vec4(abs(pos), dot(pos, pos)));  // trapping Oxz, Oyz, Oxy, (0,0,0)
     #endif
  
@@ -131,7 +131,7 @@ float mengerSponge(vec3 pos, out vec4 trapColor) {
 
     }
 
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
     trapColor = trap;
 #endif
 
@@ -310,6 +310,11 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp ) {
     #endif 
     #ifdef COLORING_TYPE_6
         vec3 albedo = color + color*cos(6.2831*trap.z);
+    #endif
+    #ifdef COLORING_TYPE_7
+        vec3 albedo = color1;
+        albedo = mix(albedo, color2, clamp(6.0*trap.y, 0.0, 1.0));
+        albedo = mix(albedo, color3, pow(clamp(1.0 - 2.0*trap.z, 0.0, 1.0), 8.0));
     #endif
         		
         //float occlusion = occlusion(point, outNormal);

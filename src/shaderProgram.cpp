@@ -132,6 +132,10 @@ void ShaderProgram::Load() {
             defines += "#define COLORING_TYPE_6" + std::string("\n");
             break;
         }
+        case ColoringType::Type7: {
+            defines += "#define COLORING_TYPE_7" + std::string("\n");
+            break;
+        }
     }
     
     Compile();

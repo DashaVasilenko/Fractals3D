@@ -641,7 +641,7 @@ void Gui::FractalColor() {
         }
         if (MyDragFloat("Type3 a", &type3_coef, 0.1, -10.0, 10.0)) {
             fractalController->SetType3Coef(type3_coef);
-    }
+        }
     }
 
     if (static_cast<ColoringType>(currentColoringType) == ColoringType::Type4) {
@@ -667,6 +667,20 @@ void Gui::FractalColor() {
     if (static_cast<ColoringType>(currentColoringType) == ColoringType::Type6) {
         if (ImGui::ColorEdit3("Type6 color", type6_color)) {
             fractalController->SetType6Color(glm::vec3(type6_color[0], type6_color[1], type6_color[2]));
+        }
+    }
+
+    if (static_cast<ColoringType>(currentColoringType) == ColoringType::Type7) {
+        if (ImGui::ColorEdit3("Type7 color1", type7_color1)) {
+            fractalController->SetType7Color1(glm::vec3(type7_color1[0], type7_color1[1], type7_color1[2]));
+        }
+
+        if (ImGui::ColorEdit3("Type7 color2", type7_color2)) {
+            fractalController->SetType7Color2(glm::vec3(type7_color2[0], type7_color2[1], type7_color2[2]));
+        }
+
+        if (ImGui::ColorEdit3("Type7 color3", type7_color3)) {
+            fractalController->SetType7Color3(glm::vec3(type7_color3[0], type7_color3[1], type7_color3[2])); 
         }
     }
 

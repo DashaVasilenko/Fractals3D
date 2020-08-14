@@ -44,7 +44,7 @@ uniform vec3 color;
 uniform float coef;
 #endif
 
-#if defined COLORING_TYPE_2 || defined COLORING_TYPE_5
+#if defined COLORING_TYPE_2 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
 uniform vec3 color1;
 uniform vec3 color2;
 uniform vec3 color3;
@@ -91,7 +91,7 @@ float juliabulb(vec3 pos, vec4 c, out vec4 trapColor) {
     //vec4 trap = vec4(abs(z), m);
 	float dz = 1.0;
     
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
     vec4 trap = vec4(abs(z.xyz), dot(z, z));
 #endif
 
@@ -107,7 +107,7 @@ float juliabulb(vec3 pos, vec4 c, out vec4 trapColor) {
         float a = 8.0*atan( z.x, z.z );
         z = c.xyz + pow(r,8.0) * vec3( sin(b)*sin(a), cos(b), sin(b)*cos(a) );
         
-    #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
+    #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
         trap = min(trap, vec4(abs(z.xyz), dot(z, z)));  // trapping Oxz, Oyz, Oxy, (0,0,0)
     #endif
 
@@ -121,7 +121,7 @@ float juliabulb(vec3 pos, vec4 c, out vec4 trapColor) {
 
     }
 
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5
+#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
     trapColor = trap;
 #endif
 
@@ -298,6 +298,11 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
         albedo = mix(albedo, color, clamp(trap.y*trap.y, 0.0, 1.0));
 	 	albedo = mix(albedo, vec3(0.5, 1.0, 0.5), clamp(trap.x*trap.x, 0.0, 1.0));
         //vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.x + color);
+    #endif
+    #ifdef COLORING_TYPE_7
+        vec3 albedo = color1;
+        albedo = mix(albedo, color2, clamp(6.0*trap.y, 0.0, 1.0));
+        albedo = mix(albedo, color3, pow(clamp(1.0 - 2.0*trap.z, 0.0, 1.0), 8.0));
     #endif
 
 		//float occlusion = clamp(2.5*trap.w - 0.15, 0.0, 1.0);

@@ -81,6 +81,9 @@ private:
         glm::vec3 type5_color2 = { 0.0, 1.0, 0.0 };
         glm::vec3 type5_color3 = { 0.0, 0.0, 1.0 };
         glm::vec3 type6_color = { 1.0, 0.8, 0.7 };
+        glm::vec3 type7_color1 = { 1.0,  1.0, 1.0 };
+        glm::vec3 type7_color2 = { 1.0, 0.80, 0.2 };
+        glm::vec3 type7_color3 = { 1.0, 0.55, 0.0 };
 
 
         // Test fractal parameters
