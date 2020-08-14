@@ -133,6 +133,11 @@ public:
     void SetApollonian1Offset2(float c) { renderer->fractalsParameters.apollonian1_offset2 = c; }
     void SetApollonian1Iterations(int c) { renderer->fractalsParameters.apollonian1_iterations = c; }
 
+    // Apollonian2 fractal parameters
+    void SetApollonian2Offset1(float c) { renderer->fractalsParameters.apollonian2_offset1 = c; }
+    void SetApollonian2Offset2(float c) { renderer->fractalsParameters.apollonian2_offset2 = c; }
+    void SetApollonian2Iterations(int c) { renderer->fractalsParameters.apollonian2_iterations = c; }
+
 private:
     Renderer* renderer;
     ShaderProgram* program;

@@ -926,17 +926,16 @@ void Gui::Apollonian2() {
     ImGui::Begin("Apollonian2 parameters", NULL, parametersWindowFlags); 
     FractalColor();
     ImGui::Separator();
-/*
+
     if (MyDragFloat("Apollonian2 a1", &apollonian2_offset1, 0.1, 12, 20)) {
         fractalController->SetApollonian2Offset1(apollonian2_offset1);
     }
-    if (MyDragFloat("Apollonian2 a2", &apollonian2_offset2, 0.1, 0, 3)) {
+    if (MyDragFloat("Apollonian2 a2", &apollonian2_offset2, 0.05, 0, 3)) {
         fractalController->SetApollonian2Offset2(apollonian2_offset2);
     }
     if (MyDragInt("Apollonian2 i", &apollonian2_iterations, 0.1, 1, 15)) {
         fractalController->SetApollonian2Iterations(apollonian2_iterations);
     }
-*/
     ImGui::End();
 }
 

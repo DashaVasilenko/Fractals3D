@@ -34,9 +34,9 @@ uniform vec3 color3;
 //uniform float shininess; // показатель степени зеркального отражения
 //uniform float reflection; // сила отражения
 
-//uniform float offset1;
-//uniform float offset2;
-//uniform int iterations;
+uniform float offset1;
+uniform float offset2;
+uniform int iterations;
 
 //const int MAX_MARCHING_STEPS = 255;
 const int MAX_MARCHING_STEPS = 256;
@@ -65,8 +65,8 @@ float apollonian(vec3 pos, float s, out vec4 trapColor) {
     vec2  trap = vec2(1e10);
 #endif
 	
-    //for (int i = 0; i < iterations; i++) {
-    for (int i = 0; i < 6; i++ ) {
+    //for (int i = 0; i < 6; i++ ) {
+    for (int i = 0; i < iterations; i++) {
         pos = -1.0 + 2.0*fract(0.5*pos + 0.5);
         pos -= sign(pos)*0.04; // trick
         float r2 = dot(pos, pos);
@@ -81,7 +81,8 @@ float apollonian(vec3 pos, float s, out vec4 trapColor) {
         trap = min(trap, vec2(r2, abs(pos.x))); // orbit trapping ( |z|² and z_x  )
     #endif
         
-        float k = 0.95/r2;
+        //float k = 0.95/r2;
+        float k = s/r2;
 		pos *= k;
 		scale *= k;
 	}
@@ -270,9 +271,9 @@ void main() {
     vec3 eye = viewMatrix[3].xyz;
     vec2  sp = (2.0*pixelCoord-iResolution.xy) / iResolution.y;
 
-    float time = Time*0.25;
-    float c = 1.1 + 0.5*smoothstep( -0.3, 0.3, cos(0.1*time) );
-    //float c = offset2 + 0.5*smoothstep( -0.3, 0.3, cos(0.1*offset1) );
+    //float time = Time*0.25;
+    //float c = 1.1 + 0.5*smoothstep( -0.3, 0.3, cos(0.1*time) );
+    float c = offset2 + 0.5*smoothstep( -0.3, 0.3, cos(0.1*offset1) );
     
     // render
     vec4 col = vec4(0.0);

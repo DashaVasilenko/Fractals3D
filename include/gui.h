@@ -142,6 +142,11 @@ private:
     float apollonian1_offset2 = 1.1;
     int apollonian1_iterations = 8;
 
+    // Apollonian2 fractal parameters
+    float apollonian2_offset1 = 12.0;
+    float apollonian2_offset2 = 1.1;
+    int apollonian2_iterations = 6;
+
 
 
     

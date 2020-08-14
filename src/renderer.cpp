@@ -425,6 +425,12 @@ void Renderer::Render(int width, int height) {
 			program.SetUniform("iterations", fractalsParameters.apollonian1_iterations);
 			break;
 		}
+		case FractalType::Apollonian2: {
+			program.SetUniform("offset1", fractalsParameters.apollonian2_offset1);
+			program.SetUniform("offset2", fractalsParameters.apollonian2_offset2);
+			program.SetUniform("iterations", fractalsParameters.apollonian2_iterations);
+			break;
+		}
 
     }
 	//--------------------------------------------------------------------------
