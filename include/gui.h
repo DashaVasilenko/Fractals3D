@@ -182,6 +182,7 @@ private:
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     bool show_demo_window = true; // потом надо удалить
     bool show_another_window = false; // потом надо удалить
+    CameraType currentCameraType = CameraType::SphericalCamera;
 
     FractalController* fractalController;
     Window* window;

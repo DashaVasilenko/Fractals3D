@@ -14,6 +14,7 @@ public:
     void SetHeight(int height) { this->height = height; }
     void SetActiveCamera(Camera* camera) { this->camera = camera; }
     void SetFractalType(FractalType fractalType) { this->currentFractalType = fractalType; }
+    void SetCameraType(CameraType t) { camera->SetCameraType(t); }
 
     FrameBuffer* GetFBO() { return &FBO; }
     Camera* GetCamera() { return camera; }

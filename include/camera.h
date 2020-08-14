@@ -6,6 +6,8 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "types.h"
+
 class Camera {
 public:
     Camera(const glm::vec3& = glm::vec3(0.0f, 0.0f, 3.0f) );
@@ -13,8 +15,11 @@ public:
     glm::mat4 GetViewMatrix();
     float GetFieldOfView() { return fieldOfView; }
     void SetDeltaTime(float t) { deltaTime = t; }
+    void SetCameraType(CameraType t);
 
 private:
+    CameraType currentCameraType = CameraType::SphericalCamera;
+
     void UpdatePosition(const float&);
     void UpdateVectors(const float&);
 

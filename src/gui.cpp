@@ -534,6 +534,14 @@ void Gui::MainParameters() {
         currentFractalType = static_cast<FractalType>(current_fractal_type);
         fractalController->SetFractalType(currentFractalType);
         flag = true;
+        if (currentFractalType == FractalType::Apollonian1 && currentCameraType == CameraType::SphericalCamera) {
+            currentCameraType = CameraType::CartesianCamera;
+            fractalController->SetCameraType(currentCameraType);
+        }
+        else if (currentFractalType != FractalType::Apollonian1 && currentCameraType == CameraType::CartesianCamera) {
+            currentCameraType = CameraType::SphericalCamera;
+            fractalController->SetCameraType(currentCameraType);
+        }
     }
     //-------------------------------------------------------------------
     

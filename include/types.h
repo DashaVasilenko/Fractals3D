@@ -1,6 +1,11 @@
 #ifndef __TYPES__
 #define __TYPES__
 
+enum CameraType {
+        CartesianCamera,
+        SphericalCamera,
+};
+
 enum ExportType {
         Png,
         Bmp,
