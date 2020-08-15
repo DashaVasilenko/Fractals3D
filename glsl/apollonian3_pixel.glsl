@@ -36,6 +36,7 @@ uniform vec3 color3;
 
 uniform float offset1;
 uniform float offset2;
+uniform float offset3;
 uniform int iterations;
 
 //const int MAX_MARCHING_STEPS = 255;
@@ -52,33 +53,12 @@ const float EPSILON = 0.001; //0.0005;
              
 //-------------------------------------------------------------------------------------------------------
 // Compute Apollonian/kleinian fractal
-// https://www.shadertoy.com/view/llKXzh
+// https://www.shadertoy.com/view/ldjGDw
 float apollonian(vec3 pos, float s, out vec4 trapColor) {
-    /*
     float scale = 1.0;
-	float add = sin(iTime)*.2+.1;
-
-	for( int i=0; i < 9;i++ )
-	{
-		p = 2.0*clamp(p, -CSize, CSize) - p;
-		float r2 = dot(p,p);
-		float k = max((1.15)/r2, 1.);
-		p     *= k;
-		scale *= k;
-	}
-	float l = length(p.xy);
-	float rxy = l - 4.0;
-	float n = l * p.z;
-	rxy = max(rxy, -(n) / (length(p))-.07+sin(iTime*2.0+p.x+p.y+23.5*p.z)*.02);
-    float x = (1.+sin(iTime*2.));x =x*x*x*x*.5;
-    float h = dot(sin(p*.013),(cos(p.zxy*.191)))*x;
-	return ((rxy+h) / abs(scale));
-    */
-
-        float scale = 1.0;
-        float add = sin(Time)*0.2 + 0.1;
-        vec3 CSize = vec3(.808, .8, 1.137);
-
+    //float add = sin(Time)*0.2 + 0.1;
+    float add = sin(offset3)*0.2 + 0.1;
+    vec3 CSize = vec3(0.808, 0.8, 1.137);
 
 #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
     //vec4 trap = vec4(abs(pos), dot(pos, pos));
@@ -89,21 +69,10 @@ float apollonian(vec3 pos, float s, out vec4 trapColor) {
     vec2  trap = vec2(1e10);
 #endif
 	
-    //for (int i = 0; i < 6; i++ ) {
     for (int i = 0; i < iterations; i++) {
-        //pos = -1.0 + 2.0*fract(0.5*pos + 0.5);
-        //pos -= sign(pos)*0.04; // trick
         pos = 2.0*clamp(pos, -CSize, CSize) - pos;
         float r2 = dot(pos, pos);
 
-        //trap = min(trap, r2); trap - float
-/*
-        p = 2.0*clamp(p, -CSize, CSize) - p;
-		float r2 = dot(p,p);
-		float k = max((1.15)/r2, 1.);
-		p     *= k;
-		scale *= k;
-*/
     #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
         trap = min(trap, vec4(abs(pos), r2));  // trapping Oxz, Oyz, Oxy, (0,0,0)
     #endif
@@ -112,8 +81,6 @@ float apollonian(vec3 pos, float s, out vec4 trapColor) {
         trap = min(trap, vec2(r2, abs(pos.x))); // orbit trapping ( |z|² and z_x  )
     #endif
         
-        //float k = 0.95/r2;
-        //float k = s/r2;
         float k = max(s/r2, 1.0);
 		pos *= k;
 		scale *= k;
@@ -121,19 +88,13 @@ float apollonian(vec3 pos, float s, out vec4 trapColor) {
 
     float l = length(pos.xy);
 	float rxy = l - 4.0;
-	float n = l * pos.z;
-	rxy = max(rxy, -(n) / (length(pos))-.07+sin(Time*2.0+pos.x+pos.y+23.5*pos.z)*.02);
-    float x = (1.+sin(Time*2.)); x =x*x*x*x*.5;
-    float h = dot(sin(pos*.013),(cos(pos.zxy*.191)))*x;
-
-    //float d1 = sqrt( min( min( dot(pos.xy, pos.xy), dot(pos.yz, pos.yz) ), dot(pos.zx, pos.zx) ) ) - 0.02;
-    //float d2 = abs(pos.y);
-    //float dmi = d2;
-    //float adr = 0.7*floor((0.5*pos.y + 0.5)*8.0);
-    //if (d1 < d2) {
-    //    dmi = d1;
-    //    adr = 0.0;
-    //}
+	float n = l*pos.z;
+	//rxy = max(rxy, -n/(length(pos)) - 0.07 + sin(Time*2.0 + pos.x + pos.y + 23.5*pos.z)*0.02);
+    //float x = (1.0 + sin(Time*2.0)); 
+    rxy = max(rxy, -n/(length(pos)) - 0.07 + sin(offset3*2.0 + pos.x + pos.y + 23.5*pos.z)*0.02);
+    float x = (1.0 + sin(offset3*2.0));
+    x =x*x*x*x*0.5;
+    float h = dot(sin(pos*0.013), (cos(pos.zxy*0.191)))*x;
 
  #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
     trapColor = trap;
@@ -143,66 +104,7 @@ float apollonian(vec3 pos, float s, out vec4 trapColor) {
     trapColor = vec4(trap, adr, 1.0);
 #endif
 
-    return ((rxy+h) / abs(scale));
-    //return 0.5*dmi/scale;
-    //return vec3( 0.5*dmi/scale, adr, orb );
-
-
-
-/*
-    float scale = 1.0;
-
-#if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
-    //vec4 trap = vec4(abs(pos), dot(pos, pos));
-    vec4 trap = vec4(1000.0);
-#endif
-
-#if defined COLORING_TYPE_3 || defined COLORING_TYPE_6
-    vec2  trap = vec2(1e10);
-#endif
-	
-    //for (int i = 0; i < 6; i++ ) {
-    for (int i = 0; i < iterations; i++) {
-        pos = -1.0 + 2.0*fract(0.5*pos + 0.5);
-        pos -= sign(pos)*0.04; // trick
-        float r2 = dot(pos, pos);
-
-        //trap = min(trap, r2); trap - float
-
-    #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
-        trap = min(trap, vec4(abs(pos), r2));  // trapping Oxz, Oyz, Oxy, (0,0,0)
-    #endif
- 
-    #if defined COLORING_TYPE_3 || defined COLORING_TYPE_6
-        trap = min(trap, vec2(r2, abs(pos.x))); // orbit trapping ( |z|² and z_x  )
-    #endif
-        
-        //float k = 0.95/r2;
-        float k = s/r2;
-		pos *= k;
-		scale *= k;
-	}
-
-    float d1 = sqrt( min( min( dot(pos.xy, pos.xy), dot(pos.yz, pos.yz) ), dot(pos.zx, pos.zx) ) ) - 0.02;
-    float d2 = abs(pos.y);
-    float dmi = d2;
-    float adr = 0.7*floor((0.5*pos.y + 0.5)*8.0);
-    if (d1 < d2) {
-        dmi = d1;
-        adr = 0.0;
-    }
-
- #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
-    trapColor = trap;
-#endif
-
-#if defined COLORING_TYPE_3 || defined COLORING_TYPE_6
-    trapColor = vec4(trap, adr, 1.0);
-#endif
-
-    return 0.5*dmi/scale;
-    //return vec3( 0.5*dmi/scale, adr, orb );
-*/
+    return ((rxy + h)/abs(scale));
 }
 
 //-------------------------------------------------------------------------------------------------------

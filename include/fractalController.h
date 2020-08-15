@@ -141,6 +141,7 @@ public:
     // Apollonian3 fractal parameters
     void SetApollonian3Offset1(float c) { renderer->fractalsParameters.apollonian3_offset1 = c; }
     void SetApollonian3Offset2(float c) { renderer->fractalsParameters.apollonian3_offset2 = c; }
+    void SetApollonian3Offset3(float c) { renderer->fractalsParameters.apollonian3_offset3 = c; }
     void SetApollonian3Iterations(int c) { renderer->fractalsParameters.apollonian3_iterations = c; }
 
 private:

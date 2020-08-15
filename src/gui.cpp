@@ -978,6 +978,9 @@ void Gui::Apollonian3() {
     if (MyDragFloat("Apollonian3 a2", &apollonian3_offset2, 0.05, 0, 3)) {
         fractalController->SetApollonian3Offset2(apollonian3_offset2);
     }
+    if (MyDragFloat("Apollonian3 a3", &apollonian3_offset3, 0.01, 0, 5)) {
+        fractalController->SetApollonian3Offset3(apollonian3_offset3);
+    }
     if (MyDragInt("Apollonian3 i", &apollonian3_iterations, 0.1, 1, 15)) {
         fractalController->SetApollonian3Iterations(apollonian3_iterations);
     }
