@@ -408,8 +408,22 @@ void Gui::MainParameters() {
     //-------------------------------------------------------------------
 
     //---------------------Background parameters-------------------------
-    if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2 && 
-        currentFractalType != FractalType::Apollonian3) {
+    if (currentFractalType == FractalType::Apollonian1 || currentFractalType == FractalType::Apollonian2 ||
+        currentFractalType == FractalType::Apollonian3) {
+
+        ImGui::NewLine();
+        ImGui::Separator();
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + parametersSize[0]/2.0 - 80.0);
+        ImGui::Text("Background parameters");
+        ImGui::Separator();
+        if (ImGui::ColorEdit3("Background", room_background)) {
+            fractalController->SetRoomBackgroundColor(glm::vec3(room_background[0], room_background[1], room_background[2]));
+        }
+    }
+    else {
+    //if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2 && 
+    //    currentFractalType != FractalType::Apollonian3) {
+
         ImGui::NewLine();
         ImGui::Separator();
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + parametersSize[0]/2.0 - 80.0);

@@ -41,6 +41,7 @@ private:
     const char* background_types[4] = { "Solid color", "Solid with sun", "Texture", "HDRTexture" };
     int current_background_type = 3; // If the selection isn't within 0..count, Combo won't display a preview
     float background_color[3] = { 0.30, 0.36, 0.60 };
+    float room_background[3] = { 0.0, 0.0, 0.0 };
     float sun_color[3] = { 0.8, 0.7, 0.5 };
     const char* skybox_texture[8] = { "Orbital", "Night", "PalmTrees", "CoitTower", "MountainPath", "NightPath", "Vasa", "Other" };
     int current_skybox_texture = 0;

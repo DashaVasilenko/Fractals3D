@@ -269,8 +269,14 @@ void Renderer::Render(int width, int height) {
 	//--------------------------------------------------------------------------
 
 	//-------------------------set background type------------------------------
-	if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2 &&
-		currentFractalType != FractalType::Apollonian3) {
+	if (currentFractalType == FractalType::Apollonian1 || currentFractalType == FractalType::Apollonian2 ||
+		currentFractalType == FractalType::Apollonian3) {
+		
+		program.SetUniform("backgroundColor", fractalsParameters.room_background);
+	}
+	else {
+	//if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2 &&
+	//	currentFractalType != FractalType::Apollonian3) {
 		switch(fractalsParameters.background_type) {
     	    case BackgroundType::Solid: {
 				program.SetUniform("reflectedColor", fractalsParameters.background_color);

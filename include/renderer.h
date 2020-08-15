@@ -58,6 +58,7 @@ private:
         // Background parameters
         BackgroundType background_type = BackgroundType::SkyboxHDR;
         glm::vec3 background_color = { 0.30, 0.36, 0.60 };
+        glm::vec3 room_background = { 0.0, 0.0, 0.0 };
         glm::vec3 sun_color = { 0.8, 0.7, 0.5 };
         SkyboxTexture skybox_texture = SkyboxTexture::Orbital;
         SkyboxTextureHDR skybox_texture_hdr = SkyboxTextureHDR::WinterForest;

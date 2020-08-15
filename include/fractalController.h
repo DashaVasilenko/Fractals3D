@@ -19,6 +19,7 @@ public:
     // Background
     void SetBackgroundType(BackgroundType c) { program->SetBackgroundType(c); renderer->fractalsParameters.background_type = c; }
     void SetBackgroundColor(const glm::vec3& c) { renderer->fractalsParameters.background_color = c; }
+    void SetRoomBackgroundColor(const glm::vec3& c) { renderer->fractalsParameters.room_background = c; }
     void SetSunColor(const glm::vec3& c) { renderer->fractalsParameters.sun_color = c; }
     void SetBackgroundBrightness(float c) { renderer->fractalsParameters.background_brightness = c; }
         

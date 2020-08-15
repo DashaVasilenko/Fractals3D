@@ -34,6 +34,7 @@ uniform vec3 color3;
 //uniform float shininess; // показатель степени зеркального отражения
 //uniform float reflection; // сила отражения
 
+uniform vec3 backgroundColor;
 uniform float offset1;
 uniform float offset2;
 uniform float offset3;
@@ -195,7 +196,8 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp, float s ) {
 
     vec3 point = eye + dist*dir; // The closest point on the surface to the eyepoint along the view ray
     vec3 outNormal = computeNormal(point, s); // N
-    vec3 col = vec3(0.0);
+    //vec3 col = vec3(0.0);
+    vec3 col = backgroundColor;
         
     if (dist > 0) {
     #ifdef COLORING_TYPE_1
