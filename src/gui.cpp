@@ -542,7 +542,10 @@ void Gui::MainParameters() {
             currentCameraType = CameraType::CartesianCamera;
             fractalController->SetCameraType(currentCameraType);
         }
-        else if ( (currentFractalType != FractalType::Apollonian1 && currentFractalType == FractalType::Apollonian2) && currentCameraType == CameraType::CartesianCamera) {
+        else if ( (currentFractalType == FractalType::Apollonian1 || currentFractalType == FractalType::Apollonian2) && currentCameraType == CameraType::CartesianCamera) {
+            currentCameraType = CameraType::CartesianCamera;
+        }
+        else if ( (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2) && currentCameraType == CameraType::CartesianCamera) {
             currentCameraType = CameraType::SphericalCamera;
             fractalController->SetCameraType(currentCameraType);
         }
