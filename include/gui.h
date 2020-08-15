@@ -151,6 +151,7 @@ private:
     float apollonian3_offset1 = 20.0;
     float apollonian3_offset2 = 1.1;
     float apollonian3_offset3 = 1.0;
+    float apollonian3_csize[3] = { 0.808, 0.8, 1.137 };
     int apollonian3_iterations = 9;
     
     // export

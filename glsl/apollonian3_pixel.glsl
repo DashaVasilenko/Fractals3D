@@ -37,6 +37,7 @@ uniform vec3 color3;
 uniform float offset1;
 uniform float offset2;
 uniform float offset3;
+uniform vec3 csize;
 uniform int iterations;
 
 //const int MAX_MARCHING_STEPS = 255;
@@ -58,7 +59,7 @@ float apollonian(vec3 pos, float s, out vec4 trapColor) {
     float scale = 1.0;
     //float add = sin(Time)*0.2 + 0.1;
     float add = sin(offset3)*0.2 + 0.1;
-    vec3 CSize = vec3(0.808, 0.8, 1.137);
+    //vec3 CSize = vec3(0.808, 0.8, 1.137);
 
 #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
     //vec4 trap = vec4(abs(pos), dot(pos, pos));
@@ -70,7 +71,7 @@ float apollonian(vec3 pos, float s, out vec4 trapColor) {
 #endif
 	
     for (int i = 0; i < iterations; i++) {
-        pos = 2.0*clamp(pos, -CSize, CSize) - pos;
+        pos = 2.0*clamp(pos, -csize, csize) - pos;
         float r2 = dot(pos, pos);
 
     #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7

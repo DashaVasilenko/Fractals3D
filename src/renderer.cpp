@@ -438,6 +438,7 @@ void Renderer::Render(int width, int height) {
 			program.SetUniform("offset1", fractalsParameters.apollonian3_offset1);
 			program.SetUniform("offset2", fractalsParameters.apollonian3_offset2);
 			program.SetUniform("offset3", fractalsParameters.apollonian3_offset3);
+			program.SetUniform("csize", fractalsParameters.apollonian3_csize);
 			program.SetUniform("iterations", fractalsParameters.apollonian3_iterations);
 			break;
 		}
