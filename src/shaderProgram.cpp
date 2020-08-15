@@ -68,6 +68,10 @@ void ShaderProgram::Load() {
             mapSources[GL_FRAGMENT_SHADER] = "glsl/apollonian2_pixel.glsl";
             break;
         }
+        case FractalType::Apollonian3: {
+            mapSources[GL_FRAGMENT_SHADER] = "glsl/apollonian3_pixel.glsl";
+            break;
+        }
     }
     Init(mapSources);
     

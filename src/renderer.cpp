@@ -251,7 +251,8 @@ void Renderer::Render(int width, int height) {
 	program.SetUniform("iResolution", glm::vec2(width, height));
 	program.SetUniform("fieldOfView", fov);
 	program.SetUniform("Time", (float)glfwGetTime());
-	if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2) {
+	if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2 &&
+		currentFractalType != FractalType::Apollonian3) {
 		program.SetUniform("shadowStrength", fractalsParameters.shadow_strength);
 	}
 
@@ -268,7 +269,8 @@ void Renderer::Render(int width, int height) {
 	//--------------------------------------------------------------------------
 
 	//-------------------------set background type------------------------------
-	if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2) {
+	if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2 &&
+		currentFractalType != FractalType::Apollonian3) {
 		switch(fractalsParameters.background_type) {
     	    case BackgroundType::Solid: {
 				program.SetUniform("reflectedColor", fractalsParameters.background_color);
@@ -339,7 +341,8 @@ void Renderer::Render(int width, int height) {
 			break;
 		}
 	}
-	if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2) {
+	if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2 &&
+	    currentFractalType != FractalType::Apollonian3) {
 		program.SetUniform("shininess", fractalsParameters.shininess);
 		program.SetUniform("reflection", fractalsParameters.reflection);
 	}
@@ -429,6 +432,12 @@ void Renderer::Render(int width, int height) {
 			program.SetUniform("offset1", fractalsParameters.apollonian2_offset1);
 			program.SetUniform("offset2", fractalsParameters.apollonian2_offset2);
 			program.SetUniform("iterations", fractalsParameters.apollonian2_iterations);
+			break;
+		}
+		case FractalType::Apollonian3: {
+			program.SetUniform("offset1", fractalsParameters.apollonian3_offset1);
+			program.SetUniform("offset2", fractalsParameters.apollonian3_offset2);
+			program.SetUniform("iterations", fractalsParameters.apollonian3_iterations);
 			break;
 		}
 

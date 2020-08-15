@@ -154,6 +154,11 @@ private:
         float apollonian2_offset2 = 1.1f;
         int apollonian2_iterations = 6;
 
+        // Apollonian3 fractal parameters
+        float apollonian3_offset1 = 12.0f;
+        float apollonian3_offset2 = 1.1f;
+        int apollonian3_iterations = 9;
+
         SkyBoxHDR monsterColorHDR;
 
     };

@@ -50,8 +50,8 @@ private:
 
     // fractal type
     FractalType currentFractalType = FractalType::Test;
-    const char* fractal_type[14] = { "Test", "Mandelbulb", "Juliabulb1", "Monster", "Julia1", "Julia2", "Julia3", "Julia4", "Sierpinski1",
-                                     "Sierpinski2", "MengerSponge1", "MengerSponge2", "Apollonian1", "Apollonian2" };
+    const char* fractal_type[15] = { "Test", "Mandelbulb", "Juliabulb1", "Monster", "Julia1", "Julia2", "Julia3", "Julia4", "Sierpinski1",
+                                     "Sierpinski2", "MengerSponge1", "MengerSponge2", "Apollonian1", "Apollonian2", "Apollonian3" };
     int current_fractal_type = 0; 
 
     // general fractal parameters
@@ -147,8 +147,10 @@ private:
     float apollonian2_offset2 = 1.1;
     int apollonian2_iterations = 6;
 
-
-
+    // Apollonian3 fractal parameters
+    float apollonian3_offset1 = 12.0;
+    float apollonian3_offset2 = 1.1;
+    int apollonian3_iterations = 9;
     
     // export
     bool exportWindowFlag = false;
@@ -218,6 +220,7 @@ private:
     void MengerSponge2();
     void Apollonian1();
     void Apollonian2();
+    void Apollonian3();
 
 };
 

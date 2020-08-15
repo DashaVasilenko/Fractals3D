@@ -330,6 +330,10 @@ void Gui::Stats() {
             ImGui::Text("Current fractal type: Apollonian2 fractal");
             break;
         }
+        case FractalType::Apollonian3: {
+            ImGui::Text("Current fractal type: Apollonian3 fractal");
+            break;
+        }
     }
 
     ImGui::End();
@@ -347,7 +351,8 @@ void Gui::MainParameters() {
     bool flag = false;
 
     //-----------------------------Shadows-------------------------------
-    if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2) {
+    if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2 &&
+        currentFractalType != FractalType::Apollonian3) {
         if (ImGui::Checkbox("Soft shadows", &soft_shadows)) { 
             flag = true; 
         }
@@ -403,7 +408,8 @@ void Gui::MainParameters() {
     //-------------------------------------------------------------------
 
     //---------------------Background parameters-------------------------
-    if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2) {
+    if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2 && 
+        currentFractalType != FractalType::Apollonian3) {
         ImGui::NewLine();
         ImGui::Separator();
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + parametersSize[0]/2.0 - 80.0);
@@ -538,6 +544,18 @@ void Gui::MainParameters() {
         currentFractalType = static_cast<FractalType>(current_fractal_type);
         fractalController->SetFractalType(currentFractalType);
         flag = true;
+        if (currentFractalType == FractalType::Apollonian1 || currentFractalType == FractalType::Apollonian2 ||
+            currentFractalType == FractalType::Apollonian3) {
+
+            currentCameraType = CameraType::CartesianCamera;
+            fractalController->SetCameraType(currentCameraType);
+        }
+        else {
+            currentCameraType = CameraType::SphericalCamera;
+            fractalController->SetCameraType(currentCameraType);
+        }
+
+        /*
         if ( (currentFractalType == FractalType::Apollonian1 || currentFractalType == FractalType::Apollonian2) && currentCameraType == CameraType::SphericalCamera) {
             currentCameraType = CameraType::CartesianCamera;
             fractalController->SetCameraType(currentCameraType);
@@ -549,6 +567,7 @@ void Gui::MainParameters() {
             currentCameraType = CameraType::SphericalCamera;
             fractalController->SetCameraType(currentCameraType);
         }
+        */
     }
     //-------------------------------------------------------------------
     
@@ -622,6 +641,10 @@ void Gui::FractalParameters() {
         }
         case FractalType::Apollonian2: {
             Apollonian2();
+            break;
+        }
+        case FractalType::Apollonian3: {
+            Apollonian3();
             break;
         }
     }
@@ -703,7 +726,9 @@ void Gui::FractalColor() {
         }
     }
 
-    if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2) {
+    if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2 &&
+        currentFractalType != FractalType::Apollonian3) {
+
         if (MyDragFloat("Shininess", &shininess, 1, 1, 100)) {
             fractalController->SetFractalShininess(shininess);
         }
@@ -938,6 +963,23 @@ void Gui::Apollonian2() {
     }
     if (MyDragInt("Apollonian2 i", &apollonian2_iterations, 0.1, 1, 15)) {
         fractalController->SetApollonian2Iterations(apollonian2_iterations);
+    }
+    ImGui::End();
+}
+
+void Gui::Apollonian3() {
+    ImGui::Begin("Apollonian3 parameters", NULL, parametersWindowFlags); 
+    FractalColor();
+    ImGui::Separator();
+
+    if (MyDragFloat("Apollonian3 a1", &apollonian3_offset1, 0.1, 12, 20)) {
+        fractalController->SetApollonian3Offset1(apollonian3_offset1);
+    }
+    if (MyDragFloat("Apollonian3 a2", &apollonian3_offset2, 0.05, 0, 3)) {
+        fractalController->SetApollonian3Offset2(apollonian3_offset2);
+    }
+    if (MyDragInt("Apollonian3 i", &apollonian3_iterations, 0.1, 1, 15)) {
+        fractalController->SetApollonian3Iterations(apollonian3_iterations);
     }
     ImGui::End();
 }
