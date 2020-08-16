@@ -22,6 +22,7 @@ uniform float fieldOfView;
 #endif
 
 uniform float Time;
+uniform int antiAliasing;
 uniform float shadowStrength;
 
 uniform vec3 lightDirection1;
@@ -61,12 +62,6 @@ const int MAX_MARCHING_STEPS = 128;
 const float MIN_DIST = 0.0;
 const float MAX_DIST = 10.0; 
 const float EPSILON = 0.0005;
-
-// antialias level (1, 2, 3...)
-#define AA 1
-//#else
-//#define AA 2  // Set AA to 1 if your machine is too slow
-//#endif
 
 //-------------------------------------------------------------------------------------------------------
 // square a quaterion
@@ -344,55 +339,21 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
 void main() {
     float s = shadowStrength;
     float t = Time;
-    
-/*
-    float f = fieldOfView; // !!!!!!!!!!!!!!!!!!!!! удалить эту строку потом !!!!!!!!!!!!!!!!!!!
-
-    vec2 fragCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
-    vec2  sp = (2.0*fragCoord-iResolution.xy) / iResolution.y;
-
-    // anim
-    float time = Time*.15;
-    vec4 c = 0.45*cos( vec4(0.5,3.9,1.4,1.1) + time*vec4(1.2,1.7,1.3,2.5) ) - vec4(0.3,0.0,0.0,0.0);
-
-    // camera
-	float r = 1.5+0.15*cos(0.0+0.29*time);
-	vec3 ro = vec3(           r*cos(0.3+0.37*time), 
-					0.3 + 0.8*r*cos(1.0+0.33*time), 
-					          r*cos(2.2+0.31*time) );
-	vec3 ta = vec3(0.0,0.0,0.0);
-    float cr = 0.1*cos(0.1*time);
-*/
-/*    
-    vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
-    vec3 dir = rayDirection(fieldOfView, iResolution, pixelCoord);
-    vec3 eye = viewMatrix[3].xyz;
-    vec2  sp = (2.0*pixelCoord-iResolution.xy) / iResolution.y;
-*/
 
     vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
-    vec3 dir = rayDirection(fieldOfView, iResolution, pixelCoord);
+    //vec3 dir = rayDirection(fieldOfView, iResolution, pixelCoord);
     vec3 eye = viewMatrix[3].xyz;
     vec2  sp = (2.0*pixelCoord-iResolution.xy) / iResolution.y;
     vec4 c = 0.45*cos( vec4(0.5,3.9,1.4,1.1) + offset*vec4(1.2,1.7,1.3,2.5) ) - vec4(0.3,0.0,0.0,0.0);
     
-    // render
     vec4 col = vec4(0.0);
-    for( int j=0; j<AA; j++ )
-    for( int i=0; i<AA; i++ )
-    {
-        //vec2 p = (-iResolution.xy + 2.0*(fragCoord + vec2(float(i),float(j))/float(AA))) / iResolution.y;
-        //vec3 cw = normalize(ta-ro);
-        //vec3 cp = vec3(sin(cr), cos(cr),0.0);
-        //vec3 cu = normalize(cross(cw,cp));
-        //vec3 cv = normalize(cross(cu,cw));
-        //vec3 rd = normalize( p.x*cu + p.y*cv + 2.0*cw );
-        //col += render(ro, rd, c, sp );
-
-        col += render(eye, dir, c, sp );
+    for( int i = 0; i < antiAliasing; i++ ) {
+        for( int j = 0; j < antiAliasing; j++ ) {
+            vec2 pixel = pixelCoord + (vec2(i,j)/float(antiAliasing));
+            vec3 dir = rayDirection(fieldOfView, iResolution, pixel);
+	        col += render(eye, dir, c, sp);
+        }
     }
-    col /= float(AA*AA);
-    
-    
+	col /= float(antiAliasing*antiAliasing);
     outColor = col;
 }

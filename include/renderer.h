@@ -59,6 +59,7 @@ private:
         SkyboxTextureHDR skybox_texture_hdr = SkyboxTextureHDR::WinterForest;
         bool irradianceCubemap = true;
         float background_brightness = 1.0;
+        int anti_aliasing = 1;
 
         // General fractal parameters
         float shadow_strength = 32.0f;

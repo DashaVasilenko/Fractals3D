@@ -56,6 +56,7 @@ public:
     void SetFractalType(FractalType c);
     void SetToneMapping(bool c) { program->SetToneMapping(c); renderer->fractalsParameters.tone_mapping = c; }
     void SetExposure(const glm::vec3& c) { renderer->fractalsParameters.exposure = c; }
+    void SetAntiAliasing(int c) { renderer->fractalsParameters.anti_aliasing = c; }
     
     // Sun parameters
     void SetLightDirection1(const glm::vec3& c) { renderer->fractalsParameters.lightDirection1 = c; }

@@ -22,7 +22,7 @@ uniform float fieldOfView;
 #endif
 
 uniform float Time;
-
+uniform int antiAliasing;
 uniform float shadowStrength;
 
 uniform vec3 lightDirection1;
@@ -62,12 +62,6 @@ uniform int iterations;
 const float MIN_DIST = 0.0;
 const float MAX_DIST = 10.0;
 const float EPSILON = 0.0005;
-
-// antialias level (1, 2, 3...)
-#define AA 1
-//#else
-//#define AA 2  // Set AA to 1 if your machine is too slow
-//#endif
 
 vec3 hash3(float n) {
     return fract(sin(vec3(n, n+1.0, n+2.0))*vec3(43758.5453123, 22578.1459123, 19642.3490423));
@@ -354,31 +348,19 @@ void main() {
     float t = Time;
     
     vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
-    vec3 dir = rayDirection(fieldOfView, iResolution, pixelCoord);
+    //vec3 dir = rayDirection(fieldOfView, iResolution, pixelCoord);
     vec3 eye = viewMatrix[3].xyz;
-    vec2  sp = (2.0*pixelCoord-iResolution.xy) / iResolution.y;
+    vec2 sp = (2.0*pixelCoord-iResolution.xy) / iResolution.y;
     vec4 c = vec4(-0.1,0.6,0.9,-0.3) + 0.1*sin( vec4(3.0,0.0,1.0,2.0) + 0.5*vec4(1.0,1.3,1.7,2.1)*offset);
 
-    //vec4 col = vec4(calcPixel(pixelCoord, Time), 1.0);
-
-    
-    // render
     vec4 col = vec4(0.0);
-    for( int j=0; j<AA; j++ )
-    for( int i=0; i<AA; i++ )
-    {
-        //vec2 p = (-iResolution.xy + 2.0*(fragCoord + vec2(float(i),float(j))/float(AA))) / iResolution.y;
-        //vec3 cw = normalize(ta-ro);
-        //vec3 cp = vec3(sin(cr), cos(cr),0.0);
-        //vec3 cu = normalize(cross(cw,cp));
-        //vec3 cv = normalize(cross(cu,cw));
-        //vec3 rd = normalize( p.x*cu + p.y*cv + 2.0*cw );
-        //col += render(ro, rd, c, sp );
-
-        col += render(eye, dir, c, sp );
+    for( int i = 0; i < antiAliasing; i++ ) {
+        for( int j = 0; j < antiAliasing; j++ ) {
+            vec2 pixel = pixelCoord + (vec2(i,j)/float(antiAliasing));
+            vec3 dir = rayDirection(fieldOfView, iResolution, pixel);
+	        col += render(eye, dir, c, sp);
+        }
     }
-    col /= float(AA*AA);
-    
-    
+	col /= float(antiAliasing*antiAliasing);
     outColor = col;
 }

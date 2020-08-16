@@ -26,6 +26,7 @@ uniform float fieldOfView;
 #endif
 
 uniform float Time;
+uniform int antiAliasing;
 
 uniform vec3 lightDirection1;
 uniform vec3 lightColor1;
@@ -325,9 +326,18 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
 
 void main() {
     vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
-    vec3 dir = rayDirection(fieldOfView, iResolution, pixelCoord);
+    //vec3 dir = rayDirection(fieldOfView, iResolution, pixelCoord);
     vec3 eye = viewMatrix[3].xyz;
     vec2  sp = (2.0*pixelCoord-iResolution.xy) / iResolution.y;
 
-    outColor = Render(eye, dir, sp);
+    vec4 col = vec4(0.0);
+    for( int i = 0; i < antiAliasing; i++ ) {
+        for( int j = 0; j < antiAliasing; j++ ) {
+            vec2 pixel = pixelCoord + (vec2(i,j)/float(antiAliasing));
+            vec3 dir = rayDirection(fieldOfView, iResolution, pixel);
+	        col += Render(eye, dir, sp);
+        }
+    }
+	col /= float(antiAliasing*antiAliasing);
+    outColor = col;
 }

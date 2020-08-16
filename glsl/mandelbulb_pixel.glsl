@@ -28,6 +28,7 @@ uniform float fieldOfView;
 #endif
 
 uniform float Time;
+uniform int antiAliasing;
 
 uniform vec3 lightDirection1;
 uniform vec3 lightColor1;
@@ -381,21 +382,19 @@ void main() {
     vec3 eye = viewMatrix[3].xyz;
     vec2  sp = (2.0*pixelCoord-iResolution.xy) / iResolution.y;
 */
+    int a = antiAliasing;
     outColor = Render(eye, dir, sp);
-
+    
 /*
-// !!!!!!!!!! добавить антиалиасинг при рендеринге картинки конечной !!!!!!!!!
-    // render
-    //#if AA<2
-    //cam = transpose(viewMatrix);
-    vec3 col = render(pixelCoord, cam);
-    //#else
-    //vec3 col = vec3(0.0);
-    //for( int j=ZERO; j<AA; j++ )
-    //for( int i=ZERO; i<AA; i++ ) {
-	//    col += render( fragCoord + (vec2(i,j)/float(AA)), cam );
-    //}
-	//col /= float(AA*AA);
-    //#endif
+    vec4 col = vec4(0.0);
+    for( int i = 0; i < antiAliasing; i++ )
+        for( int j = 0; j < antiAliasing; j++ ) {
+            vec2 pixel = pixelCoord + (vec2(i,j)/float(antiAliasing));
+            vec3 dir = rayDirection(fieldOfView, iResolution, pixel);
+	        col += render(eye, dir, sp);
+        }
+    }
+	col /= float(antiAliasing*antiAliasing);
+    outColor = col;
 */
 } 

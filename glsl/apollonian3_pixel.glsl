@@ -5,6 +5,7 @@ uniform vec2 iResolution;
 uniform float fieldOfView;
 
 uniform float Time;
+uniform int antiAliasing;
 
 uniform vec3 lightDirection1;
 uniform vec3 lightColor1;
@@ -43,12 +44,6 @@ const int MAX_MARCHING_STEPS = 256;
 const float MIN_DIST = 0.01;
 const float MAX_DIST = 20.0; 
 const float EPSILON = 0.001; 
-
-// antialias level (1, 2, 3...)
-#define AA 1
-//#else
-//#define AA 2  // Set AA to 1 if your machine is too slow
-//#endif
              
 //-------------------------------------------------------------------------------------------------------
 // Compute Apollonian/kleinian fractal
@@ -236,104 +231,22 @@ void main() {
     float t = Time;
     
     vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
-    vec3 dir = rayDirection(fieldOfView, iResolution, pixelCoord);
+    //vec3 dir = rayDirection(fieldOfView, iResolution, pixelCoord);
     vec3 eye = viewMatrix[3].xyz;
     vec2  sp = (2.0*pixelCoord-iResolution.xy) / iResolution.y;
 
     //float time = Time*0.25;
     //float c = 1.1 + 0.5*smoothstep( -0.3, 0.3, cos(0.1*time) );
     float c = offset2 + 0.5*smoothstep( -0.3, 0.3, cos(0.1*offset1) );
-    
-    // render
+
     vec4 col = vec4(0.0);
-    for( int j=0; j<AA; j++ )
-    for( int i=0; i<AA; i++ )
-    {
-        //vec2 p = (-iResolution.xy + 2.0*(fragCoord + vec2(float(i),float(j))/float(AA))) / iResolution.y;
-        //vec3 cw = normalize(ta-ro);
-        //vec3 cp = vec3(sin(cr), cos(cr),0.0);
-        //vec3 cu = normalize(cross(cw,cp));
-        //vec3 cv = normalize(cross(cu,cw));
-        //vec3 rd = normalize( p.x*cu + p.y*cv + 2.0*cw );
-        //col += render(ro, rd, c, sp );
-
-        col += render(eye, dir, sp, c);
+    for( int i = 0; i < antiAliasing; i++ ) {
+        for( int j = 0; j < antiAliasing; j++ ) {
+            vec2 pixel = pixelCoord + (vec2(i,j)/float(antiAliasing));
+            vec3 dir = rayDirection(fieldOfView, iResolution, pixel);
+	        col += render(eye, dir, sp, c);
+        }
     }
-    col /= float(AA*AA);
-
-    /*
-    // это АА для этого фрактала
-    float time = iTime*0.15 + 0.005*iMouse.x;
-    
-    vec3 tot = vec3(0.0);
-    #if AA>1
-    for( int jj=0; jj<AA; jj++ )
-    for( int ii=0; ii<AA; ii++ )
-    #else
-    int ii = 0, jj = 0;
-    #endif
-    {
-        vec2 q = fragCoord+vec2(float(ii),float(jj))/float(AA);
-
-        // camera
-        vec3 ro = vec3( 2.8*cos(0.1+.33*time), 0.5 + 0.20*cos(0.37*time), 2.8*cos(0.5+0.35*time) );
-        vec3 ta = vec3( 1.9*cos(1.2+.41*time), 0.5 + 0.10*cos(0.27*time), 1.9*cos(2.0+0.38*time) );
-        float roll = 0.2*cos(0.1*time);
-        vec3 cw = normalize(ta-ro);
-        vec3 cp = vec3(sin(roll), cos(roll),0.0);
-        vec3 cu = normalize(cross(cw,cp));
-        vec3 cv = normalize(cross(cu,cw));
-
-        #if 1
-        vec2 p = (2.0*q-iResolution.xy)/iResolution.y;
-        vec3 rd = normalize( p.x*cu + p.y*cv + 2.0*cw );
-        #else
-        vec2 p = q/iResolution.xy;
-        vec2 an = 3.1415926535898 * (p*vec2(2.0, 1.0) - vec2(0.0,0.5));
-        vec3 rd = vec3(cos(an.y) * sin(an.x), sin(an.y), cos(an.y) * cos(an.x));
-		#endif
-
-        tot += render( ro, rd );
-    }
-    
-    tot = tot/float(AA*AA);
-    
-	fragColor = vec4( tot, 1.0 );	
-    */
-/*
-    // Menger sponge
-    // camera
-    vec3 ro = 1.1*vec3(2.5*sin(0.25*iTime),1.0+1.0*cos(iTime*.13),2.5*cos(0.25*iTime));
-
-#if AA>1
-    #define ZERO (min(iFrame,0))
-    vec3 col = vec3(0.0);
-    for( int m=ZERO; m<AA; m++ )
-    for( int n=ZERO; n<AA; n++ )
-    {
-        // pixel coordinates
-        vec2 o = vec2(float(m),float(n)) / float(AA) - 0.5;
-        vec2 p = (2.0*(fragCoord+o)-iResolution.xy)/iResolution.y;
-
-        vec3 ww = normalize(vec3(0.0) - ro);
-        vec3 uu = normalize(cross( vec3(0.0,1.0,0.0), ww ));
-        vec3 vv = normalize(cross(ww,uu));
-        vec3 rd = normalize( p.x*uu + p.y*vv + 2.5*ww );
-
-        col += render( ro, rd );
-    }
-    col /= float(AA*AA);
-#else   
-    vec2 p = (2.0*fragCoord-iResolution.xy)/iResolution.y;
-    vec3 ww = normalize(vec3(0.0) - ro);
-    vec3 uu = normalize(cross( vec3(0.0,1.0,0.0), ww ));
-    vec3 vv = normalize(cross(ww,uu));
-    vec3 rd = normalize( p.x*uu + p.y*vv + 2.5*ww );
-    vec3 col = render( ro, rd );
-#endif        
-    
-    fragColor = vec4(col,1.0);
-*/   
-    
+	col /= float(antiAliasing*antiAliasing);
     outColor = col;
 }

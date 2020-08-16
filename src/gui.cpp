@@ -1047,7 +1047,15 @@ void Gui::ExportAs() {
             ImGui::Text("(1..100)");
         }
 
+        ImGui::Text("Anti-aliasing:");
+        ImGui::SetNextItemWidth(200);
+        ImGui::SameLine();
+        MyDragInt("##AA", &anti_aliasing, 0.1, 1, 10);
+        ImGui::SameLine();
+        ImGui::Text("(1..10)");
+
         if (ImGui::Button("Save")) {
+            fractalController->SetAntiAliasing(anti_aliasing);
             int fbo_height, fbo_width;
             fbo_height = fbo->GetHeight();
             fbo_width = fbo->GetWidth();
@@ -1083,6 +1091,8 @@ void Gui::ExportAs() {
                 }
             }
             exportWindowFlag = false;
+            anti_aliasing = 1;
+            fractalController->SetAntiAliasing(anti_aliasing);
 
 	        free(imageData);
             free(imageData2);

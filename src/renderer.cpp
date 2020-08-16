@@ -219,9 +219,13 @@ void Renderer::Render(int width, int height) {
 	program.SetUniform("iResolution", glm::vec2(width, height));
 	program.SetUniform("fieldOfView", fov);
 	program.SetUniform("Time", (float)glfwGetTime());
+	program.SetUniform("antiAliasing", fractalsParameters.anti_aliasing);
 	if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2 &&
 		currentFractalType != FractalType::Apollonian3 && currentFractalType != FractalType::MengerSponge3) {
 		program.SetUniform("shadowStrength", fractalsParameters.shadow_strength);
+	}
+	if (fractalsParameters.tone_mapping) {
+		program.SetUniform("exposure", fractalsParameters.exposure);
 	}
 
 	program.SetUniform("lightDirection1", fractalsParameters.lightDirection1);
@@ -317,11 +321,6 @@ void Renderer::Render(int width, int height) {
 		program.SetUniform("shininess", fractalsParameters.shininess);
 		program.SetUniform("reflection", fractalsParameters.reflection);
 	}
-
-	if (fractalsParameters.tone_mapping) {
-		program.SetUniform("exposure", fractalsParameters.exposure);
-	}
-
 	//--------------------------------------------------------------------------
 
 	//-------------------------set fractal parameters---------------------------

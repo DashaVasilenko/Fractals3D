@@ -165,6 +165,7 @@ private:
     int output_width = 1920;
     int output_height = 1080;
     int output_quality = 100;
+    int anti_aliasing = 1;
 
     // setup new HDR skybox
     ImGui::FileBrowser fileBrowserSetupSkyboxHDR = ImGui::FileBrowser(ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
