@@ -835,16 +835,16 @@ void Gui::Sierpinski1() {
     FractalColor();
     ImGui::Separator();
 
-    if (MyDragFloat3("Sierpinski1 v1", sierpinski1_va, 0.1, -100, 100)) {
+    if (MyDragFloat3("Sierpinski1 v1", sierpinski1_va, 0.01, -100, 100)) {
         fractalController->SetSierpinski1Vector1(glm::vec3(sierpinski1_va[0], sierpinski1_va[1], sierpinski1_va[2]));
     }
-    if (MyDragFloat3("Sierpinski1 v2", sierpinski1_vb, 0.1, -100, 100)) {
+    if (MyDragFloat3("Sierpinski1 v2", sierpinski1_vb, 0.01, -100, 100)) {
         fractalController->SetSierpinski1Vector2(glm::vec3(sierpinski1_vb[0], sierpinski1_vb[1], sierpinski1_vb[2]));
     }
-    if (MyDragFloat3("Sierpinski1 v3", sierpinski1_vc, 0.1, -100, 100)) {
+    if (MyDragFloat3("Sierpinski1 v3", sierpinski1_vc, 0.01, -100, 100)) {
         fractalController->SetSierpinski1Vector3(glm::vec3(sierpinski1_vc[0], sierpinski1_vc[1], sierpinski1_vc[2]));
     }
-    if (MyDragFloat3("Sierpinski1 v4", sierpinski1_vd, 0.1, -100, 100)) {
+    if (MyDragFloat3("Sierpinski1 v4", sierpinski1_vd, 0.01, -100, 100)) {
         fractalController->SetSierpinski1Vector4(glm::vec3(sierpinski1_vd[0], sierpinski1_vd[1], sierpinski1_vd[2]));
     }
     if (MyDragInt("Sierpinski1 i", &sierpinski1_iterations, 0.1, 1, 15)) {
