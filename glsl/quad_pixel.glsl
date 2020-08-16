@@ -107,8 +107,8 @@ float sceneSDF(vec3 point, out vec4 resColor) {
 #endif
 
     float t = sphereSDF(point - vec3(-3, 0, 0), 2.5);
-    t = unionSDF(t, sphereSDF(point-vec3(3, 0, 0), 2.5));
-    t = unionSDF(t, sphereSDF(point-vec3(0, 0, 10), 2.5));
+    t = unionSDF(t, sphereSDF(point - vec3(3, 0, 0), 2.5));
+    t = unionSDF(t, sphereSDF(point - vec3(0, 0, 10), 2.5));
     t = unionSDF(t, planeSDF(point, vec4(0, 1, 0, 5.5)));
 
 #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
@@ -158,7 +158,7 @@ float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end
 // fragCoord: the x,y coordinate of the pixel in the output image
 vec3 rayDirection(float fieldOfView, vec2 size, vec2 fragCoord) {
     vec2 xy = fragCoord - size / 2.0;
-    float z = size.y / tan(radians(fieldOfView) / 2.0);
+    float z = size.y/tan(radians(fieldOfView)/ 2.0);
     vec3 dir = xy.x*viewMatrix[0].xyz + xy.y*viewMatrix[1].xyz + z*viewMatrix[2].xyz;
     return normalize(dir);
 }
@@ -181,10 +181,10 @@ float softShadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end
     float res = 1.0;
     vec4 trap;
     float iterations = 64;
-    for(float t=start; t<end; iterations--) {
+    for (float t = start; t < end; iterations--) {
         float h = sceneSDF(shadowRayOrigin + shadowRayDir*t, trap);
         //if (h < 0.0001 ) return 0.0;
-        res = min( res, w*h/t );
+        res = min(res, w*h/t);
         if (res < 0.001 || iterations <= 0) break;
         //if (iterations <= 0) break;
         t += h;
@@ -211,12 +211,12 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
 #endif
 
 #ifdef SOLID_BACKGROUND
-        return vec4(reflectedColor - (dir.y * 0.7), 1.0); // Skybox color
+        return vec4(reflectedColor - (dir.y*0.7), 1.0); // Skybox color
 #endif
 
 #ifdef SOLID_BACKGROUND_WITH_SUN
-        vec3 col  = reflectedColor*(0.6+0.4*dir.y); 
-        col += lightIntensity1*sunColor*pow( clamp(dot(dir, lightDirection1),0.0,1.0), 32.0); 
+        vec3 col  = reflectedColor*(0.6 + 0.4*dir.y); 
+        col += lightIntensity1*sunColor*pow(clamp(dot(dir, lightDirection1),0.0,1.0), 32.0); 
         return vec4(col, 1.0);
 #endif
     }
@@ -245,13 +245,13 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
     #ifdef COLORING_TYPE_4
         vec3 albedo = color;
         albedo *= 0.1;
-        albedo.x = 1.0-10.0*trap.x; 
+        albedo.x = 1.0 - 10.0*trap.x; 
     #endif
     #ifdef COLORING_TYPE_5
         vec3 albedo = vec3(0.0);
-        albedo = mix(albedo, color1, sqrt(trap.x) );
-		albedo = mix(albedo, color2, sqrt(trap.y) );
-		albedo = mix(albedo, color3, trap.z );
+        albedo = mix(albedo, color1, sqrt(trap.x));
+		albedo = mix(albedo, color2, sqrt(trap.y));
+		albedo = mix(albedo, color3, trap.z);
         albedo *= 0.09;
     #endif   
     #ifdef COLORING_TYPE_6
@@ -304,8 +304,8 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
         vec3 kS = fresnelSchlick(max(dot(outNormal, inEye), 0.0), F0);
         vec3 kD = 1.0 - kS;
         vec3 irradiance = texture(irradianceMap, outNormal).rgb;
-        vec3 diffuseIBL      = irradiance * albedo;
-        vec3 ambientIBL = (kD * diffuseIBL) * occlusion;
+        vec3 diffuseIBL = irradiance*albedo;
+        vec3 ambientIBL = (kD*diffuseIBL)*occlusion;
         color.xyz += ambientIBL; 
     #endif
 

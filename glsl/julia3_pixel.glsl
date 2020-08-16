@@ -6,11 +6,11 @@ uniform float fieldOfView;
 
 #if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
     uniform float backgroundBrightness;
-    uniform samplerCube skyBox; // сэмплер для кубической карты
+    uniform samplerCube skyBox;  
 #endif
 
 #if defined SKYBOX_BACKGROUND_HDR && defined IRRADIANCE_CUBEMAP
-    uniform samplerCube irradianceMap; // освещенность из кубмапы
+    uniform samplerCube irradianceMap;  
 #endif
 
 #if defined SOLID_BACKGROUND || defined SOLID_BACKGROUND_WITH_SUN
@@ -57,10 +57,9 @@ uniform float offset;
 uniform float smoothness;
 uniform int iterations;
 
-//const int MAX_MARCHING_STEPS = 255;
-const int MAX_MARCHING_STEPS = 128;
+ const int MAX_MARCHING_STEPS = 128;
 const float MIN_DIST = 0.0;
-const float MAX_DIST = 10.0; //50
+const float MAX_DIST = 10.0;
 const float EPSILON = 0.0005;
 
 // antialias level (1, 2, 3...)
@@ -69,8 +68,7 @@ const float EPSILON = 0.0005;
 //#define AA 2  // Set AA to 1 if your machine is too slow
 //#endif
 
-vec3 hash3( float n )
-{
+vec3 hash3( float n ) {
     return fract(sin(vec3(n,n+1.0,n+2.0))*vec3(43758.5453123,22578.1459123,19642.3490423));
 }
 
@@ -82,15 +80,9 @@ vec4 qSquare(vec4 a)  {
                  2.0*a.x*a.z,
                  2.0*a.x*a.w );
 }
-/*
-vec4 qSquare( vec4 a )
-{
-    return vec4( a.x*a.x - dot(a.yzw,a.yzw), 2.0*a.x*(a.yzw) );
-}
-*/
 
 vec4 qCube(vec4 a) {
-	return a*(4.0*a.x*a.x - dot(a,a)*vec4(3.0,1.0,1.0,1.0));
+	return a*(4.0*a.x*a.x - dot(a, a)*vec4(3.0, 1.0, 1.0, 1.0));
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -100,17 +92,16 @@ vec4 qCube(vec4 a) {
 // https://www.shadertoy.com/view/lsl3W2
 float julia( vec3 pos, vec4 c, out vec4 trapColor) {
     vec4 z = vec4(pos, 0.2);
-	float m2 = 0.0;
+	float m2 = dot(z, z);
 	float dz2 = 1.0;
 
 #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
-    vec4 trap = vec4(abs(z.xyz), dot(z, z));
+    vec4 trap = vec4(abs(z.xyz), m2);
 #endif
 
 #if defined COLORING_TYPE_3 || defined COLORING_TYPE_6
     vec2  trap = vec2(1e10);
 #endif
-
 
 	for( int i = 0; i < iterations; i++ ) {
         vec4 q = qSquare(z);
@@ -124,7 +115,7 @@ float julia( vec3 pos, vec4 c, out vec4 trapColor) {
         //if (m2 > 10.0) break;	
 
     #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
-        trap = min(trap, vec4(abs(z.xyz), dot(z, z)));  // trapping Oxz, Oyz, Oxy, (0,0,0)
+        trap = min(trap, vec4(abs(z.xyz), m2));  // trapping Oxz, Oyz, Oxy, (0,0,0)
     #endif
 
     #if defined COLORING_TYPE_3 || defined COLORING_TYPE_6
@@ -150,7 +141,7 @@ float julia( vec3 pos, vec4 c, out vec4 trapColor) {
 // size: resolution of the output image
 // fragCoord: the x,y coordinate of the pixel in the output image
 vec3 rayDirection(float fieldOfView, vec2 size, vec2 fragCoord) {
-    vec2 xy = fragCoord - size / 2.0;
+    vec2 xy = fragCoord - size/2.0;
     float z = size.y / tan(radians(fieldOfView) / 2.0);
     vec3 dir = xy.x*viewMatrix[0].xyz + xy.y*viewMatrix[1].xyz + z*viewMatrix[2].xyz;
     return normalize(dir);
@@ -163,11 +154,11 @@ vec3 rayDirection(float fieldOfView, vec2 size, vec2 fragCoord) {
 vec3 computeNormal(vec3 p, vec4 c) {
     vec4 trap;
     const float h = 0.0001; // replace by an appropriate value
-    const vec2 k = vec2(1,-1)*h;
-    return normalize( k.xyy*julia( p + k.xyy, c, trap) + 
-                      k.yyx*julia( p + k.yyx, c, trap) + 
-                      k.yxy*julia( p + k.yxy, c, trap) + 
-                      k.xxx*julia( p + k.xxx, c, trap) );
+    const vec2 k = vec2(1, -1)*h;
+    return normalize( k.xyy*julia(p + k.xyy, c, trap) + 
+                      k.yyx*julia(p + k.yyx, c, trap) + 
+                      k.yxy*julia(p + k.yxy, c, trap) + 
+                      k.xxx*julia(p + k.xxx, c, trap) );
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -177,10 +168,9 @@ float softShadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end
     float res = 1.0;
     vec4 trap;
     float iterations = 64;
-    for(float t=start; t<end; iterations--) {
-        //float h = mandelbulb(shadowRayOrigin + shadowRayDir*t, trap);
+    for (float t = start; t < end; iterations--) {
         float h = julia(shadowRayOrigin + shadowRayDir*t, c, trap);
-        res = min( res, w*h/t );
+        res = min(res, w*h/t);
         if (res < 0.001 || iterations <= 0) break;
         t += h;
     }
@@ -193,8 +183,8 @@ float softShadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end
 // https://iquilezles.org/www/articles/sdfbounding/sdfbounding.htm
 float isphere(vec4 boundingSphere, vec3 point, vec3 direction) {
     vec3 dist = point - boundingSphere.xyz;
-	float b = dot(dist,direction);
-	float c = dot(dist,dist) - boundingSphere.w*boundingSphere.w;
+	float b = dot(dist, direction);
+	float c = dot(dist, dist) - boundingSphere.w*boundingSphere.w;
     float h = b*b - c;
     
     if (h < 0.0) return -1.0;
@@ -214,9 +204,6 @@ float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end
     float depth = start;
     float res = end;
 
-    // bounding sphere
-    // !!!!!!!!!!!!!!!!!! проверить, будет ли все влезать!!!!!!!!!!
-    // возможно, надо будет удалить сферу
     float dist = isphere(vec4(0.0, 0.0, 0.0, 1.25), eye, direction);
     if(dist < 0.0) return end;
     dist = min(dist, end);
@@ -237,100 +224,9 @@ float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end
     return res;
 }
 
-/*
-vec3 raycast( in vec3 ro, in vec3 rd, in vec4 c ) {
-	float maxd = 8.0;
-	float precis = 0.002;
-    float h = 1.0;
-    float t = 0.0;
-	float d = 0.0;
-    float m = 1.0;
-    for( int i=0; i<150; i++ ) {
-        if( h<precis||t>maxd ) break;
-        t += h;
-	    vec3 res = map( ro+rd*t, c );
-        h = res.x;
-		d = res.y;
-		m = res.z;
-    }
-
-    if( t>maxd ) m=-1.0;
-    return vec3( t, d, m );
-}
-*/
-
-/*
-vec3 calcPixel(vec2 pi, float time ) {
-    vec4 c = vec4(-0.1,0.6,0.9,-0.3) + 0.1*sin( vec4(3.0,0.0,1.0,2.0) + 0.5*vec4(1.0,1.3,1.7,2.1)*iTime);
-
-	vec2 q = pi / iResolution.xy;
-    vec2 p = -1.0 + 2.0*q;
-    p.x *= iResolution.x/iResolution.y;
-    vec2 m = vec2(0.5);
-	//if(iMouse.z > 0.0) m = iMouse.xy/iResolution.xy;
-
-    // camera
-	float an = -2.4 + 0.2*time - 6.2*m.x;
-    vec3 ro = 4.0*vec3(sin(an),0.25,cos(an));
-    vec3 ta = vec3( 0.0, 0.08, 0.0 );
-    vec3 ww = normalize( ta - ro );
-    vec3 uu = normalize( cross(ww,vec3(0.0,1.0,0.0) ) );
-    vec3 vv = normalize( cross(uu,ww));
-    vec3 rd = normalize( p.x*uu + p.y*vv + 4.1*ww );
-
-	// raymarch
-    vec3 tmat = raycast(ro,rd,c);
-	
-	// shade
-    vec3 col = vec3(0.0);
-    if( tmat.z>-0.5 )
-    {
-        // geometry
-        vec3 pos = ro + tmat.x*rd;
-        vec3 nor = calcNormal(pos, 0.001,c);
-        vec3 sor = calcNormal(pos, 0.01,c);
-
-        // material		
-		vec3 mate = 0.5 + 0.5*sin( tmat.z*4.0 + 4.0 + vec3(3.0,1.5,2.0)  + nor*0.2 ).xzy;
-		
-        // lighting		
-		float occ = clamp( tmat.y*0.5 + 0.5*(tmat.y*tmat.y), 0.0, 1.0 ) * (1.0 + 0.1*nor.y);
-		
-        // diffuse		
-		col = vec3(0.0);
-		for( int i=0; i<32; i++ )
-		{
-			vec3 rr = normalize(-1.0 + 2.0*hash3(float(i)*123.5463));
-			rr = normalize( nor + 8.0*rr );
-			rr = rr * sign(dot(nor,rr));							  
-            col += pow( texture( iChannel0, rr ).xyz, vec3(2.2) ) * dot(rr,nor);
-		}
-        col = 5.0 * occ * (col/32.0);
-
-        // rim		
-		col *= 1.0 + 1.0*pow(clamp(1.0+dot(rd,sor),0.0,1.0),1.0)*vec3(1.0);
-
-        // specular		 
-		float fre = pow( clamp(1.0+dot(rd,sor),0.0,1.0), 5.0 );
-		vec3  ref = reflect( rd, nor );
-		col *= 1.0 - 0.5*fre; 
-		col += 1.5 * (0.5 + 0.5*fre) * pow( texture( iChannel0, ref ).xyz, vec3(2.0) ) * occ;
-
-        col *= mate;
-    }
-	else {
-        // background		
-		col = pow( texture( iChannel0, rd ).xyz, vec3(2.2) );
-	}
-
-	col = pow( clamp( col, 0.0, 1.0 ), vec3(0.45) ); // gamma
-    return col;
-}
-*/
-
 //-------------------------------------------------------------------------------------------------------
 vec3 fresnelSchlick(float cosTheta, vec3 F0) {
-    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+    return F0 + (1.0 - F0)*pow(1.0 - cosTheta, 5.0);
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -348,11 +244,11 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
 #endif
 
 #ifdef SOLID_BACKGROUND
-        return vec4(reflectedColor - (dir.y * 0.7), 1.0); // Skybox color
+        return vec4(reflectedColor - (dir.y*0.7), 1.0); // Skybox color
 #endif
 
 #ifdef SOLID_BACKGROUND_WITH_SUN
-        vec3 col  = reflectedColor*(0.6+0.4*dir.y); 
+        vec3 col  = reflectedColor*(0.6 + 0.4*dir.y); 
         col += lightIntensity1*sunColor*pow( clamp(dot(dir, lightDirection1),0.0,1.0), 32.0); 
         return vec4(col, 1.0);
 #endif
@@ -375,16 +271,13 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
         vec3 albedo = color + color*sin(trap.y*coef + coef + color + outNormal*0.2).xzy;
     #endif
     #ifdef COLORING_TYPE_4
-        vec3 albedo = color;
-        albedo *= 0.1;
-        albedo.x = 1.0-10.0*trap.x; 
+        vec3 albedo = 0.5*cos(6.2831*trap.x + color);
     #endif
     #ifdef COLORING_TYPE_5
         vec3 albedo = vec3(0.0);
         albedo = mix(albedo, color1, sqrt(trap.x) );
 		albedo = mix(albedo, color2, sqrt(trap.y) );
 		albedo = mix(albedo, color3, trap.z );
-        //albedo *= 0.4;
     #endif 
     #ifdef COLORING_TYPE_6
         vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.x + color);
@@ -395,7 +288,6 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
         albedo = mix(albedo, color3, pow(clamp(1.0 - 2.0*trap.z, 0.0, 1.0), 8.0));
     #endif
         
-		//float occlusion = clamp(2.5*trap.w - 0.15, 0.0, 1.0);
         float occlusion = clamp(trap.x*0.5 + 0.5*(trap.x*trap.x), 0.0, 1.0) * (1.0 + 0.1*outNormal.y);
         vec3 hal = normalize(lightDirection1 - dir);
         float shadow = 1.0;
@@ -416,8 +308,14 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
              lin +=  ambientLightIntensity3*ambientLightColor3*(0.05+0.95*occlusion); // ambient light
         vec3 col = albedo*lin;
 		col = pow(col, vec3(0.7, 0.9, 1.0));
-        //col += spe1*15.0;
         col += spe1*lightIntensity1;
+
+        #if defined COLORING_TYPE_3 || defined COLORING_TYPE_4 || defined COLORING_TYPE_6
+        // luma based Reinhard tone mapping
+	    float luma = dot(col, vec3(0.2126, 0.7152, 0.0722));
+	    float toneMappedLuma = luma/(1.0 + luma);
+	    col *= toneMappedLuma/luma;
+        #endif
         
         // sky
         vec4 color; 
@@ -437,58 +335,15 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
         // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
         // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
         vec3 F0 = vec3(0.04); 
-        //F0 = mix(F0, albedo, metallic);
         // ambient lighting (we now use IBL as the ambient term)
         vec3 kS = fresnelSchlick(max(dot(outNormal, inEye), 0.0), F0);
         vec3 kD = 1.0 - kS;
-        //kD *= 1.0 - metallic;	  
         vec3 irradiance = texture(irradianceMap, outNormal).rgb;
-        //vec3 diffuse      = irradiance * albedo;
-        vec3 diffuseIBL      = irradiance * albedo;
-        //vec3 ambient = (kD * diffuse) * ao;
-        vec3 ambientIBL = (kD * diffuseIBL) * occlusion;
-
-        //col += ambientIBL; 
+        vec3 diffuseIBL = irradiance*albedo;
+        vec3 ambientIBL = (kD*diffuseIBL)*occlusion;
         color.xyz += ambientIBL; 
     #endif
-/*
-    #if defined SKYBOX_BACKGROUND_HDR && defined IRRADIANCE_CUBEMAP
-        vec3 inEye = normalize(eye - point); // V
-        // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
-        // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
-        vec3 F0 = vec3(0.04); 
-        //F0 = mix(F0, albedo, metallic);
-        // ambient lighting (we now use IBL as the ambient term)
-        vec3 kS = fresnelSchlick(max(dot(outNormal, inEye), 0.0), F0);
-        vec3 kD = 1.0 - kS;
-        //kD *= 1.0 - metallic;	  
-        vec3 irradiance = texture(irradianceMap, outNormal).rgb;
-        //vec3 diffuse      = irradiance * albedo;
-        vec3 diffuseIBL      = irradiance * albedo;
-        //vec3 ambient = (kD * diffuse) * ao;
-        vec3 ambientIBL = (kD * diffuseIBL) * occlusion;
 
-        col += ambientIBL; 
-    #endif
-
-        vec4 color;
-        // sky
-    #if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
-        vec3 reflected_dir = reflect(dir, outNormal); //R
-        vec4 reflected_color = texture(skyBox, reflected_dir);
-        color = vec4(col, 1.0)*(1.0 - reflection) + reflected_color*reflection;
-    #endif
-
-    #if defined SOLID_BACKGROUND || defined SOLID_BACKGROUND_WITH_SUN
-        color = vec4(col, 1.0)*(1.0 - reflection) + vec4(reflectedColor, 1.0)*reflection;
-    #endif
-*/
-        //color = clamp(color, 0.0, 1.0);
-        //color = sqrt(color); // gamma
-        //color = vec4(pow(color.xyz, vec3(1.0/2.2)), 1.0); // gamma
-        //color *= 1.0 - 0.05*length(sp); // vignette
-        //return color;
-        //return vec4(pow(clamp(color.xyz, 0.0, 1.0), vec3(0.4545)), 1.0); // gamma
 	    return vec4(pow(color.xyz, vec3(0.4545)), 1.0);
     }
 }

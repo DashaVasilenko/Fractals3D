@@ -96,7 +96,7 @@ float julia(vec3 pos, vec4 c, out vec4 trapColor) {
 
 
     float n = 1.0;
-    for(int i = 0; i < iterations; i++ ) {
+    for(int i = 0; i < iterations; i++) {
         // dz -> 2·z·dz, meaning |dz| -> 2·|z|·|dz|
         // Now we take the 2.0 out of the loop and do it at the end with an exp2
         md2 *= smoothness*mz2;
@@ -133,7 +133,7 @@ float julia(vec3 pos, vec4 c, out vec4 trapColor) {
 // size: resolution of the output image
 // fragCoord: the x,y coordinate of the pixel in the output image
 vec3 rayDirection(float fieldOfView, vec2 size, vec2 fragCoord) {
-    vec2 xy = fragCoord - size / 2.0;
+    vec2 xy = fragCoord - size/2.0;
     float z = size.y / tan(radians(fieldOfView) / 2.0);
     vec3 dir = xy.x*viewMatrix[0].xyz + xy.y*viewMatrix[1].xyz + z*viewMatrix[2].xyz;
     return normalize(dir);
@@ -146,21 +146,11 @@ vec3 rayDirection(float fieldOfView, vec2 size, vec2 fragCoord) {
 vec3 computeNormal(vec3 p, vec4 c) {
     vec4 trap;
     const float h = 0.0001; // replace by an appropriate value
-    const vec2 k = vec2(1,-1)*h;
-    return normalize( k.xyy*julia( p + k.xyy, c, trap) + 
-                      k.yyx*julia( p + k.yyx, c, trap) + 
-                      k.yxy*julia( p + k.yxy, c, trap) + 
-                      k.xxx*julia( p + k.xxx, c, trap) );
-}
-
-vec3 computeNormal2(vec3 p, vec4 c) {
-    vec4 trap;
-    const float h = 0.001; // replace by an appropriate value
-    const vec2 k = vec2(1,-1)*h;
-    return normalize( k.xyy*julia( p + k.xyy, c, trap) + 
-                      k.yyx*julia( p + k.yyx, c, trap) + 
-                      k.yxy*julia( p + k.yxy, c, trap) + 
-                      k.xxx*julia( p + k.xxx, c, trap) );
+    const vec2 k = vec2(1, -1)*h;
+    return normalize( k.xyy*julia(p + k.xyy, c, trap) + 
+                      k.yyx*julia(p + k.yyx, c, trap) + 
+                      k.yxy*julia(p + k.yxy, c, trap) + 
+                      k.xxx*julia(p + k.xxx, c, trap) );
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -170,9 +160,9 @@ float softShadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end
     float res = 1.0;
     vec4 trap;
     float iterations = 64;
-    for(float t=start; t<end; iterations--) {
+    for (float t = start; t < end; iterations--) {
         float h = julia(shadowRayOrigin + shadowRayDir*t, c, trap);
-        res = min( res, w*h/t );
+        res = min(res, w*h/t);
         if (res < 0.001 || iterations <= 0) break;
         t += h;
     }
@@ -185,8 +175,8 @@ float softShadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end
 // https://iquilezles.org/www/articles/sdfbounding/sdfbounding.htm
 float isphere(vec4 boundingSphere, vec3 point, vec3 direction) {
     vec3 dist = point - boundingSphere.xyz;
-	float b = dot(dist,direction);
-	float c = dot(dist,dist) - boundingSphere.w*boundingSphere.w;
+	float b = dot(dist, direction);
+	float c = dot(dist, dist) - boundingSphere.w*boundingSphere.w;
     float h = b*b - c;
     
     if (h < 0.0) return -1.0;
@@ -207,7 +197,7 @@ float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end
     float res = end;
 
     float dist = isphere(vec4(0.0, 0.0, 0.0, 1.25), eye, direction);
-    if(dist < 0.0) return end;
+    if (dist < 0.0) return end;
     dist = min(dist, end);
 
     for (int i = 0; i < MAX_MARCHING_STEPS; i++) {
@@ -228,7 +218,7 @@ float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end
 
 //-------------------------------------------------------------------------------------------------------
 vec3 fresnelSchlick(float cosTheta, vec3 F0) {
-    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+    return F0 + (1.0 - F0)*pow(1.0 - cosTheta, 5.0);
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -246,11 +236,11 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
 #endif
 
 #ifdef SOLID_BACKGROUND
-        return vec4(reflectedColor - (dir.y * 0.7), 1.0); // Skybox color
+        return vec4(reflectedColor - (dir.y*0.7), 1.0); // Skybox color
 #endif
 
 #ifdef SOLID_BACKGROUND_WITH_SUN
-        vec3 col  = reflectedColor*(0.6+0.4*dir.y); 
+        vec3 col  = reflectedColor*(0.6 + 0.4*dir.y); 
         col += lightIntensity1*sunColor*pow( clamp(dot(dir, lightDirection1),0.0,1.0), 32.0); 
         return vec4(col, 1.0);
 #endif
@@ -277,9 +267,9 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
     #endif
     #ifdef COLORING_TYPE_5
         vec3 albedo = vec3(0.0);
-        albedo = mix(albedo, color1, sqrt(trap.x) );
-		albedo = mix(albedo, color2, sqrt(trap.y) );
-		albedo = mix(albedo, color3, trap.z );
+        albedo = mix(albedo, color1, sqrt(trap.x));
+		albedo = mix(albedo, color2, sqrt(trap.y));
+		albedo = mix(albedo, color3, trap.z);
     #endif 
     #ifdef COLORING_TYPE_6
         vec3 albedo = 0.9*cos(6.2831*trap.y + color) + 0.9*sin(6.2831*trap.x + color);
@@ -315,8 +305,8 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
         #if defined COLORING_TYPE_3 || defined COLORING_TYPE_4 || defined COLORING_TYPE_6
         // luma based Reinhard tone mapping
 	    float luma = dot(col, vec3(0.2126, 0.7152, 0.0722));
-	    float toneMappedLuma = luma / (1.0 + luma);
-	    col *= toneMappedLuma / luma;
+	    float toneMappedLuma = luma/(1.0 + luma);
+	    col *= toneMappedLuma/luma;
         #endif
 
         // sky
@@ -341,8 +331,8 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
         vec3 kS = fresnelSchlick(max(dot(outNormal, inEye), 0.0), F0);
         vec3 kD = 1.0 - kS;
         vec3 irradiance = texture(irradianceMap, outNormal).rgb;
-        vec3 diffuseIBL      = irradiance * albedo;
-        vec3 ambientIBL = (kD * diffuseIBL) * occlusion;
+        vec3 diffuseIBL = irradiance*albedo;
+        vec3 ambientIBL = (kD*diffuseIBL)*occlusion;
         color.xyz += ambientIBL; 
     #endif
 
