@@ -231,7 +231,7 @@ void Gui::Preview() {
     ImGui::SetNextWindowPos(ImVec2(0.0f, 18.0f));
     int width, height;
     window->GetSize(&width, &height);
-    ImVec2 previewSize = ImVec2((float)width*2/3, (float)(height - 168));
+    ImVec2 previewSize = ImVec2((float)width*2/3-20, (float)(height - 168));
 	ImGui::SetNextWindowSize(previewSize);
     ImGuiWindowFlags previewWindowFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoScrollWithMouse ;
     ImGui::Begin("Test", NULL, previewWindowFlags);
@@ -246,7 +246,7 @@ void Gui::Stats() {
     int width, height;
     window->GetSize(&width, &height);
     ImGui::SetNextWindowPos(ImVec2(0.0f, (float)(height - 150)));
-    ImVec2 parametersSize = ImVec2((float)width*2/3, 150.0f);
+    ImVec2 parametersSize = ImVec2((float)width*2/3-20, 150.0f);
 	ImGui::SetNextWindowSize(parametersSize);
 
     ImGui::Begin("Stats", NULL, parametersWindowFlags);                         
@@ -324,8 +324,8 @@ void Gui::Stats() {
 void Gui::MainParameters() {
     int width, height;
     window->GetSize(&width, &height);
-    ImGui::SetNextWindowPos(ImVec2((float)width*2/3, 18.0f));
-    ImVec2 parametersSize = ImVec2((float)width*1/3, (float)(height*2/3 + 25.0));
+    ImGui::SetNextWindowPos(ImVec2((float)width*2/3-20, 18.0f));
+    ImVec2 parametersSize = ImVec2((float)width*1/3+20, (float)(height*2/3 + 25.0));
 	ImGui::SetNextWindowSize(parametersSize);
     
     ImGui::Begin("Parameters", NULL, parametersWindowFlags); 
@@ -560,8 +560,8 @@ void Gui::MainParameters() {
 void Gui::FractalParameters() {
     int width, height;
     window->GetSize(&width, &height);
-    ImGui::SetNextWindowPos(ImVec2((float)width*2/3, (float)(height*2/3) + 43.0f));
-    ImVec2 parametersSize = ImVec2((float)width*1/3, (float)(height*1/3) - 43.0f);
+    ImGui::SetNextWindowPos(ImVec2((float)width*2/3-20, (float)(height*2/3) + 43.0f));
+    ImVec2 parametersSize = ImVec2((float)width*1/3+20, (float)(height*1/3) - 43.0f);
 	ImGui::SetNextWindowSize(parametersSize);
     
     switch(currentFractalType) {
@@ -744,13 +744,13 @@ void Gui::Juliabulb1() {
     FractalColor();
     ImGui::Separator();
 
-    if (MyDragFloat("Juliabulb1 offset", &juliabulb1_offset, 0.1, 0, 50)) {
+    if (MyDragFloat("Juliabulb1 shift", &juliabulb1_offset, 0.01, 0, 50)) {
         fractalController->SetJuliabulb1Offset(juliabulb1_offset);
     }
-    if (MyDragFloat("Juliabulb1 smoothness", &juliabulb1_smoothness, 0.1, 0, 45)) {
+    if (MyDragFloat("Juliabulb1 smooth", &juliabulb1_smoothness, 0.1, 0, 45)) {
         fractalController->SetJuliabulb1Smoothness(juliabulb1_smoothness);
     }
-    if (MyDragInt("Juliabulb1 i", &juliabulb1_iterations, 0.1, 0, 10)) {
+    if (MyDragInt("Juliabulb1 it", &juliabulb1_iterations, 0.1, 0, 10)) {
         fractalController->SetJuliabulb1Iterations(juliabulb1_iterations);
     }
     ImGui::End();
