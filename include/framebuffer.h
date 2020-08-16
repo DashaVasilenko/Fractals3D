@@ -12,12 +12,15 @@ public:
     void Bind() const;
     void Resize(int width, int height);
     void Unbind() const;
+
     GLuint GetDescriptor() { return descriptor; }
     GLuint GetTexDescriptor() { return tex_color_buf.GetDescriptor(); }
     int GetWidth() { return width; }
     int GetHeight() { return height; }
+
     void SetWidth(int w) { width = w; }
     void SetHeight(int h) { height = h; }
+    
     ~FrameBuffer();
     
 protected:

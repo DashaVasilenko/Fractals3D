@@ -82,10 +82,8 @@ public:
  										"textures/Vasa/posx.jpg"
  										};											  										  									  										  								
 
-
 private:
     unsigned int descriptor;
-
 };
 
 class SkyBoxHDR {
@@ -114,7 +112,6 @@ public:
 	const std::string factoryHDR = "textures/HDR/Factory/Factory.hdr";
 	const std::string topangaForestHDR = "textures/HDR/TopangaForest/TopangaForest.hdr";
 	const std::string tropicalBeachHDR = "textures/HDR/TropicalBeach/TropicalBeach.hdr";
-
 
 private:
 	// projection and view matrices for capturing data onto the 6 cubemap face directions

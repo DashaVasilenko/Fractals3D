@@ -12,8 +12,10 @@ class Camera {
 public:
     Camera(const glm::vec3& = glm::vec3(0.0f, 0.0f, 3.0f) );
     void Update();
+
     glm::mat4 GetViewMatrix();
     float GetFieldOfView() { return fieldOfView; }
+    
     void SetDeltaTime(float t) { deltaTime = t; }
     void SetCameraType(CameraType t);
 

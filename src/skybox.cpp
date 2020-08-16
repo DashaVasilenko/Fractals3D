@@ -23,8 +23,6 @@ void SkyBox::Load(const std::array<std::string, 6>& fileNames) {
     GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
     GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
     GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE));  
-
-    // !!!!!!!!!!!!!!!!!!!!!! нужно отбиндить в конце текстуру ... !!!!!!!!!!!!!!!!!!!
 }
 
 void SkyBox::Reload(const std::array<std::string, 6>& fileNames) {
@@ -143,7 +141,6 @@ void SkyBoxHDR::ReloadHDR(const std::string& fileName) {
     GLCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, size, size));
     GLCall(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, RBO));
 
-    //std::cout << fileName.c_str() << std::endl;
     stbi_set_flip_vertically_on_load(true);
     int width, height, nrComponents;
     float *data = stbi_loadf(fileName.c_str(), &width, &height, &nrComponents, 0);
@@ -165,6 +162,10 @@ void SkyBoxHDR::ReloadHDR(const std::string& fileName) {
     }  
 }
 
+
+//-------------------------------------------------------------------------------------------------
+// reload the irradiance map
+//-------------------------------------------------------------------------------------------------
 void SkyBoxHDR::ReloadIrradianceCubemap() {
     // rescale FBO to irradiance scale
     GLCall(glBindFramebuffer(GL_FRAMEBUFFER, FBO));

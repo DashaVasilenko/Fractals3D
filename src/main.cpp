@@ -1,18 +1,13 @@
 #include <iostream>
 #include <string>
 
-#include "window.h"
-#include "renderer.h"
-#include "camera.h"
 #include "gui.h"
-#include "fractalController.h"
-#include "skybox.h"
 
 int main() {
     Window window;
  	window.SetWidth(1080);
  	window.SetHeight(768);
- 	window.SetName("Karl's window!");
+ 	window.SetName("Fractal3D");
  	window.Init();
 
 	Renderer renderer;

@@ -45,7 +45,7 @@ void FractalController::SetSkyboxTexture(SkyboxTexture skyboxTexture) {
 }
 
 void FractalController::SetSkyboxTexture(std::array<std::string, 6>& paths) { 
-    renderer->fractalsParameters.skybox_texture = SkyboxTexture::Other;  // это возможно вообще надо удалить и в рендерере тоже
+    renderer->fractalsParameters.skybox_texture = SkyboxTexture::Other;
     skybox->Reload(paths);
 }
 
@@ -95,7 +95,7 @@ void FractalController::SetIrradianceMap(bool irradianceMap) {
 }
 
 void FractalController::SetSkyboxTextureHDR(std::string path) { 
-    renderer->fractalsParameters.skybox_texture_hdr = SkyboxTextureHDR::OtherHDR; // это возможно вообще надо удалить и в рендерере тоже
+    renderer->fractalsParameters.skybox_texture_hdr = SkyboxTextureHDR::OtherHDR;
     skyboxHDR->ReloadHDR(path);
     renderer->ConvertHdrMapToCubemap();   
     skyboxHDR->ReloadIrradianceCubemap();
@@ -111,76 +111,4 @@ void FractalController::SetColoringType(ColoringType c) {
 void FractalController::SetFractalType(FractalType c) { 
     program->SetFractalType(c); 
     renderer->currentFractalType = c; 
-
-/*
-    switch(c) {
-        case FractalType::Test: {
-            break;
-        }
-        case FractalType::Mandelbulb: {
-            renderer->fractalsParameters.lightDirection1 = glm::vec3(0.577, 0.577, -0.577);
-            renderer->fractalsParameters.lightColor1 = glm::vec3(1.0, 1.0, 0.70);
-            renderer->fractalsParameters.lightIntensity1 = 12.0;
-            
-            renderer->fractalsParameters.lightDirection2 = glm::vec3(-0.707, 0.000, 0.707);
-            renderer->fractalsParameters.lightColor2 = glm::vec3(0.25, 0.20, 0.15);
-            renderer->fractalsParameters.lightIntensity2 = 4.0;
-            renderer->fractalsParameters.ambientLightColor = glm::vec3(0.35, 0.30, 0.25);
-            renderer->fractalsParameters.ambientLightIntensity = 2.5;
-            break;
-        }
-        case FractalType::Monster: {
-            break;
-        }
-        case FractalType::Julia1: {
-            renderer->fractalsParameters.lightDirection1 = glm::vec3(0.577, 0.577,  0.577);
-            renderer->fractalsParameters.lightColor1 = glm::vec3(1.00,0.90,0.70);
-            renderer->fractalsParameters.lightIntensity1 = 3.5;
-            
-            renderer->fractalsParameters.lightDirection2 = glm::vec3(-0.707, 0.000, 0.707);
-            renderer->fractalsParameters.lightColor2 = glm::vec3(1.00,0.90,0.70);
-            renderer->fractalsParameters.lightIntensity2 = 3.5;
-            renderer->fractalsParameters.ambientLightColor = glm::vec3(0.35, 0.30, 0.25);
-            renderer->fractalsParameters.ambientLightIntensity = 2.5;
-            break;
-        }
-        case FractalType::Julia2: {
-            renderer->fractalsParameters.lightDirection1 = glm::vec3(0.577, 0.577,  0.577);
-            renderer->fractalsParameters.lightColor1 = glm::vec3(1.00,0.90,0.70);
-            renderer->fractalsParameters.lightIntensity1 = 3.5;
-            
-            renderer->fractalsParameters.lightDirection2 = glm::vec3(-0.707, 0.000, 0.707);
-            renderer->fractalsParameters.lightColor2 = glm::vec3(1.00,0.90,0.70);
-            renderer->fractalsParameters.lightIntensity2 = 3.5;
-            renderer->fractalsParameters.ambientLightColor = glm::vec3(0.35, 0.30, 0.25);
-            renderer->fractalsParameters.ambientLightIntensity = 2.5;
-            break;
-        }
-        case FractalType::Julia3: {
-            renderer->fractalsParameters.lightDirection1 = glm::vec3(0.577, 0.577,  0.577);
-            renderer->fractalsParameters.lightColor1 = glm::vec3(1.00,0.90,0.70);
-            renderer->fractalsParameters.lightIntensity1 = 3.5;
-            
-            renderer->fractalsParameters.lightDirection2 = glm::vec3(-0.707, 0.000, 0.707);
-            renderer->fractalsParameters.lightColor2 = glm::vec3(1.00,0.90,0.70);
-            renderer->fractalsParameters.lightIntensity2 = 3.5;
-            renderer->fractalsParameters.ambientLightColor = glm::vec3(0.35, 0.30, 0.25);
-            renderer->fractalsParameters.ambientLightIntensity = 2.5;
-            break;
-        }
-        case FractalType::Julia4: {
-            renderer->fractalsParameters.lightDirection1 = glm::vec3(0.577, 0.577,  0.577);
-            renderer->fractalsParameters.lightColor1 = glm::vec3(1.00,0.90,0.70);
-            renderer->fractalsParameters.lightIntensity1 = 3.5;
-            
-            renderer->fractalsParameters.lightDirection2 = glm::vec3(-0.707, 0.000, 0.707);
-            renderer->fractalsParameters.lightColor2 = glm::vec3(1.00,0.90,0.70);
-            renderer->fractalsParameters.lightIntensity2 = 3.5;
-            renderer->fractalsParameters.ambientLightColor = glm::vec3(0.35, 0.30, 0.25);
-            renderer->fractalsParameters.ambientLightIntensity = 2.5;
-            break;
-        }
-    }
-    */
-}
-    
+} 

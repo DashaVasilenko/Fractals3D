@@ -2,9 +2,7 @@
 
 #include "camera.h"
 #include "inputSystem.h"
-//#include <glfw/glfw3.h>
 #include <GLFW/glfw3.h>
-//#include <math.h>
 
 Camera::Camera(const glm::vec3& position) {
     this->position = position;
@@ -36,7 +34,6 @@ void Camera::SetCameraType(CameraType t) {
         }
     }
 }
-
 
 glm::mat4 Camera::GetViewMatrix() {
     return glm::mat4(glm::vec4(right, 0.0f), glm::vec4(up, 0.0f), glm::vec4(front, 0.0f), glm::vec4(position, 1.0f));
@@ -114,5 +111,4 @@ void Camera::UpdateVectors(const float& delta) {
         right = glm::normalize(glm::cross(front, glm::vec3(0.0f, 1.0f, 0.0f)));
         up = glm::normalize(glm::cross(right, front));
     }
-    //fieldOfView = InputSystem::fieldOfView;
 } 

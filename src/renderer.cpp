@@ -85,31 +85,6 @@ void Renderer::ConvertHdrMapToCubemap() {
     GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 }
 
-void Renderer::ConvertHdrMapToCubemapMonster() {
-	cubeProgram.Run();
-	cubeProgram.SetUniform("equirectangularMap", 0);
-    cubeProgram.SetUniform("projection", fractalsParameters.monsterColorHDR.GetProjection());
-    GLCall(glActiveTexture(GL_TEXTURE0));
-    GLCall(glBindTexture(GL_TEXTURE_2D, fractalsParameters.monsterColorHDR.GetDescriptor()));
-
-    GLCall(glViewport(0, 0, fractalsParameters.monsterColorHDR.GetSize(), fractalsParameters.monsterColorHDR.GetSize())); // configure the viewport to the capture dimensions.
-    GLCall(glBindFramebuffer(GL_FRAMEBUFFER, fractalsParameters.monsterColorHDR.GetFBO()));
-
-	glm::mat4* views = fractalsParameters.monsterColorHDR.GetView();
-    for (unsigned int i = 0; i < 6; ++i) {
-		cubeProgram.SetUniform("view", views[i]);
-        GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, fractalsParameters.monsterColorHDR.GetCubemap(), 0));
-        GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-
-        //render cube
-		GLCall(glBindVertexArray(cubeVAO));
-		GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIBO)); 
-		GLCall(glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, NULL));
-    }
-    GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
-}
-
-
 //--------------------------------------------------------------------------
 // solve diffuse integral by convolution to create an irradiance (cube)map
 //--------------------------------------------------------------------------
@@ -209,8 +184,6 @@ void Renderer::Init() {
  	irradianceProgram.Link();
 	irradianceProgram.DeleteShaders();
 	//--------------------------------------------------------------------------
-	//fractalsParameters.monsterColorHDR.LoadHDR(fractalsParameters.monsterColorHDR.factoryHDR);
-	//ConvertHdrMapToCubemapMonster();
 
 	program.Run();
 	program.SetUniform("skyBox", 0);
@@ -220,17 +193,12 @@ void Renderer::Init() {
 	ConvertHdrMapToCubemap();
 	skyBoxHDR.InitIrradianceCubemap();
 	CreateIrradianceCubeMap();
-
-	fractalsParameters.monsterColorHDR.LoadHDR(fractalsParameters.monsterColorHDR.factoryHDR);
-	ConvertHdrMapToCubemapMonster();
-
-	
 }
 
 void Renderer::Render(int width, int height) {
 	GLCall(glViewport(0, 0, width, height));
 	GLCall(glEnable(GL_DEPTH_TEST));
-    GLCall(glDepthFunc(GL_LEQUAL)); // set depth function to less than AND equal for skybox depth trick.
+    GLCall(glDepthFunc(GL_LEQUAL)); // set depth function to less than AND equal for skybox depth trick
 
 	//---------------------------change size of window--------------------------
 	if (InputSystem::isWindowSizeChange) {
@@ -252,7 +220,7 @@ void Renderer::Render(int width, int height) {
 	program.SetUniform("fieldOfView", fov);
 	program.SetUniform("Time", (float)glfwGetTime());
 	if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2 &&
-		currentFractalType != FractalType::Apollonian3) {
+		currentFractalType != FractalType::Apollonian3 && currentFractalType != FractalType::MengerSponge3) {
 		program.SetUniform("shadowStrength", fractalsParameters.shadow_strength);
 	}
 
@@ -270,13 +238,11 @@ void Renderer::Render(int width, int height) {
 
 	//-------------------------set background type------------------------------
 	if (currentFractalType == FractalType::Apollonian1 || currentFractalType == FractalType::Apollonian2 ||
-		currentFractalType == FractalType::Apollonian3) {
+		currentFractalType == FractalType::Apollonian3 || currentFractalType == FractalType::MengerSponge3) {
 		
 		program.SetUniform("backgroundColor", fractalsParameters.room_background);
 	}
 	else {
-	//if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2 &&
-	//	currentFractalType != FractalType::Apollonian3) {
 		switch(fractalsParameters.background_type) {
     	    case BackgroundType::Solid: {
 				program.SetUniform("reflectedColor", fractalsParameters.background_color);
@@ -298,11 +264,9 @@ void Renderer::Render(int width, int height) {
 				GLCall(glActiveTexture(GL_TEXTURE0));
 				GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxHDR.GetCubemap()));
 				//if (fractalsParameters.irradianceCubemap) {
-				//	program.SetUniform("irradianceMap", 1);
 					GLCall(glActiveTexture(GL_TEXTURE1));
 					GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxHDR.GetIrradiance()));
 				//}
-				//std::cout << "vre" << std::endl;
     	        break;
     	    }
     	}
@@ -348,7 +312,7 @@ void Renderer::Render(int width, int height) {
 		}
 	}
 	if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2 &&
-	    currentFractalType != FractalType::Apollonian3) {
+	    currentFractalType != FractalType::Apollonian3 && currentFractalType != FractalType::MengerSponge3) {
 		program.SetUniform("shininess", fractalsParameters.shininess);
 		program.SetUniform("reflection", fractalsParameters.reflection);
 	}
@@ -371,12 +335,6 @@ void Renderer::Render(int width, int height) {
 			program.SetUniform("iterations", fractalsParameters.juliabulb1_iterations);
             break;
         }
-		case FractalType::Monster: {
-			//program.SetUniform("color", 2);
-			//GLCall(glActiveTexture(GL_TEXTURE2));
-			//GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, fractalsParameters.monsterColorHDR.GetCubemap()));
-			break;
-		}
 		case FractalType::Julia1: {
 			program.SetUniform("offset", fractalsParameters.julia1_offset);
 			program.SetUniform("smoothness", fractalsParameters.julia1_smoothness);
@@ -426,6 +384,10 @@ void Renderer::Render(int width, int height) {
 			program.SetUniform("offset1", fractalsParameters.menger_sponge2_offset1);
 			program.SetUniform("offset2", fractalsParameters.menger_sponge2_offset2);
 			program.SetUniform("iterations", fractalsParameters.menger_sponge2_iterations);
+			break;
+		}
+		case FractalType::MengerSponge3: {
+			program.SetUniform("type", fractalsParameters.menger_sponge3_type);
 			break;
 		}
 		case FractalType::Apollonian1: {

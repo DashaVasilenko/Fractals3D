@@ -11,4 +11,3 @@ double InputSystem::deltaCursPosY;
 double InputSystem::scrollOffsetX;
 double InputSystem::scrollOffsetY; 
 bool InputSystem::isWindowSizeChange = false;
-//float InputSystem::fieldOfView = 45.0f;

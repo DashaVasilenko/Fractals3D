@@ -25,7 +25,6 @@ public:
     static double scrollOffsetX;
     static double scrollOffsetY;
     static bool isWindowSizeChange;
-    //static float fieldOfView;
 private:
 };
 

@@ -22,7 +22,6 @@ public:
     void SetRoomBackgroundColor(const glm::vec3& c) { renderer->fractalsParameters.room_background = c; }
     void SetSunColor(const glm::vec3& c) { renderer->fractalsParameters.sun_color = c; }
     void SetBackgroundBrightness(float c) { renderer->fractalsParameters.background_brightness = c; }
-        
 
     // Textures
     void SetSkyboxTexture(SkyboxTexture skyboxTexture);
@@ -50,12 +49,10 @@ public:
     void SetType7Color2(const glm::vec3& c) { renderer->fractalsParameters.type7_color2 = c; }
     void SetType7Color3(const glm::vec3& c) { renderer->fractalsParameters.type7_color3 = c; }
 
-
     // General fractal parameters
     void SetShadowStrength(float c ) { renderer->fractalsParameters.shadow_strength = c; }
     void SetFractalShininess(float c) { renderer->fractalsParameters.shininess = c; }
     void SetFractalReflect(float c) { renderer->fractalsParameters.reflection = c; }
-
     void SetFractalType(FractalType c);
     
     // Sun parameters
@@ -129,6 +126,9 @@ public:
     void SetMengerSponge2Offset2(float c) { renderer->fractalsParameters.menger_sponge2_offset2 = c; }
     void SetMengerSponge2Iterations(int c) { renderer->fractalsParameters.menger_sponge2_iterations = c; }
 
+    // MengerSponge3 fractal parameters
+    void SetMengerSponge3Type(int c) { renderer->fractalsParameters.menger_sponge3_type = c; }
+
     // Apollonian1 fractal parameters
     void SetApollonian1Offset1(float c) { renderer->fractalsParameters.apollonian1_offset1 = c; }
     void SetApollonian1Offset2(float c) { renderer->fractalsParameters.apollonian1_offset2 = c; }
@@ -153,6 +153,5 @@ private:
     SkyBoxHDR* skyboxHDR;
 
 };
-
 
 #endif

@@ -4,10 +4,8 @@
 #include <GL/glew.h>
 #define GLEW_STATIC
 
-
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
-
 
 #include <stdlib.h>
 #include <string>
@@ -25,7 +23,6 @@ public:
     int GetHeight() const { return this->height; }
     void GetSize(int* width, int* heigth) const { *width = this->width; *heigth = this->height; }
 
-
     int Init();
     void Destroy();
     void Close() { GLCall(glfwSetWindowShouldClose(window, GL_TRUE)); };
@@ -36,7 +33,6 @@ public:
     static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
     static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
     static void WindowSizeCallback(GLFWwindow* window, int width, int height);
-
 
 private:
     GLFWwindow* window; 

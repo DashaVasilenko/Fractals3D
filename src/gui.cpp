@@ -1,11 +1,8 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-//#include <iostream>
-
 #include "gui.h"
 #include "inputSystem.h"
-#include "errors.h"
 
 bool MyDragInt(const char *label, int *v, float v_speed = (1.0F), int v_min = 0, int v_max = 0) {
     float v_backup = *v;
@@ -139,7 +136,6 @@ void Gui::Init(Window* window, FractalController* fr) {
     fileBrowserSetupSkyboxHDR.SetTitle("Setup HDR skybox");
     //std::vector<const char*> image_filter = { ".png", ".jpg", ".jpeg", ".bmp", ".tga", ".hdr", ".obj" };
     //fileBrowserSaveImage.SetTypeFilters(image_filter);
- 
 }
 
 void Gui::MenuBar() {
@@ -166,9 +162,6 @@ void Gui::MenuBar() {
                 //m_FileExplorerSaveConfig.Open();
             }
             ImGui::Separator();
-            //if (ImGui::MenuItem("Export..")) {
-                //m_FileExplorerSaveConfig.Open();
-            //}
             
             if (ImGui::BeginMenu("Export..")) {
                 if (ImGui::MenuItem("PNG")) {
@@ -229,18 +222,7 @@ void Gui::MenuBar() {
             ImGui::Text("By Daria Vasilenko");
             ImGui::EndMenu();
         }
-        /*
-        if (ImGui::BeginMenu("Render")) {
-            if (ImGui::MenuItem("Render Image", "F5")) {
-                m_RenderSettingsVisible = true;
-                s32 width;
-                s32 height;
-                window.GetSize(&width, &height);
-                ImGui::SetNextWindowPos(ImVec2(width*0.5f, height*0.5f));
-            }
-            ImGui::EndMenu();
-        }
-        */
+        
         ImGui::EndMainMenuBar();
     }
 }
@@ -286,10 +268,6 @@ void Gui::Stats() {
             ImGui::Text("Current fractal type: Juliabulb1 fractal");
             break;
         }
-        case FractalType::Monster: {
-            ImGui::Text("Current fractal type: Monster fractal");
-            break;
-        }
         case FractalType::Julia1: {
             ImGui::Text("Current fractal type: Julia1 fractal");
             break;
@@ -322,6 +300,10 @@ void Gui::Stats() {
             ImGui::Text("Current fractal type: MengerSponge2 fractal");
             break;
         }
+        case FractalType::MengerSponge3: {
+            ImGui::Text("Current fractal type: MengerSponge3 fractal");
+            break;
+        }
         case FractalType::Apollonian1: {
             ImGui::Text("Current fractal type: Apollonian1 fractal");
             break;
@@ -352,7 +334,7 @@ void Gui::MainParameters() {
 
     //-----------------------------Shadows-------------------------------
     if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2 &&
-        currentFractalType != FractalType::Apollonian3) {
+        currentFractalType != FractalType::Apollonian3 && currentFractalType != FractalType::MengerSponge3) {
         if (ImGui::Checkbox("Soft shadows", &soft_shadows)) { 
             flag = true; 
         }
@@ -409,7 +391,7 @@ void Gui::MainParameters() {
 
     //---------------------Background parameters-------------------------
     if (currentFractalType == FractalType::Apollonian1 || currentFractalType == FractalType::Apollonian2 ||
-        currentFractalType == FractalType::Apollonian3) {
+        currentFractalType == FractalType::Apollonian3 || currentFractalType == FractalType::MengerSponge3) {
 
         ImGui::NewLine();
         ImGui::Separator();
@@ -421,9 +403,6 @@ void Gui::MainParameters() {
         }
     }
     else {
-    //if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2 && 
-    //    currentFractalType != FractalType::Apollonian3) {
-
         ImGui::NewLine();
         ImGui::Separator();
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + parametersSize[0]/2.0 - 80.0);
@@ -516,7 +495,6 @@ void Gui::MainParameters() {
             }  
         }
     
-
         // HDR Texture background
         if (current_background_type == 3) {
             if (MyDragFloat("Brightness", &background_brightness, 0.1, 0, 30)) {
@@ -559,7 +537,7 @@ void Gui::MainParameters() {
         fractalController->SetFractalType(currentFractalType);
         flag = true;
         if (currentFractalType == FractalType::Apollonian1 || currentFractalType == FractalType::Apollonian2 ||
-            currentFractalType == FractalType::Apollonian3) {
+            currentFractalType == FractalType::Apollonian3 || currentFractalType == FractalType::MengerSponge3) {
 
             currentCameraType = CameraType::CartesianCamera;
             fractalController->SetCameraType(currentCameraType);
@@ -568,20 +546,6 @@ void Gui::MainParameters() {
             currentCameraType = CameraType::SphericalCamera;
             fractalController->SetCameraType(currentCameraType);
         }
-
-        /*
-        if ( (currentFractalType == FractalType::Apollonian1 || currentFractalType == FractalType::Apollonian2) && currentCameraType == CameraType::SphericalCamera) {
-            currentCameraType = CameraType::CartesianCamera;
-            fractalController->SetCameraType(currentCameraType);
-        }
-        else if ( (currentFractalType == FractalType::Apollonian1 || currentFractalType == FractalType::Apollonian2) && currentCameraType == CameraType::CartesianCamera) {
-            currentCameraType = CameraType::CartesianCamera;
-        }
-        else if ( (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2) && currentCameraType == CameraType::CartesianCamera) {
-            currentCameraType = CameraType::SphericalCamera;
-            fractalController->SetCameraType(currentCameraType);
-        }
-        */
     }
     //-------------------------------------------------------------------
     
@@ -611,10 +575,6 @@ void Gui::FractalParameters() {
         }
         case FractalType::Juliabulb1: {
             Juliabulb1();
-            break;
-        }
-        case FractalType::Monster: {
-
             break;
         }
         case FractalType::Julia1: {
@@ -647,6 +607,10 @@ void Gui::FractalParameters() {
         }
         case FractalType::MengerSponge2: {
             MengerSponge2();
+            break;
+        }
+        case FractalType::MengerSponge3: {
+            MengerSponge3();
             break;
         }
         case FractalType::Apollonian1: {
@@ -741,7 +705,7 @@ void Gui::FractalColor() {
     }
 
     if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2 &&
-        currentFractalType != FractalType::Apollonian3) {
+        currentFractalType != FractalType::Apollonian3 && currentFractalType != FractalType::MengerSponge3) {
 
         if (MyDragFloat("Shininess", &shininess, 1, 1, 100)) {
             fractalController->SetFractalShininess(shininess);
@@ -947,6 +911,18 @@ void Gui::MengerSponge2() {
     ImGui::End();
 }
 
+void Gui::MengerSponge3() {
+    ImGui::Begin("MengerSponge3 parameters", NULL, parametersWindowFlags); 
+    FractalColor();
+    ImGui::Separator();
+
+    if (ImGui::Combo("Sponge type", &current_menger_sponge3_type, menger_sponge3_type, IM_ARRAYSIZE(menger_sponge3_type))) {
+        fractalController->SetMengerSponge3Type(current_menger_sponge3_type);
+    }
+
+    ImGui::End();
+}
+
 void Gui::Apollonian1() {
     ImGui::Begin("Apollonian1 parameters", NULL, parametersWindowFlags); 
     FractalColor();
@@ -1082,7 +1058,6 @@ void Gui::ExportAs() {
                 }
             }
 
-            //printf("Hey\n");
             switch(currentExportType) {
                 case ExportType::Png: {
                     stbi_write_png((output_path + output_name).c_str(), output_width, output_height, 3, imageData2, output_width * 3);

@@ -2,13 +2,12 @@
 #define __SHADER_PROGRAM__
 
 #include <stdio.h>
-
-#include "window.h"
 #include <map>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "errors.h"
+
+#include "window.h"
 #include "types.h"
 
 class ShaderProgram {
@@ -20,7 +19,6 @@ public:
     void Run();
     void DeleteShaders();
     void Delete();
-    //~ShaderProgram();
 
     void SetShaderParameters(bool c) { shader_parameters = c; }
     void SetFractalType(FractalType c) { currentFractalType = c; }
@@ -34,7 +32,6 @@ public:
     void SetUniform(const char* name, const glm::mat4&);
     void SetUniform(const char* name, float value);
     void SetUniform(const char* name, int value);
-
 
     FractalType GetFractalType() { return currentFractalType; }
 

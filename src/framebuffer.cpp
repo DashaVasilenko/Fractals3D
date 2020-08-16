@@ -4,7 +4,7 @@
 #include "inputSystem.h"
 
 FrameBuffer::FrameBuffer() {
-    GLCall(glGenFramebuffers(1, &descriptor)); // создаем буфер FBO (frame buffer objects) 1 - кол-во буферов
+    GLCall(glGenFramebuffers(1, &descriptor)); // create FBO (frame buffer objects) 1 - number of buffers
 }
 
 void FrameBuffer::BufferInit(int width, int  height) {
@@ -54,5 +54,5 @@ void FrameBuffer::Unbind() const {
 }
 
 FrameBuffer::~FrameBuffer() {
-    GLCall(glDeleteFramebuffers(1, &descriptor));  // удаляем ненужный буфер
+    GLCall(glDeleteFramebuffers(1, &descriptor));  // delete buffer
 }

@@ -6,7 +6,6 @@
 #include "camera.h"
 #include "framebuffer.h"
 #include "skybox.h"
-#include "texture.h"
 
 class Renderer {
 public:
@@ -24,9 +23,6 @@ public:
 
     void ConvertHdrMapToCubemap();
     void CreateIrradianceCubeMap();
-
-    void ConvertHdrMapToCubemapMonster();
-
 
     void Init();
     void Update();
@@ -145,6 +141,9 @@ private:
         float menger_sponge2_offset2 = 1.0f;
         int menger_sponge2_iterations = 5;
 
+        //MengerSponge3 fractal parameters
+        int menger_sponge3_type;
+
         // Apollonian1 fractal parameters
         float apollonian1_offset1 = 12.0f;
         float apollonian1_offset2 = 1.1f;
@@ -161,9 +160,6 @@ private:
         float apollonian3_offset3 = 1.0f;
         glm::vec3 apollonian3_csize = { 0.808, 0.8, 1.137 };
         int apollonian3_iterations = 9;
-
-        SkyBoxHDR monsterColorHDR;
-
     };
     FractalsParameters fractalsParameters;
 

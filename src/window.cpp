@@ -46,8 +46,6 @@ void Window::MouseButtonCallback(GLFWwindow* window, int button, int action, int
 void Window::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset) { 
     InputSystem::scrollOffsetX = xoffset;
     InputSystem::scrollOffsetY = yoffset;
-    //InputSystem::fieldOfView -= yoffset;
-    //InputSystem::fieldOfView = glm::clamp(InputSystem::fieldOfView, 1.0f, 45.0f);
 }
 
 void Window::WindowSizeCallback(GLFWwindow* window, int width, int height) {

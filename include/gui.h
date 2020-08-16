@@ -8,13 +8,7 @@
 #include <stdio.h>
 #include <array>
 
-#include "renderer.h"
-#include "framebuffer.h"
-#include "window.h"
-#include "camera.h"
-#include "types.h"
 #include "fractalController.h"
-
 
 class Gui {
 public:
@@ -51,8 +45,9 @@ private:
 
     // fractal type
     FractalType currentFractalType = FractalType::Test;
-    const char* fractal_type[15] = { "Test", "Mandelbulb", "Juliabulb1", "Monster", "Julia1", "Julia2", "Julia3", "Julia4", "Sierpinski1",
-                                     "Sierpinski2", "MengerSponge1", "MengerSponge2", "Apollonian1", "Apollonian2", "Apollonian3" };
+    const char* fractal_type[15] = { "Test", "Mandelbulb", "Juliabulb1", "Julia1", "Julia2", "Julia3", "Julia4", "Sierpinski1",
+                                     "Sierpinski2", "MengerSponge1", "MengerSponge2", "MengerSponge3", "Apollonian1", "Apollonian2",
+                                      "Apollonian3" };
     int current_fractal_type = 0; 
 
     // general fractal parameters
@@ -97,7 +92,6 @@ private:
     float julia1_smoothness = 4.0;
     int julia1_iterations = 11;
 
-
     // julia2 fractal parameters
     float julia2_offset[3] = { 0.1498, 0.4479, 0.4495 };
     float julia2_w =  0.4491;
@@ -137,6 +131,10 @@ private:
     float menger_sponge2_offset1 = 1.0;
     float menger_sponge2_offset2 = 1.0;
     int menger_sponge2_iterations = 5;
+
+    // MengerSponge3 fractal parameters
+    const char* menger_sponge3_type[4] = { "1", "2", "3", "4" };
+    int current_menger_sponge3_type = 0; 
 
     // Apollonian1 fractal parameters
     float apollonian1_offset1 = 12.0;
@@ -190,8 +188,8 @@ private:
     ImGuiWindowFlags parametersWindowFlags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse ;
     ImGuiWindowFlags fractalParametersWindowFlags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-    bool show_demo_window = true; // потом надо удалить
-    bool show_another_window = false; // потом надо удалить
+    bool show_demo_window = true; // потом надо удалить !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    bool show_another_window = false; // потом надо удалить !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     CameraType currentCameraType = CameraType::SphericalCamera;
 
     FractalController* fractalController;
@@ -221,6 +219,7 @@ private:
     void Sierpinski2();
     void MengerSponge1();
     void MengerSponge2();
+    void MengerSponge3();
     void Apollonian1();
     void Apollonian2();
     void Apollonian3();

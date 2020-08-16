@@ -9,7 +9,7 @@ void ShaderProgram::Init(const std::map<GLenum, std::string>& mapSources) {
 }
 
 void ShaderProgram::Load() {
-    // разбираемся с дефайнами до компиляции
+    //--------------------download the necessary program------------------------
     mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
     switch(currentFractalType) {
         case FractalType::Test: {
@@ -22,10 +22,6 @@ void ShaderProgram::Load() {
         }
         case FractalType::Juliabulb1: {
  	        mapSources[GL_FRAGMENT_SHADER] = "glsl/juliabulb_pixel.glsl";
-            break;
-        }
-        case FractalType::Monster: {
- 	        mapSources[GL_FRAGMENT_SHADER] = "glsl/monster_pixel.glsl";
             break;
         }
         case FractalType::Julia1: {
@@ -60,6 +56,10 @@ void ShaderProgram::Load() {
             mapSources[GL_FRAGMENT_SHADER] = "glsl/menger_sponge2_pixel.glsl";
             break;
         }
+        case FractalType::MengerSponge3: {
+            mapSources[GL_FRAGMENT_SHADER] = "glsl/menger_sponge3_pixel.glsl";
+            break;
+        }
         case FractalType::Apollonian1: {
             mapSources[GL_FRAGMENT_SHADER] = "glsl/apollonian1_pixel.glsl";
             break;
@@ -74,23 +74,14 @@ void ShaderProgram::Load() {
         }
     }
     Init(mapSources);
+    //--------------------------------------------------------------------------
     
+    //------------------create all defines before compilation-------------------
     defines = "";
     if (shader_parameters)
         defines += "#define FLAG_SOFT_SHADOWS" + std::string("\n");
     
-    /*
-    switch(currentFractalType) {
-        case FractalType::Test: {
-            defines += "#define TEST" + std::string("\n");
-            break;
-        }
-        case FractalType::Mandelbulb: {
-            defines += "#define MANDELBULB" + std::string("\n");
-            break;
-        }
-    }
-    */
+    //--------------------------background defines------------------------------
     switch(currentBackgroundType) {
         case BackgroundType::Solid: {
             defines += "#define SOLID_BACKGROUND" + std::string("\n");
@@ -106,15 +97,14 @@ void ShaderProgram::Load() {
         }
         case BackgroundType::SkyboxHDR: {
             defines += "#define SKYBOX_BACKGROUND_HDR" + std::string("\n");
-            //if (irradianceCubemap) 
-            //    defines += "#define IRRADIANCE_CUBEMAP" + std::string("\n");
             break;
         }
     }
     if (irradianceCubemap) 
         defines += "#define IRRADIANCE_CUBEMAP" + std::string("\n");
-    //std::cout << currentBackgroundType << std::endl;
+    //--------------------------------------------------------------------------
 
+    //--------------------------coloring type defines---------------------------
     switch(currentColoringType) {
         case ColoringType::Type1: {
             defines += "#define COLORING_TYPE_1" + std::string("\n");
@@ -145,6 +135,7 @@ void ShaderProgram::Load() {
             break;
         }
     }
+    //--------------------------------------------------------------------------
     
     Compile();
     Link();
@@ -165,7 +156,7 @@ void ShaderProgram::Compile() {
 
         const char *sources[3] = { version.c_str(), defines.c_str(), source_cpp.c_str() };
 	    GLCall(glShaderSource(shader_descriptor, 3, sources, NULL));  
-	    GLCall(glCompileShader(shader_descriptor)); // компилируем шейдер
+	    GLCall(glCompileShader(shader_descriptor));
 
  	    // проверка на ошибки при сборке шейдера
  	    GLint success;
@@ -184,7 +175,6 @@ void ShaderProgram::Compile() {
 }
 
 void ShaderProgram::Link() {
-    // создание программы 
  	descriptor = glCreateProgram();
 
     for (auto& element: mapShaders) {
@@ -217,16 +207,7 @@ void ShaderProgram::DeleteShaders() {
     }
 }
 
-/*
-ShaderProgram::~ShaderProgram(){
-    GLCall(glDeleteProgram(descriptor));
-}
-*/
-
 void ShaderProgram::Delete() {
-    //for (auto& element: mapShaders) {
- 	//    GLCall(glDeleteShader(element.second));
-    //}
     GLCall(glDeleteProgram(descriptor));
 }
 
@@ -237,7 +218,6 @@ void ShaderProgram::SetUniform(const char* name, const glm::vec2& vector) {
         std::cerr << "Uniform  " << std::string(name) + " " <<  location << " not found" << std::endl;
         exit(EXIT_FAILURE);
     }
-    // обработка ошибок!!!
 }
 
 void ShaderProgram::SetUniform(const char* name, const glm::vec3& vector) {
@@ -247,7 +227,6 @@ void ShaderProgram::SetUniform(const char* name, const glm::vec3& vector) {
         std::cerr << "Uniform  " << std::string(name) + " " <<  location << " not found" << std::endl;
         exit(EXIT_FAILURE);
     }
-    // обработка ошибок!!!
 }
 
 void ShaderProgram::SetUniform(const char* name, const glm::vec4& vector) {
@@ -257,7 +236,6 @@ void ShaderProgram::SetUniform(const char* name, const glm::vec4& vector) {
         std::cerr << "Uniform  " << std::string(name) + " " <<  location << " not found" << std::endl;
         exit(EXIT_FAILURE);
     }
-    // обработка ошибок!!!
 }
 
 void ShaderProgram::SetUniform(const char* name, const glm::mat4& matrix) {
@@ -267,7 +245,6 @@ void ShaderProgram::SetUniform(const char* name, const glm::mat4& matrix) {
         std::cerr << "Uniform  " << std::string(name) + " " << location << " not found" << std::endl;
         exit(EXIT_FAILURE);
     }
-    // обработка ошибок!!!
 }
 
 void ShaderProgram::SetUniform(const char* name, float value) {
@@ -277,7 +254,6 @@ void ShaderProgram::SetUniform(const char* name, float value) {
         std::cerr << "Uniform  " << std::string(name) + " " <<  location << " not found" << std::endl;
         exit(EXIT_FAILURE);
     }
-    // обработка ошибок!!!
 }
 
 void ShaderProgram::SetUniform(const char* name, int value) {
@@ -287,5 +263,4 @@ void ShaderProgram::SetUniform(const char* name, int value) {
         std::cerr << "Uniform  " << std::string(name) + " " <<  location << " not found" << std::endl;
         exit(EXIT_FAILURE);
     }
-    // обработка ошибок!!!
 }
