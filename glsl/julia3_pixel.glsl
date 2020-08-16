@@ -68,8 +68,8 @@ const float EPSILON = 0.0005;
 //#define AA 2  // Set AA to 1 if your machine is too slow
 //#endif
 
-vec3 hash3( float n ) {
-    return fract(sin(vec3(n,n+1.0,n+2.0))*vec3(43758.5453123,22578.1459123,19642.3490423));
+vec3 hash3(float n) {
+    return fract(sin(vec3(n, n+1.0, n+2.0))*vec3(43758.5453123, 22578.1459123, 19642.3490423));
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -344,7 +344,7 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
         color.xyz += ambientIBL; 
     #endif
 
-	    return vec4(pow(color.xyz, vec3(0.4545)), 1.0);
+	    return vec4(pow(color.xyz, vec3(0.4545)), 1.0); // gamma
     }
 }
 

@@ -336,7 +336,7 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
         color.xyz += ambientIBL; 
     #endif
 
-	    return vec4(pow(color.xyz, vec3(0.4545)), 1.0);
+	    return vec4(pow(color.xyz, vec3(0.4545)), 1.0); // gamma
     }
 }
 
