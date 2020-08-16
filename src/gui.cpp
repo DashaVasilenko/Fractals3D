@@ -859,19 +859,18 @@ void Gui::Sierpinski2() {
     FractalColor();
     ImGui::Separator();
 
-    if (MyDragFloat3("Sierpinski2 v1", sierpinski2_va, 0.1, -100, 100)) {
+    if (MyDragFloat3("Sierpinski2 v1", sierpinski2_va, 0.01, -100, 100)) {
         fractalController->SetSierpinski2Vector1(glm::vec3(sierpinski2_va[0], sierpinski2_va[1], sierpinski2_va[2]));
     }
-    if (MyDragFloat3("Sierpinski2 v2", sierpinski2_vb, 0.1, -100, 100)) {
+    if (MyDragFloat3("Sierpinski2 v2", sierpinski2_vb, 0.01, -100, 100)) {
         fractalController->SetSierpinski2Vector2(glm::vec3(sierpinski2_vb[0], sierpinski2_vb[1], sierpinski2_vb[2]));
     }
-    if (MyDragFloat3("Sierpinski2 v3", sierpinski2_vc, 0.1, -100, 100)) {
+    if (MyDragFloat3("Sierpinski2 v3", sierpinski2_vc, 0.01, -100, 100)) {
         fractalController->SetSierpinski2Vector3(glm::vec3(sierpinski2_vc[0], sierpinski2_vc[1], sierpinski2_vc[2]));
     }
     if (MyDragInt("Sierpinski2 i", &sierpinski2_iterations, 0.1, 0, 10)) {
         fractalController->SetSierpinski2Iterations(sierpinski2_iterations);
     }
-    
     ImGui::End();
 }
 
