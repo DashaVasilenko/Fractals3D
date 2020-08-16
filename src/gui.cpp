@@ -761,7 +761,7 @@ void Gui::Julia1() {
     FractalColor();
     ImGui::Separator();
 
-    if (MyDragFloat("Julia1 offset", &julia1_offset, 0.1, 0, 100)) {
+    if (MyDragFloat("Julia1 offset", &julia1_offset, 0.01, 0, 100)) {
         fractalController->SetJulia1Offset(julia1_offset);
     }
     if (MyDragFloat("Julia1 smoothness", &julia1_smoothness, 0.1, 0, 45)) {
@@ -774,14 +774,14 @@ void Gui::Julia1() {
 }
 
 void Gui::Julia2() {
-    ImGui::Begin("Julia2 parameters", NULL, parametersWindowFlags); 
+    ImGui::Begin("Julia2 parameters", NULL, fractalParametersWindowFlags); 
     FractalColor();
     ImGui::Separator();
 
-    if (MyDragFloat3("Julia2 offset", julia2_offset, 0.1, 0, 100)) {
+    if (MyDragFloat3("Julia2 offset", julia2_offset, 0.01, 0, 100)) {
         fractalController->SetJulia2Offset(glm::vec3(julia2_offset[0], julia2_offset[1], julia2_offset[2]));
     }
-    if (MyDragFloat("Julia2 W", &julia2_w, 0.1, 0, 100)) {
+    if (MyDragFloat("Julia2 W", &julia2_w, 0.01, 0, 100)) {
         fractalController->SetJulia2W(julia2_w);
     }
     if (MyDragFloat("Julia2 smoothness", &julia2_smoothness, 0.1, 0, 45)) {
