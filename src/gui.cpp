@@ -879,16 +879,15 @@ void Gui::MengerSponge1() {
     FractalColor();
     ImGui::Separator();
 
-    if (MyDragFloat("MengerSponge1 offset1", &menger_sponge1_offset1, 0.01, -30, 30)) {
+    if (MyDragFloat("Sponge1 offset1", &menger_sponge1_offset1, 0.01, -30, 30)) {
         fractalController->SetMengerSponge1Offset1(menger_sponge1_offset1);
     }
-    if (MyDragFloat("MengerSponge1 ofset2", &menger_sponge1_offset2, 0.01, -30, 30)) {
+    if (MyDragFloat("Sponge1 offset2", &menger_sponge1_offset2, 0.01, -30, 30)) {
         fractalController->SetMengerSponge1Offset2(menger_sponge1_offset2);
     }
-    if (MyDragInt("MengerSponge1 i", &menger_sponge1_iterations, 0.1, 0, 10)) {
+    if (MyDragInt("Sponge1 i", &menger_sponge1_iterations, 0.1, 0, 10)) {
         fractalController->SetMengerSponge1Iterations(menger_sponge1_iterations);
     }
-
     ImGui::End();
 }
 
@@ -897,16 +896,15 @@ void Gui::MengerSponge2() {
     FractalColor();
     ImGui::Separator();
 
-    if (MyDragFloat("MengerSponge2 offset1", &menger_sponge2_offset1, 0.01, -30, 30)) {
+    if (MyDragFloat("Sponge2 offset1", &menger_sponge2_offset1, 0.01, -30, 30)) {
         fractalController->SetMengerSponge2Offset1(menger_sponge2_offset1);
     }
-    if (MyDragFloat("MengerSponge2 ofset2", &menger_sponge2_offset2, 0.01, -30, 30)) {
+    if (MyDragFloat("Sponge2 ofset2", &menger_sponge2_offset2, 0.01, -30, 30)) {
         fractalController->SetMengerSponge2Offset2(menger_sponge2_offset2);
     }
-    if (MyDragInt("MengerSponge2 i", &menger_sponge2_iterations, 0.1, 0, 10)) {
+    if (MyDragInt("Sponge2 i", &menger_sponge2_iterations, 0.1, 0, 10)) {
         fractalController->SetMengerSponge2Iterations(menger_sponge2_iterations);
     }
-
     ImGui::End();
 }
 
@@ -918,7 +916,6 @@ void Gui::MengerSponge3() {
     if (ImGui::Combo("Sponge type", &current_menger_sponge3_type, menger_sponge3_type, IM_ARRAYSIZE(menger_sponge3_type))) {
         fractalController->SetMengerSponge3Type(current_menger_sponge3_type);
     }
-
     ImGui::End();
 }
 
