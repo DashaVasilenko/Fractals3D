@@ -31,9 +31,6 @@ uniform vec3 color2;
 uniform vec3 color3;
 #endif
 
-//uniform float shininess; // показатель степени зеркального отражения
-//uniform float reflection; // сила отражения
-
 uniform vec3 backgroundColor;
 uniform float offset1;
 uniform float offset2;
@@ -41,11 +38,10 @@ uniform float offset3;
 uniform vec3 csize;
 uniform int iterations;
 
-//const int MAX_MARCHING_STEPS = 255;
 const int MAX_MARCHING_STEPS = 256;
 const float MIN_DIST = 0.01;
-const float MAX_DIST = 20.0; //50
-const float EPSILON = 0.001; //0.0005;
+const float MAX_DIST = 20.0; 
+const float EPSILON = 0.001; 
 
 // antialias level (1, 2, 3...)
 #define AA 1
@@ -58,12 +54,9 @@ const float EPSILON = 0.001; //0.0005;
 // https://www.shadertoy.com/view/ldjGDw
 float apollonian(vec3 pos, float s, out vec4 trapColor) {
     float scale = 1.0;
-    //float add = sin(Time)*0.2 + 0.1;
     float add = sin(offset3)*0.2 + 0.1;
-    //vec3 CSize = vec3(0.808, 0.8, 1.137);
 
 #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
-    //vec4 trap = vec4(abs(pos), dot(pos, pos));
     vec4 trap = vec4(1000.0);
 #endif
 
@@ -91,8 +84,6 @@ float apollonian(vec3 pos, float s, out vec4 trapColor) {
     float l = length(pos.xy);
 	float rxy = l - 4.0;
 	float n = l*pos.z;
-	//rxy = max(rxy, -n/(length(pos)) - 0.07 + sin(Time*2.0 + pos.x + pos.y + 23.5*pos.z)*0.02);
-    //float x = (1.0 + sin(Time*2.0)); 
     rxy = max(rxy, -n/(length(pos)) - 0.07 + sin(offset3*2.0 + pos.x + pos.y + 23.5*pos.z)*0.02);
     float x = (1.0 + sin(offset3*2.0));
     x =x*x*x*x*0.5;
@@ -103,7 +94,7 @@ float apollonian(vec3 pos, float s, out vec4 trapColor) {
 #endif
 
 #if defined COLORING_TYPE_3 || defined COLORING_TYPE_6
-    trapColor = vec4(trap, adr, 1.0);
+    trapColor = vec4(trap, 1.0, 1.0);
 #endif
 
     return ((rxy + h)/abs(scale));
@@ -115,8 +106,8 @@ float apollonian(vec3 pos, float s, out vec4 trapColor) {
 // size: resolution of the output image
 // fragCoord: the x,y coordinate of the pixel in the output image
 vec3 rayDirection(float fieldOfView, vec2 size, vec2 fragCoord) {
-    vec2 xy = fragCoord - size / 2.0;
-    float z = size.y / tan(radians(fieldOfView) / 2.0);
+    vec2 xy = fragCoord - size/2.0;
+    float z = size.y / tan(radians(fieldOfView)/2.0);
     vec3 dir = xy.x*viewMatrix[0].xyz + xy.y*viewMatrix[1].xyz + z*viewMatrix[2].xyz;
     return normalize(dir);
 }
@@ -128,11 +119,11 @@ vec3 rayDirection(float fieldOfView, vec2 size, vec2 fragCoord) {
 vec3 computeNormal(vec3 p, float s) {
     vec4 trap;
     const float h = 0.0001; // replace by an appropriate value
-    const vec2 k = vec2(1,-1)*h;
-    return normalize( k.xyy*apollonian( p + k.xyy, s, trap) + 
-                      k.yyx*apollonian( p + k.yyx, s, trap) + 
-                      k.yxy*apollonian( p + k.yxy, s, trap) + 
-                      k.xxx*apollonian( p + k.xxx, s, trap) );
+    const vec2 k = vec2(1, -1)*h;
+    return normalize( k.xyy*apollonian(p + k.xyy, s, trap) + 
+                      k.yyx*apollonian(p + k.yyx, s, trap) + 
+                      k.yxy*apollonian(p + k.yxy, s, trap) + 
+                      k.xxx*apollonian(p + k.xxx, s, trap) );
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -152,51 +143,36 @@ float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end
         float precis = EPSILON*depth;
         float h = apollonian(eye + depth*direction, s, trap);
         if (h < precis) break; // We're inside the scene surface!
-        //if (depth >= dist) break; // Gone too far; give up
         if (depth >= end) break; // Gone too far; give up
         depth += h; // Move along the view ray
     }
     
     if (depth > end) return -1.0;
-    if (depth < end) { 
-        trapColor = trap;
-        res = depth;
-    }
+    trapColor = trap;
+    res = depth;
     return res;
 }
 
-vec3 forwardSF(float i, float n) {
-    const float PI  = 3.141592653589793238;
-    const float PHI = 1.618033988749894848;
-    float phi = 2.0*PI*fract(i/PHI);
-    float zi = 1.0 - (2.0*i + 1.0)/n;
-    float sinTheta = sqrt( 1.0 - zi*zi);
-    return vec3(cos(phi)*sinTheta, sin(phi)*sinTheta, zi);
-}
-
-float calcAO(vec3 pos, vec3 n, float s) {
+float calculateAO(vec3 pos, vec3 normal, float s) {
 	float ao = 0.0;
+    float sca = 1.0;
     vec4 t;
-    for (int i = 0; i < 16; i++ ) {
-        vec3 w = forwardSF(float(i), 16.0);
-		w *= sign( dot(w, n) );
-        float h = float(i)/15.0;
-        ao += clamp(apollonian(pos + n*0.01 + w*h*0.15, s, t)*2.0, 0.0, 1.0);
+    for (int i = 0; i < 8; i++) {
+        float h = 0.001 + 0.5*pow(i/7.0, 1.5);
+        float d = apollonian(pos + h*normal, s, t);
+        ao += -(d - h)*sca;
+        sca *= 0.95;
     }
-	ao /= 16.0;
-	
-    return clamp(ao*16.0, 0.0, 1.0);
+    return clamp(1.0 - 0.8*ao, 0.0, 1.0);
 }
 
 //-------------------------------------------------------------------------------------------------------
 vec4 render(vec3 eye, vec3 dir, vec2 sp, float s ) {
-    //float r = reflection;
 	vec4 trap;  
     float dist = shortestDistanceToSurface(eye, dir, MIN_DIST, MAX_DIST, s, trap); // intersect fractal
 
     vec3 point = eye + dist*dir; // The closest point on the surface to the eyepoint along the view ray
     vec3 outNormal = computeNormal(point, s); // N
-    //vec3 col = vec3(0.0);
     vec3 col = backgroundColor;
         
     if (dist > 0) {
@@ -216,16 +192,13 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp, float s ) {
                            color.z+color.z*cos(color.z+coef*trap.w) );
     #endif
     #ifdef COLORING_TYPE_4
-        vec3 albedo = color;
-        albedo *= 0.1;
-        albedo.x = 1.0-10.0*trap.x;
+        vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.z + color); 
     #endif
     #ifdef COLORING_TYPE_5
         vec3 albedo = vec3(0.0);
         albedo = mix(albedo, color1, sqrt(trap.x) );
 		albedo = mix(albedo, color2, sqrt(trap.y) );
 		albedo = mix(albedo, color3, trap.z );
-        //albedo *= 0.4;
     #endif 
     #ifdef COLORING_TYPE_6
         vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.x + color);
@@ -234,20 +207,11 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp, float s ) {
         vec3 albedo = color1;
         albedo = mix(albedo, color2, clamp(6.0*trap.y, 0.0, 1.0));
         albedo = mix(albedo, color3, pow(clamp(1.0 - 2.0*trap.z, 0.0, 1.0), 8.0));
-
-        //vec3 albedo = vec3(1.0);
-        //albedo = mix(albedo, vec3(1.0, 0.80, 0.2), clamp(6.0*trap.y, 0.0, 1.0));
-        //albedo = mix(albedo, vec3(1.0, 0.55, 0.0), pow(clamp(1.0 - 2.0*trap.z, 0.0, 1.0), 8.0));
     #endif
         		
-        float occlusion = pow(clamp(trap.x*2.0, 0.0, 1.0), 1.2);
-        occlusion = 1.5*(0.1 + 0.9*occlusion)*calcAO(point, outNormal, s);
-        //float occlusion = pow(clamp(trap.w*2.0, 0.0, 1.0), 1.2);
-        //vec3 hal = normalize(lightDirection1 - dir);
+        float occlusion = calculateAO(point, outNormal, s);
 
         float dif1 = clamp(dot(lightDirection1, outNormal), 0.0, 1.0 )*occlusion; // light1
-        //float s = shininess;
-        //float spe1 = pow(clamp(dot(outNormal, hal), 0.0, 1.0), shininess)*dif1*(0.04 + 0.96*pow(clamp(dot(dir, lightDirection1), 0.0, 1.0), 5.0));
         float dif2 = clamp(0.2 + 0.8*dot(lightDirection2, outNormal), 0.0, 1.0)*occlusion; // bounce
         
         vec3 lin = vec3(0.0); 
@@ -255,30 +219,14 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp, float s ) {
 		     lin += lightIntensity2*lightColor2*dif2; //light2
              lin +=  ambientLightIntensity3*ambientLightColor3*(0.7 + 0.3*outNormal.y)*occlusion; // ambient light
         col = albedo*lin*exp(-0.3*dist);    
-        //col *= exp(-0.3*dist);
-        //col = albedo*lin*exp(-0.2*dist);
-		//col = pow(col, vec3(0.7, 0.9, 1.0));
-        //col += spe1*15.0;
-        //col += spe1*lightIntensity1;  
-
-        // linear tone mapping
-        //float exposure = 1.0;
-	    //col = clamp(exposure*col, 0.0, 1.0);
-	    //col = pow(col, vec3(1.0 / 2.2));
 
         // luma based Reinhard tone mapping
 	    float luma = dot(col, vec3(0.2126, 0.7152, 0.0722));
 	    float toneMappedLuma = luma / (1.0 + luma);
 	    col *= toneMappedLuma / luma;
 	    col = pow(col, vec3(1.0 / 2.2)); // gamma
-
-        // RomBinDaHouse tone mapping
-        //col = exp(-1.0/(2.72*col + 0.15));
-	    //col = pow(col, vec3(1.0/2.2)); // gamma
-
     }
     return vec4(col, 1.0);
-    //return vec4(sqrt(col), 1.0);
 }
 
 void main() {
