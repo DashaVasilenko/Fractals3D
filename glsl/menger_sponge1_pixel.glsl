@@ -94,7 +94,7 @@ float mengerSponge(vec3 pos, out vec4 trapColor) {
 #endif
 
     for (int m = 0; m < iterations; m++) {
-        pos = mix(pos, pos+off, ani);
+        pos = mix(pos, pos + off, ani);
 	   
         vec3 a = mod(pos*s, 2.0) - 1.0;
         s *= 3.0;

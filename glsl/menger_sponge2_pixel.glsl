@@ -6,11 +6,11 @@ uniform float fieldOfView;
 
 #if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
     uniform float backgroundBrightness;
-    uniform samplerCube skyBox; // сэмплер для кубической карты
+    uniform samplerCube skyBox;  
 #endif
 
 #if defined SKYBOX_BACKGROUND_HDR && defined IRRADIANCE_CUBEMAP
-    uniform samplerCube irradianceMap; // освещенность из кубмапы
+    uniform samplerCube irradianceMap;  
 #endif
 
 #if defined SOLID_BACKGROUND || defined SOLID_BACKGROUND_WITH_SUN
@@ -22,7 +22,6 @@ uniform float fieldOfView;
 #endif
 
 uniform float Time;
-
 uniform float shadowStrength;
 
 uniform vec3 lightDirection1;
@@ -57,10 +56,9 @@ uniform float offset1;
 uniform float offset2;
 uniform int iterations;
 
-//const int MAX_MARCHING_STEPS = 255;
 const int MAX_MARCHING_STEPS = 128;
 const float MIN_DIST = 0.0;
-const float MAX_DIST = 10.0; //50
+const float MAX_DIST = 10.0; 
 const float EPSILON = 0.0005;
 
 // antialias level (1, 2, 3...)
@@ -90,12 +88,8 @@ float mengerSponge(vec3 pos, out vec4 trapColor) {
     float d = cylinderIntersection(pos);
     float s = 1.0;
     vec4 res = vec4(d, 1.0, 0.0, 0.0);
-
     float ani = offset2;
 	float off = offset1;
-
-    //float ani = smoothstep(-0.2, 0.2, -cos(0.5*Time));
-	//float off = 1.5*sin(0.01*Time);
 
 #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7
     vec4 trap = vec4(abs(pos), dot(pos, pos));
@@ -106,7 +100,7 @@ float mengerSponge(vec3 pos, out vec4 trapColor) {
 #endif
 
     for (int i = 0; i < iterations; i++) {
-        pos = mix(pos, pos+off, ani);
+        pos = mix(pos, pos + off, ani);
         vec3 a = mod(pos*s, 2.0) - 1.0;
     	s *= 3.0;
         vec3 r = abs(1.0 - 3.0*abs(a));
@@ -145,7 +139,7 @@ float mengerSponge(vec3 pos, out vec4 trapColor) {
 // size: resolution of the output image
 // fragCoord: the x,y coordinate of the pixel in the output image
 vec3 rayDirection(float fieldOfView, vec2 size, vec2 fragCoord) {
-    vec2 xy = fragCoord - size / 2.0;
+    vec2 xy = fragCoord - size/2.0;
     float z = size.y / tan(radians(fieldOfView) / 2.0);
     vec3 dir = xy.x*viewMatrix[0].xyz + xy.y*viewMatrix[1].xyz + z*viewMatrix[2].xyz;
     return normalize(dir);
@@ -158,11 +152,11 @@ vec3 rayDirection(float fieldOfView, vec2 size, vec2 fragCoord) {
 vec3 computeNormal(vec3 p) {
     vec4 trap;
     const float h = 0.0001; // replace by an appropriate value
-    const vec2 k = vec2(1,-1)*h;
-    return normalize( k.xyy*mengerSponge( p + k.xyy, trap) + 
-                      k.yyx*mengerSponge( p + k.yyx, trap) + 
-                      k.yxy*mengerSponge( p + k.yxy, trap) + 
-                      k.xxx*mengerSponge( p + k.xxx, trap) );
+    const vec2 k = vec2(1, -1)*h;
+    return normalize( k.xyy*mengerSponge(p + k.xyy, trap) + 
+                      k.yyx*mengerSponge(p + k.yyx, trap) + 
+                      k.yxy*mengerSponge(p + k.yxy, trap) + 
+                      k.xxx*mengerSponge(p + k.xxx, trap) );
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -172,28 +166,13 @@ float softShadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end
     float res = 1.0;
     vec4 trap;
     float iterations = 64;
-    for(float t=start; t<end; iterations--) {
-        //float h = mandelbulb(shadowRayOrigin + shadowRayDir*t, trap);
+    for (float t = start; t < end; iterations--) {
         float h = mengerSponge(shadowRayOrigin + shadowRayDir*t, trap);
-        res = min( res, w*h/t );
+        res = min(res, w*h/t);
         if (res < 0.001 || iterations <= 0) break;
         t += h;
     }
     return clamp(res, 0.0, 1.0);
-}
-
-//-------------------------------------------------------------------------------------------------------
-// Basic Bounding Volumes
-// boundingSphere.xyz - centrum, boundingSphere..w - radius
-// https://iquilezles.org/www/articles/sdfbounding/sdfbounding.htm
-float isphere(vec4 boundingSphere, vec3 point, vec3 direction) {
-    vec3 dist = point - boundingSphere.xyz;
-	float b = dot(dist,direction);
-	float c = dot(dist,dist) - boundingSphere.w*boundingSphere.w;
-    float h = b*b - c;
-    
-    if (h < 0.0) return -1.0;
-    return -b + sqrt(h);
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -209,22 +188,13 @@ float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end
     float depth = start;
     float res = end;
 
-    // bounding sphere
-    // !!!!!!!!!!!!!!!!!! проверить, будет ли все влезать!!!!!!!!!!
-    // возможно, надо будет удалить сферу
-    //float dist = isphere(vec4(0.0, 0.0, 0.0, 1.75), eye, direction);
-    //if(dist < 0.0) return end;
-    //dist = min(dist, end);
-
     for (int i = 0; i < MAX_MARCHING_STEPS; i++) {
         float h = mengerSponge(eye + depth*direction, trap);
         if (h < EPSILON) break; // We're inside the scene surface!
-        //if (depth >= dist) break; // Gone too far; give up
         if (depth >= end) break; // Gone too far; give up
         depth += h; // Move along the view ray
     }
     
-    //if (depth < dist) { 
     if (depth < end) { 
         trapColor = trap;
         res = depth;
@@ -248,7 +218,7 @@ float occlusion(vec3 pos, vec3 normal) {
 
 //-------------------------------------------------------------------------------------------------------
 vec3 fresnelSchlick(float cosTheta, vec3 F0) {
-    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+    return F0 + (1.0 - F0)*pow(1.0 - cosTheta, 5.0);
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -266,18 +236,17 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp ) {
 #endif
 
 #ifdef SOLID_BACKGROUND
-        return vec4(reflectedColor - (dir.y * 0.7), 1.0); // Skybox color
+        return vec4(reflectedColor - (dir.y*0.7), 1.0); // Skybox color
 #endif
 
 #ifdef SOLID_BACKGROUND_WITH_SUN
         vec3 col  = reflectedColor*(0.6+0.4*dir.y); 
-        col += lightIntensity1*sunColor*pow( clamp(dot(dir, lightDirection1),0.0,1.0), 32.0); 
+        col += lightIntensity1*sunColor*pow(clamp(dot(dir, lightDirection1), 0.0, 1.0), 32.0); 
         return vec4(col, 1.0);
 #endif
 	}
     // color fractal
 	else {
-
         // main color
     #ifdef COLORING_TYPE_1
         vec3 albedo = color*0.3;
@@ -303,10 +272,9 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp ) {
         albedo = mix(albedo, color1, sqrt(trap.x) );
 		albedo = mix(albedo, color2, sqrt(trap.y) );
 		albedo = mix(albedo, color3, trap.z );
-        //albedo *= 0.4;
     #endif 
     #ifdef COLORING_TYPE_6
-        vec3 albedo = 0.5 + 0.5*cos(6.2831*trap.z + color);
+        vec3 albedo = color + color*cos(6.2831*trap.z + color);
     #endif
     #ifdef COLORING_TYPE_7
         vec3 albedo = color1;
@@ -314,8 +282,8 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp ) {
         albedo = mix(albedo, color3, pow(clamp(1.0 - 2.0*trap.z, 0.0, 1.0), 8.0));
     #endif
         		
-        //float occlusion = occlusion(point, outNormal);
-        float occlusion = trap.z;
+        float occlusion = occlusion(point, outNormal);
+        //float occlusion = trap.z;
         vec3 hal = normalize(lightDirection1 - dir);
         float shadow = 1.0;
 
@@ -335,8 +303,14 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp ) {
              lin +=  ambientLightIntensity3*ambientLightColor3*(0.05+0.95*occlusion); // ambient light
         vec3 col = albedo*lin;
 		col = pow(col, vec3(0.7, 0.9, 1.0));
-        //col += spe1*15.0;
         col += spe1*lightIntensity1;
+
+        #if defined COLORING_TYPE_4 || defined COLORING_TYPE_6
+        // luma based Reinhard tone mapping
+	    float luma = dot(col, vec3(0.2126, 0.7152, 0.0722));
+	    float toneMappedLuma = luma/(1.0 + luma);
+	    col *= toneMappedLuma/luma;
+        #endif
         
         // sky
         vec4 color; 
@@ -356,59 +330,16 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp ) {
         // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
         // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
         vec3 F0 = vec3(0.04); 
-        //F0 = mix(F0, albedo, metallic);
         // ambient lighting (we now use IBL as the ambient term)
         vec3 kS = fresnelSchlick(max(dot(outNormal, inEye), 0.0), F0);
         vec3 kD = 1.0 - kS;
-        //kD *= 1.0 - metallic;	  
         vec3 irradiance = texture(irradianceMap, outNormal).rgb;
-        //vec3 diffuse      = irradiance * albedo;
-        vec3 diffuseIBL      = irradiance * albedo;
-        //vec3 ambient = (kD * diffuse) * ao;
-        vec3 ambientIBL = (kD * diffuseIBL) * occlusion;
-
-        //col += ambientIBL; 
+        vec3 diffuseIBL = irradiance*albedo;
+        vec3 ambientIBL = (kD*diffuseIBL)*occlusion;
         color.xyz += ambientIBL; 
     #endif
-/*
-    #if defined SKYBOX_BACKGROUND_HDR && defined IRRADIANCE_CUBEMAP
-        vec3 inEye = normalize(eye - point); // V
-        // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
-        // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
-        vec3 F0 = vec3(0.04); 
-        //F0 = mix(F0, albedo, metallic);
-        // ambient lighting (we now use IBL as the ambient term)
-        vec3 kS = fresnelSchlick(max(dot(outNormal, inEye), 0.0), F0);
-        vec3 kD = 1.0 - kS;
-        //kD *= 1.0 - metallic;	  
-        vec3 irradiance = texture(irradianceMap, outNormal).rgb;
-        //vec3 diffuse      = irradiance * albedo;
-        vec3 diffuseIBL      = irradiance * albedo;
-        //vec3 ambient = (kD * diffuse) * ao;
-        vec3 ambientIBL = (kD * diffuseIBL) * occlusion;
 
-        col += ambientIBL; 
-    #endif
-
-        vec4 color;
-        // sky
-    #if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
-        vec3 reflected_dir = reflect(dir, outNormal); //R
-        vec4 reflected_color = texture(skyBox, reflected_dir);
-        color = vec4(col, 1.0)*(1.0 - reflection) + reflected_color*reflection;
-    #endif
-
-    #if defined SOLID_BACKGROUND || defined SOLID_BACKGROUND_WITH_SUN
-        color = vec4(col, 1.0)*(1.0 - reflection) + vec4(reflectedColor, 1.0)*reflection;
-    #endif
-*/
-        //color = clamp(color, 0.0, 1.0);
-        //color = sqrt(color); // gamma
-        //color = vec4(pow(color.xyz, vec3(1.0/2.2)), 1.0); // gamma
-        //color *= 1.0 - 0.05*length(sp); // vignette
-        //return color;
-        //return vec4(pow(clamp(color.xyz, 0.0, 1.0), vec3(0.4545)), 1.0); // gamma
-	    return vec4(pow(color.xyz, vec3(0.4545)), 1.0);
+	    return vec4(pow(color.xyz, vec3(0.4545)), 1.0); // gamma
     }
 }
 
