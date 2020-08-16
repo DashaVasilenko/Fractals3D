@@ -1,7 +1,6 @@
 #ifndef __RENDERER__
 #define __RENDERER__
 
-#include "window.h"
 #include "shaderProgram.h"
 #include "camera.h"
 #include "framebuffer.h"
