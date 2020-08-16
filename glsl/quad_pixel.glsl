@@ -10,12 +10,11 @@ uniform float fieldOfView;
 
 #if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
     uniform float backgroundBrightness;
-    uniform samplerCube skyBox; // сэмплер для кубической карты
+    uniform samplerCube skyBox; 
 #endif
 
 #if defined SKYBOX_BACKGROUND_HDR && defined IRRADIANCE_CUBEMAP
-//#ifdef IRRADIANCE_CUBEMAP
-    uniform samplerCube irradianceMap; // освещенность из кубмапы
+    uniform samplerCube irradianceMap; 
 #endif
 
 #if defined SOLID_BACKGROUND || defined SOLID_BACKGROUND_WITH_SUN
@@ -57,12 +56,10 @@ uniform float shininess; // показатель степени зеркальн
 uniform float reflection; // сила отражения
 uniform float shadowStrength;
 
-
 const int MAX_MARCHING_STEPS = 255;
 const float MIN_DIST = 0.0;
 const float MAX_DIST = 50.0;
 const float EPSILON = 0.005;
-
 
 vec2 hash2( float n ){
     return fract(sin(vec2(n, n+1.0))*vec2(13.5453123, 31.1459123));
@@ -92,74 +89,6 @@ float unionSDF(float distA, float distB) {
 
 float differenceSDF(float distA, float distB) {
     return max(distA, -distB);
-}
-
-float sierpinskiTriangle(vec3 pos) {
-    float t = Time;
-/*
-    const int FRACTAL_ITERATIONS = 16;
-    float scale = 1.8+cos(Time)*0.18;
-	float offset = 1.5;
-	float x1,y1,z1;
-	for(int n=0; n< FRACTAL_ITERATIONS; n++)
-	{
-        pos.xy = (pos.x+pos.y < 0.0) ? -pos.yx : pos.xy;
-		pos.xz = (pos.x+pos.z < 0.0) ? -pos.zx : pos.xz;
-		pos.zy = (pos.z+pos.y < 0.0) ? -pos.yz : pos.zy;
-       
-		pos = scale*pos-offset*(scale-1.0);
-	}
- 
-	return length(pos) * pow(scale, -float(FRACTAL_ITERATIONS));
-*/
-
-    const vec3 v1 = vec3(-1.0f, -1.0f, -1.0f);
-    const vec3 v2 = vec3(1.0f, 1.0f, -1.0f);
-    const vec3 v3 = vec3(1.0f, -1.0f, 1.0f);
-    const vec3 v4 = vec3(-1.0f, 1.0f, 1.0f);
-    const int maxit = 15;
-    const float scale = 2.0;
-
-    for (int i = 0; i < maxit; ++i) {
-        float d = distance(pos, v1);
-        vec3 c = v1;
-        
-        float t = distance(pos, v2);
-        if (t < d) { c = v2; d = t; }
-        
-        t = distance(pos, v3);
-        if (t < d) { c = v3; d = t; }
-        
-        t = distance(pos, v4);
-        if (t < d) { c = v4; d = t; }
-        
-        pos = (pos - c)*scale;
-    }
-    return length(pos) * pow(scale, float(-maxit)); 
-    // return length(p) * pow(scale, float(-maxit)) - pixsize; // let the leaves be one pixel in size
-
-/*
-    int Iterations = 30;
-    float Scale = 3.0f;
-    float t = Time;
-
-	vec3 a1 = vec3(1.0f, 1.0f, 1.0f);
-	vec3 a2 = vec3(-1.0f, -1.0f, 1.0f);
-	vec3 a3 = vec3(1.0f, -1.0f, -1.0f);
-	vec3 a4 = vec3(-1.0f, 1.0f, -1.0f);
-	vec3 c;
-	int n = 0;
-	float dist, d;
-	while (n < Iterations) {
-		c = a1; dist = length(z - a1);
-	    d = length(z - a2); if (d < dist) { c = a2; dist = d; }
-		d = length(z - a3); if (d < dist) { c = a3; dist = d; }
-		d = length(z - a4); if (d < dist) { c = a4; dist = d; }
-		z = Scale*z - c*(Scale - 1.0);
-		n++;
-	}
-	return length(z)*pow(Scale, -n);
-*/
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -192,9 +121,6 @@ float sceneSDF(vec3 point, out vec4 resColor) {
 #endif
 
     return t;
-
-    //return 0;
-    //return sierpinskiTriangle(point);
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -223,7 +149,6 @@ float shortestDistanceToSurface(vec3 eye, vec3 direction, float start, float end
     }
     return res;
 }
-
 
 //-------------------------------------------------------------------------------------------------------
 // Return the normalized direction to march in from the eye point for a single pixel.
@@ -354,8 +279,8 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
              lin +=  ambientLightIntensity3*ambientLightColor3*(0.05+0.95*occlusion); // ambient light
 		vec3 col = albedo*lin;
 		col = pow(col, vec3(0.7, 0.9, 1.0));
-        //col += spe1*15.0;
         col += spe1*lightIntensity1;
+        col = exp(-1.0/(2.72*col + 0.15)); // tone mapping
 
         // sky
         vec4 color; 
@@ -375,24 +300,16 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
         // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
         // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
         vec3 F0 = vec3(0.04); 
-        //F0 = mix(F0, albedo, metallic);
         // ambient lighting (we now use IBL as the ambient term)
         vec3 kS = fresnelSchlick(max(dot(outNormal, inEye), 0.0), F0);
         vec3 kD = 1.0 - kS;
-        //kD *= 1.0 - metallic;	  
         vec3 irradiance = texture(irradianceMap, outNormal).rgb;
-        //vec3 diffuse      = irradiance * albedo;
         vec3 diffuseIBL      = irradiance * albedo;
-        //vec3 ambient = (kD * diffuse) * ao;
         vec3 ambientIBL = (kD * diffuseIBL) * occlusion;
-
-        //col += ambientIBL; 
         color.xyz += ambientIBL; 
     #endif
 
-        //color = clamp(color, 0.0, 1.0);
         color = sqrt(color); // gamma
-        //color = vec4(pow(color.xyz, vec3(1.0/2.2)), 1.0); // gamma
         color *= 1.0 - 0.05*length(sp); // vignette
         return color;
     }

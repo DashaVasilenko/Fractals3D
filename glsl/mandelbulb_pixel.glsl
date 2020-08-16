@@ -12,11 +12,11 @@ uniform float fieldOfView;
 
 #if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
     uniform float backgroundBrightness;
-    uniform samplerCube skyBox; // сэмплер для кубической карты
+    uniform samplerCube skyBox; 
 #endif
 
 #if defined SKYBOX_BACKGROUND_HDR && defined IRRADIANCE_CUBEMAP
-    uniform samplerCube irradianceMap; // освещенность из кубмапы
+    uniform samplerCube irradianceMap; 
 #endif
 
 #if defined SOLID_BACKGROUND || defined SOLID_BACKGROUND_WITH_SUN
@@ -62,16 +62,12 @@ uniform int Iterations = 8;
 uniform float Bailout = 10.0f;
 uniform float Power = 8.0;
 
-//const int MAX_MARCHING_STEPS = 255;
 const int MAX_MARCHING_STEPS = 128;
 const float MIN_DIST = 0.0;
-const float MAX_DIST = 10.0; //50
+const float MAX_DIST = 10.0;
 const float EPSILON = 0.0005;
  
 //-------------------------------------------------------------------------------------------------------
-// The basic formulation of the Mandelbulb is derived from extracting the polar coordinates of a 3D point 
-// and doubling its angles and squaring its length. The idea of duplicating can be generalized to triplicating,
-// or more popularly multiplying by eight. 
 // https://iquilezles.org/www/articles/mandelbulb/mandelbulb.htm
 // https://www.shadertoy.com/view/ltfSWn
 //
@@ -80,10 +76,6 @@ const float EPSILON = 0.0005;
 // https://iquilezles.org/www/articles/ftrapsgeometric/ftrapsgeometric.htm
 // https://en.wikipedia.org/wiki/Orbit_trap
 float mandelbulb(vec3 pos, out vec4 resColor) {
-    //int Iterations = 8;
-    //float Bailout = 10.0f;
-    //float Power = 8.0;
-    //float Power = 8.0*sin(Time / 50.0f);
     float t = Time;
     
     vec3 point = pos;
@@ -172,10 +164,8 @@ float softShadow(vec3 shadowRayOrigin, vec3 shadowRayDir, float start, float end
     float iterations = 64;
     for(float t=start; t<end; iterations--) {
         float h = mandelbulb(shadowRayOrigin + shadowRayDir*t, trap);
-        //if (h < 0.0001 ) return 0.0;
         res = min( res, w*h/t );
         if (res < 0.001 || iterations <= 0) break;
-        //if (iterations <= 0) break;
         t += h;
     }
     return clamp(res, 0.0, 1.0);
@@ -334,53 +324,15 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
         // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
         // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
         vec3 F0 = vec3(0.04); 
-        //F0 = mix(F0, albedo, metallic);
         // ambient lighting (we now use IBL as the ambient term)
         vec3 kS = fresnelSchlick(max(dot(outNormal, inEye), 0.0), F0);
         vec3 kD = 1.0 - kS;
-        //kD *= 1.0 - metallic;	  
         vec3 irradiance = texture(irradianceMap, outNormal).rgb;
-        //vec3 diffuse      = irradiance * albedo;
         vec3 diffuseIBL      = irradiance * albedo;
-        //vec3 ambient = (kD * diffuse) * ao;
         vec3 ambientIBL = (kD * diffuseIBL) * occlusion;
-
-        //col += ambientIBL; 
         color.xyz += ambientIBL; 
     #endif
 
-/*
-    #if defined SKYBOX_BACKGROUND_HDR && defined IRRADIANCE_CUBEMAP
-        vec3 inEye = normalize(eye - point); // V
-        // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
-        // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
-        vec3 F0 = vec3(0.04); 
-        //F0 = mix(F0, albedo, metallic);
-        // ambient lighting (we now use IBL as the ambient term)
-        vec3 kS = fresnelSchlick(max(dot(outNormal, inEye), 0.0), F0);
-        vec3 kD = 1.0 - kS;
-        //kD *= 1.0 - metallic;	  
-        vec3 irradiance = texture(irradianceMap, outNormal).rgb;
-        //vec3 diffuse      = irradiance * albedo;
-        vec3 diffuseIBL      = irradiance * albedo;
-        //vec3 ambient = (kD * diffuse) * ao;
-        vec3 ambientIBL = (kD * diffuseIBL) * occlusion;
-
-        col += ambientIBL; 
-    #endif
-
-        vec4 color;
-        // sky
-    #if defined SKYBOX_BACKGROUND || defined SKYBOX_BACKGROUND_HDR
-        vec3 reflected_dir = reflect(dir, outNormal); //R
-        vec4 reflected_color = texture(skyBox, reflected_dir);
-        color = vec4(col, 1.0)*(1.0 - reflection) + reflected_color*reflection;
-    #endif
-
-    #if defined SOLID_BACKGROUND || defined SOLID_BACKGROUND_WITH_SUN
-        color = vec4(col, 1.0)*(1.0 - reflection) + vec4(reflectedColor, 1.0)*reflection;
-    #endif
-*/
         //color = clamp(color, 0.0, 1.0);
         color = sqrt(color); // gamma
         //color = vec4(pow(color.xyz, vec3(1.0/2.2)), 1.0); // gamma
@@ -388,8 +340,6 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
         //return vec4(pow(color.xyz, vec3(0.4545)), 1.0);
         return color;
     }
-
-
 }
 
 void main() {
