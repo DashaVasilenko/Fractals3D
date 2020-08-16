@@ -199,9 +199,9 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp, float s ) {
         #if defined COLORING_TYPE_4
         // luma based Reinhard tone mapping
 	    float luma = dot(col, vec3(0.2126, 0.7152, 0.0722));
-	    float toneMappedLuma = luma / (1.0 + luma);
-	    col *= toneMappedLuma / luma;
-	    col = pow(col, vec3(1.0 / 2.2)); // gamma
+	    float toneMappedLuma = luma/(1.0 + luma);
+	    col *= toneMappedLuma/luma;
+	    col = pow(col, vec3(1.0/2.2)); // gamma
         #endif
     }
     return vec4(sqrt(col), 1.0);
