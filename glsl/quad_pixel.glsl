@@ -55,6 +55,7 @@ uniform vec3 color3;
 uniform float shininess; // показатель степени зеркального отражения
 uniform float reflection; // сила отражения
 uniform float shadowStrength;
+uniform vec3 exposure;
 
 const int MAX_MARCHING_STEPS = 255;
 const float MIN_DIST = 0.0;
@@ -281,6 +282,13 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
 		col = pow(col, vec3(0.7, 0.9, 1.0));
         col += spe1*lightIntensity1;
         col = exp(-1.0/(2.72*col + 0.15)); // tone mapping
+
+    #ifdef TONE_MAPPING
+        // luma based Reinhard tone mapping
+	    float luma = dot(col, exposure);
+	    float toneMappedLuma = luma/(1.0 + luma);
+	    col *= toneMappedLuma/luma;
+    #endif
 
         // sky
         vec4 color; 

@@ -57,6 +57,7 @@ uniform vec3 color3;
 uniform float shininess; // показатель степени зеркального отражения
 uniform float reflection; // сила отражения
 uniform float shadowStrength;
+uniform vec3 exposure;
 
 uniform int Iterations = 8;
 uniform float Bailout = 10.0f;
@@ -303,8 +304,14 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
              lin +=  ambientLightIntensity3*ambientLightColor3*(0.05+0.95*occlusion); // ambient light
 		vec3 col = albedo*lin;
 		col = pow(col, vec3(0.7, 0.9, 1.0));
-        //col += spe1*15.0;
         col += spe1*lightIntensity1;
+
+    #ifdef TONE_MAPPING
+        // luma based Reinhard tone mapping
+	    float luma = dot(col, exposure);
+	    float toneMappedLuma = luma/(1.0 + luma);
+	    col *= toneMappedLuma/luma;
+    #endif
         
         // sky
         vec4 color; 

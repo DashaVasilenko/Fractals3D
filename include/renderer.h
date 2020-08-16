@@ -64,6 +64,8 @@ private:
         float shadow_strength = 32.0f;
         float shininess = 32.0f;
         float reflection = 0.2f;
+        glm::vec3 exposure = { 0.126, 0.7152, 0.0722 };
+        bool tone_mapping = false;
 
         // Fractals coloring
         ColoringType coloring_type = ColoringType::Type1;

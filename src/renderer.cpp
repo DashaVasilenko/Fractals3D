@@ -311,11 +311,17 @@ void Renderer::Render(int width, int height) {
 			break;
 		}
 	}
+
 	if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2 &&
 	    currentFractalType != FractalType::Apollonian3 && currentFractalType != FractalType::MengerSponge3) {
 		program.SetUniform("shininess", fractalsParameters.shininess);
 		program.SetUniform("reflection", fractalsParameters.reflection);
 	}
+
+	if (fractalsParameters.tone_mapping) {
+		program.SetUniform("exposure", fractalsParameters.exposure);
+	}
+
 	//--------------------------------------------------------------------------
 
 	//-------------------------set fractal parameters---------------------------

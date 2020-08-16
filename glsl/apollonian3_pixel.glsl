@@ -37,6 +37,7 @@ uniform float offset2;
 uniform float offset3;
 uniform vec3 csize;
 uniform int iterations;
+uniform vec3 exposure;
 
 const int MAX_MARCHING_STEPS = 256;
 const float MIN_DIST = 0.01;
@@ -220,13 +221,15 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp, float s ) {
              lin +=  ambientLightIntensity3*ambientLightColor3*(0.7 + 0.3*outNormal.y)*occlusion; // ambient light
         col = albedo*lin*exp(-0.3*dist);    
 
+    #ifdef TONE_MAPPING
         // luma based Reinhard tone mapping
-	    float luma = dot(col, vec3(0.2126, 0.7152, 0.0722));
-	    float toneMappedLuma = luma / (1.0 + luma);
-	    col *= toneMappedLuma / luma;
-	    col = pow(col, vec3(1.0 / 2.2)); // gamma
+	    float luma = dot(col, exposure);
+	    float toneMappedLuma = luma/(1.0 + luma);
+	    col *= toneMappedLuma/luma;
+    #endif    
+
     }
-    return vec4(col, 1.0);
+    return vec4(pow(col, vec3(1.0/2.2)), 1.0); // gamma
 }
 
 void main() {

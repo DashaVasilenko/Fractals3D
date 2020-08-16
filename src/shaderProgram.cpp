@@ -80,6 +80,9 @@ void ShaderProgram::Load() {
     defines = "";
     if (shader_parameters)
         defines += "#define FLAG_SOFT_SHADOWS" + std::string("\n");
+
+    if (toneMapping) 
+        defines += "#define TONE_MAPPING" + std::string("\n");
     
     //--------------------------background defines------------------------------
     switch(currentBackgroundType) {

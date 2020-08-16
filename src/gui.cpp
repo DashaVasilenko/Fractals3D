@@ -328,7 +328,7 @@ void Gui::MainParameters() {
     ImVec2 parametersSize = ImVec2((float)width*1/3+20, (float)(height*2/3 + 25.0));
 	ImGui::SetNextWindowSize(parametersSize);
     
-    ImGui::Begin("Parameters", NULL, parametersWindowFlags); 
+    ImGui::Begin("Parameters", NULL, fractalParametersWindowFlags); 
     ShaderProgram* program = fractalController->GetShaderProgram(); 
     bool flag = false;
 
@@ -343,6 +343,16 @@ void Gui::MainParameters() {
         }
     }
     //-------------------------------------------------------------------
+    if (ImGui::Checkbox("Tone mapping", &tone_mapping)) { 
+        flag = true; 
+        fractalController->SetToneMapping(tone_mapping);
+    }
+    if (tone_mapping) {
+        if (MyDragFloat3("Exposure", exposure, 0.01, 0, 1)) {
+            fractalController->SetExposure(glm::vec3(exposure[0], exposure[1], exposure[2]));
+        }
+    }
+
 
     //--------------------------Light parameters-------------------------
     ImGui::Separator();

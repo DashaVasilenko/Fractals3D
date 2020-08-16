@@ -55,6 +55,8 @@ private:
     float shadow_strength = 32.0;
     float shininess = 32.0;
     float reflection = 0.2;
+    bool tone_mapping = false; // use Reinhard Tone Mapping
+    float exposure[3] = { 0.126, 0.7152, 0.0722 }; 
 
     // coloring types
     ColoringType currentColoringType = ColoringType::Type1;

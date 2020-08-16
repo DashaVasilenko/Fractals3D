@@ -25,6 +25,7 @@ public:
     void SetBackgroundType(BackgroundType c) { currentBackgroundType = c; }
     void SetIrradianceCubemap(bool c) { irradianceCubemap = c; }
     void SetColoringType(ColoringType c) { currentColoringType = c; }
+    void SetToneMapping(bool c) { toneMapping = c; }
 
     void SetUniform(const char* name, const glm::vec2&);
     void SetUniform(const char* name, const glm::vec3&);
@@ -47,6 +48,7 @@ private:
     BackgroundType currentBackgroundType = BackgroundType::SkyboxHDR;
     bool irradianceCubemap = true;
     ColoringType currentColoringType = ColoringType::Type1;
+    bool toneMapping = false;
 };
 
 #endif /* End of __SHADERPROGRAM__ */
