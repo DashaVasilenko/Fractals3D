@@ -360,7 +360,7 @@ void Gui::MainParameters() {
     if (ImGui::ColorEdit3("Color1", light_color1)) {
         fractalController->SetLightColor1(glm::vec3(light_color1[0], light_color1[1], light_color1[2]));
     }
-    if (MyDragFloat("Intensity1", &light_intensity1, 0.5, 0, 30)) {
+    if (MyDragFloat("Intensity1", &light_intensity1, 0.1, 0, 30)) {
         fractalController->SetLightIntensity1(light_intensity1);
     }
     ImGui::Separator();
@@ -375,7 +375,7 @@ void Gui::MainParameters() {
     if (ImGui::ColorEdit3("Color2", light_color2)) {
         fractalController->SetLightColor2(glm::vec3(light_color2[0], light_color2[1], light_color2[2]));
     }
-    if (MyDragFloat("Intensity2", &light_intensity2, 0.5, 0, 30)) {
+    if (MyDragFloat("Intensity2", &light_intensity2, 0.1, 0, 30)) {
         fractalController->SetLightIntensity2(light_intensity2);
     }
     ImGui::Separator();
@@ -384,7 +384,7 @@ void Gui::MainParameters() {
     if (ImGui::ColorEdit3("Color3", ambient_fractal_light_color)) {
         fractalController->SetAmbientFractalLightColor(glm::vec3(ambient_fractal_light_color[0], ambient_fractal_light_color[1], ambient_fractal_light_color[2]));
     }
-    if (MyDragFloat("Intensity3", &ambient_light_intensity, 0.5, 0, 30)) {
+    if (MyDragFloat("Intensity3", &ambient_light_intensity, 0.1, 0, 30)) {
         fractalController->SetAmbientFractalLightIntensity(ambient_light_intensity);
     }
     //-------------------------------------------------------------------
