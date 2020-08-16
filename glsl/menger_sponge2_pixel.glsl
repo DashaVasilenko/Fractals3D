@@ -269,9 +269,9 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp ) {
     #endif
     #ifdef COLORING_TYPE_5
         vec3 albedo = vec3(0.0);
-        albedo = mix(albedo, color1, sqrt(trap.x) );
-		albedo = mix(albedo, color2, sqrt(trap.y) );
-		albedo = mix(albedo, color3, trap.z );
+        albedo = mix(albedo, color1, sqrt(trap.x));
+		albedo = mix(albedo, color2, sqrt(trap.y));
+		albedo = mix(albedo, color3, trap.z);
     #endif 
     #ifdef COLORING_TYPE_6
         vec3 albedo = color + color*cos(6.2831*trap.z + color);
