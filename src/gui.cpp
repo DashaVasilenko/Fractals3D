@@ -924,10 +924,10 @@ void Gui::Apollonian1() {
     FractalColor();
     ImGui::Separator();
 
-    if (MyDragFloat("Apollonian1 a1", &apollonian1_offset1, 0.1, 12, 20)) {
+    if (MyDragFloat("Apollonian1 a1", &apollonian1_offset1, 0.01, 12, 20)) {
         fractalController->SetApollonian1Offset1(apollonian1_offset1);
     }
-    if (MyDragFloat("Apollonian1 a2", &apollonian1_offset2, 0.1, 0, 3)) {
+    if (MyDragFloat("Apollonian1 a2", &apollonian1_offset2, 0.01, 0, 3)) {
         fractalController->SetApollonian1Offset2(apollonian1_offset2);
     }
     if (MyDragInt("Apollonian1 i", &apollonian1_iterations, 0.1, 1, 15)) {
@@ -941,10 +941,10 @@ void Gui::Apollonian2() {
     FractalColor();
     ImGui::Separator();
 
-    if (MyDragFloat("Apollonian2 a1", &apollonian2_offset1, 0.1, 12, 20)) {
+    if (MyDragFloat("Apollonian2 a1", &apollonian2_offset1, 0.01, 12, 20)) {
         fractalController->SetApollonian2Offset1(apollonian2_offset1);
     }
-    if (MyDragFloat("Apollonian2 a2", &apollonian2_offset2, 0.05, 0, 3)) {
+    if (MyDragFloat("Apollonian2 a2", &apollonian2_offset2, 0.01, 0, 3)) {
         fractalController->SetApollonian2Offset2(apollonian2_offset2);
     }
     if (MyDragInt("Apollonian2 i", &apollonian2_iterations, 0.1, 1, 15)) {
@@ -958,10 +958,10 @@ void Gui::Apollonian3() {
     FractalColor();
     ImGui::Separator();
 
-    if (MyDragFloat("Apollonian3 a1", &apollonian3_offset1, 0.1, 12, 20)) {
+    if (MyDragFloat("Apollonian3 a1", &apollonian3_offset1, 0.01, 12, 20)) {
         fractalController->SetApollonian3Offset1(apollonian3_offset1);
     }
-    if (MyDragFloat("Apollonian3 a2", &apollonian3_offset2, 0.05, 0, 3)) {
+    if (MyDragFloat("Apollonian3 a2", &apollonian3_offset2, 0.01, 0, 3)) {
         fractalController->SetApollonian3Offset2(apollonian3_offset2);
     }
     if (MyDragFloat("Apollonian3 a3", &apollonian3_offset3, 0.01, 0, 5)) {
