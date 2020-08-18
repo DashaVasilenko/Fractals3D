@@ -1,6 +1,7 @@
 #include "renderer.h"
 #include "inputSystem.h"
 
+
 const GLfloat Renderer::vertices[20] = {  -1.0f,  1.0f, 0.0f, 1.0f, 0.0f,
     									   1.0f,  1.0f, 0.0f, 0.0f, 0.0f,
     									   1.0f, -1.0f, 0.0f, 1.0f, 1.0f,

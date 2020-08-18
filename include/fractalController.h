@@ -14,6 +14,9 @@ public:
     Camera* GetCamera() { return renderer->GetCamera(); }
     ShaderProgram* GetShaderProgram() { return renderer->GetShaderProgram(); }
 
+    //void SaveParameters(const char* path) { renderer->SaveParameters(path); }
+    //void LoadParameters(const char* path) { renderer->LoadParameters(path); }
+
     void SetCameraType(CameraType t) { renderer->SetCameraType(t); }
 
     // Background
@@ -50,6 +53,7 @@ public:
     void SetType7Color3(const glm::vec3& c) { renderer->fractalsParameters.type7_color3 = c; }
 
     // General fractal parameters
+    void SetSoftShadows(bool c) { program->SetSoftShadows(c); renderer->fractalsParameters.soft_shadows = c; }
     void SetShadowStrength(float c ) { renderer->fractalsParameters.shadow_strength = c; }
     void SetFractalShininess(float c) { renderer->fractalsParameters.shininess = c; }
     void SetFractalReflect(float c) { renderer->fractalsParameters.reflection = c; }

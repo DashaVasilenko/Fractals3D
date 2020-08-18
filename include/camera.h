@@ -14,9 +14,30 @@ public:
     void Update();
 
     glm::mat4 GetViewMatrix();
+    glm::vec3 GetPosition() { return position; }
+    glm::vec3 GetUp() { return up; }
+    glm::vec3 GetRight() { return right; }
+    glm::vec3 GetFront() { return front;}
     float GetFieldOfView() { return fieldOfView; }
-    
+    CameraType GetCameraType() { return currentCameraType; } 
+    float GetPitch() { return pitch; }
+    float GetYaw() { return yaw; }
+    float GetPhi() { return phi; }
+    float GetTheta() { return theta; }
+    float GetR() { return r; } 
+     
     void SetDeltaTime(float t) { deltaTime = t; }
+    void SetViewMatrix(glm::mat4 m) { right = glm::vec3(m[0]); up = glm::vec3(m[1]); front = glm::vec3(m[2]); position = glm::vec3(m[3]); }
+    void SetPosition(glm::vec3 c) { position = c; }
+    void SetUp(glm::vec3 c) { up = c; }
+    void SetRight(glm::vec3 c) { right = c; }
+    void SetFront(glm::vec3 c) { front = c;}
+    void SetFieldOfView(float c) { fieldOfView = c; }
+    void SetPitch(float c) { pitch = c; }
+    void SetYaw(float c) { yaw = c; }
+    void SetPhi(float c) { phi = c; }
+    void SetTheta(float c) { theta = c; }
+    void SetR(float c) { r = c; } 
     void SetCameraType(CameraType t);
 
 private:

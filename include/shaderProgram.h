@@ -20,7 +20,8 @@ public:
     void DeleteShaders();
     void Delete();
 
-    void SetShaderParameters(bool c) { shader_parameters = c; }
+    //void SetShaderParameters(bool c) { shader_parameters = c; }
+    void SetSoftShadows(bool c) { soft_shadows = c; }
     void SetFractalType(FractalType c) { currentFractalType = c; }
     void SetBackgroundType(BackgroundType c) { currentBackgroundType = c; }
     void SetIrradianceCubemap(bool c) { irradianceCubemap = c; }
@@ -43,7 +44,8 @@ private:
     std::map<GLenum, GLuint> mapShaders;
     GLuint descriptor;
 
-    bool shader_parameters = false;
+    //bool shader_parameters = false;
+    bool soft_shadows = false;
     FractalType currentFractalType = FractalType::Test;
     BackgroundType currentBackgroundType = BackgroundType::SkyboxHDR;
     bool irradianceCubemap = true;

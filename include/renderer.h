@@ -52,21 +52,24 @@ private:
 
         // Background parameters
         BackgroundType background_type = BackgroundType::SkyboxHDR;
+        glm::vec3 room_background = { 0.0, 0.0, 0.0 }; // for room fractals
         glm::vec3 background_color = { 0.30, 0.36, 0.60 };
-        glm::vec3 room_background = { 0.0, 0.0, 0.0 };
         glm::vec3 sun_color = { 0.8, 0.7, 0.5 };
         SkyboxTexture skybox_texture = SkyboxTexture::Orbital;
+        std::array<std::string, 6> skybox_paths = {};
         SkyboxTextureHDR skybox_texture_hdr = SkyboxTextureHDR::WinterForest;
+        std::string skybox_hdr_path = {};
         bool irradianceCubemap = true;
         float background_brightness = 1.0;
-        int anti_aliasing = 1;
 
         // General fractal parameters
+        bool soft_shadows = false;
         float shadow_strength = 32.0f;
         float shininess = 32.0f;
         float reflection = 0.2f;
-        glm::vec3 exposure = { 0.126, 0.7152, 0.0722 };
         bool tone_mapping = false;
+        glm::vec3 exposure = { 0.126, 0.7152, 0.0722 };
+        int anti_aliasing = 1;
 
         // Fractals coloring
         ColoringType coloring_type = ColoringType::Type1;
@@ -84,7 +87,6 @@ private:
         glm::vec3 type7_color1 = { 1.0,  1.0, 1.0 };
         glm::vec3 type7_color2 = { 1.0, 0.80, 0.2 };
         glm::vec3 type7_color3 = { 1.0, 0.55, 0.0 };
-
 
         // Test fractal parameters
 

@@ -167,6 +167,18 @@ private:
     int output_quality = 100;
     int anti_aliasing = 1;
 
+    // save parameters
+    bool saveWindowFlag = false;
+    ImGui::FileBrowser fileBrowserSaveParameters = ImGui::FileBrowser(ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
+    std::string save_path = std::filesystem::current_path().u8string() + "/parameters/";
+    std::string save_name = "parameters.json";
+
+    // load parameters
+    bool loadWindowFlag = false;
+    ImGui::FileBrowser fileBrowserLoadParameters = ImGui::FileBrowser(ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
+    std::string load_path = std::filesystem::current_path().u8string() + "/parameters/";
+    std::string load_name = "parameters.json";
+
     // setup new HDR skybox
     ImGui::FileBrowser fileBrowserSetupSkyboxHDR = ImGui::FileBrowser(ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
     std::string skybox_hdr_path = "/" + std::filesystem::current_path().u8string() + "/textures/HDR/Milkyway/Milkyway.hdr";
@@ -207,7 +219,13 @@ private:
     void FractalColor();
     void FractalParameters();
     void ExportAs();
+    void SaveParameters();
+    void LoadParameters();
+    void SaveParameters(const char* path);
+    void LoadParameters(const char* path);
     void FileBrowserExport();
+    void FileBrowserSaveParameters();
+    void FileBrowserLoadParameters();
     void FileBrowserSetupSkybox();
     void FileBrowserSetupSkyboxHDR();
 

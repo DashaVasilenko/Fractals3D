@@ -1,5 +1,9 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
+#include "json.hpp"
+#include <glm/gtc/type_ptr.hpp>
+#include <fstream>
+#include <vector>
 
 #include "gui.h"
 #include "inputSystem.h"
@@ -87,6 +91,36 @@ void Gui::FileBrowserExport() {
     }
 }
 
+void Gui::FileBrowserSaveParameters() {
+    fileBrowserSaveParameters.Display();
+    if (fileBrowserSaveParameters.HasSelected()) {
+        save_path = fileBrowserSaveParameters.GetSelected().parent_path().u8string() + "/";
+        save_name = fileBrowserSaveParameters.GetSelected().filename().u8string();
+        int i = save_name.length();
+        bool flag = true;
+
+        if (i < 5) flag = false;
+        if (flag && save_name.compare(save_name.length() - 5, 5, ".json") != 0)
+            flag = false;
+        if (!flag)
+            save_name = save_name + ".json";                    
+
+        fileBrowserSaveParameters.ClearSelected();
+        fileBrowserSaveParameters.Close();
+    }
+}
+
+void Gui::FileBrowserLoadParameters() {
+    fileBrowserLoadParameters.Display();
+    if(fileBrowserLoadParameters.HasSelected()) {
+        load_path = fileBrowserLoadParameters.GetSelected().parent_path().u8string() + "/";
+        load_name = fileBrowserLoadParameters.GetSelected().filename().u8string();
+
+        fileBrowserLoadParameters.ClearSelected();
+        fileBrowserLoadParameters.Close();
+    }
+}
+
 void Gui::FileBrowserSetupSkyboxHDR() {
     fileBrowserSetupSkyboxHDR.Display();
     if(fileBrowserSetupSkyboxHDR.HasSelected()) {
@@ -134,6 +168,8 @@ void Gui::Init(Window* window, FractalController* fr) {
 
     fileBrowserSaveImage.SetTitle("Save image as..");
     fileBrowserSetupSkyboxHDR.SetTitle("Setup HDR skybox");
+    fileBrowserSaveParameters.SetTitle("Save parameters");
+    fileBrowserLoadParameters.SetTitle("Load parameters");
     //std::vector<const char*> image_filter = { ".png", ".jpg", ".jpeg", ".bmp", ".tga", ".hdr", ".obj" };
     //fileBrowserSaveImage.SetTypeFilters(image_filter);
 }
@@ -141,26 +177,28 @@ void Gui::Init(Window* window, FractalController* fr) {
 void Gui::MenuBar() {
     if(ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem("Open", "Ctrl+O")) {
+            //if (ImGui::MenuItem("Open", "Ctrl+O")) {
             //if (ImGui::MenuItem("Open", "Ctrl + O") || Input::GetKey(KeyCode::LeftCtrl)) {
                 //m_FileExplorerLoadConfig.Open();
-            }
+            //}
+            //ImGui::Separator();
+            //if (ImGui::MenuItem("New", "Ctrl+N")) {
+            //}
             ImGui::Separator();
-            if (ImGui::MenuItem("New", "Ctrl+N")) {
+            if (ImGui::MenuItem("Save Parameters", "Исправить Ctrl+P")) {
+                saveWindowFlag = true;
             }
-            ImGui::Separator();
-            if (ImGui::MenuItem("Save Parameters", "Ctrl+P")) {
-            }
-            if (ImGui::MenuItem("Load Parameters", "Ctrl+Shift+P")) {
+            if (ImGui::MenuItem("Load Parameters", "Исправить Ctrl+Shift+P")) {
+                loadWindowFlag = true;
             }
             ImGui::Separator();
             
-            if (ImGui::MenuItem("Save", "Ctrl+S")) {
+            //if (ImGui::MenuItem("Save", "Ctrl+S")) {
                 //m_FileExplorerSaveConfig.Open();
-            }
-            if (ImGui::MenuItem("Save as..")) {
+            //}
+            //if (ImGui::MenuItem("Save as..")) {
                 //m_FileExplorerSaveConfig.Open();
-            }
+            //}
             ImGui::Separator();
             
             if (ImGui::BeginMenu("Export..")) {
@@ -189,13 +227,13 @@ void Gui::MenuBar() {
                 ImGui::EndMenu();
             }
             ImGui::Separator();
-            if (ImGui::MenuItem("Exit", "Alt+F4")) {
+            if (ImGui::MenuItem("Exit", "Esc")) {
                 window->Close();
             }
             
             ImGui::EndMenu();
         }
-
+/*
         if (ImGui::BeginMenu("Edit")) {
             if (ImGui::MenuItem("Undo", "Ctrl+Z")) {
                 
@@ -214,7 +252,7 @@ void Gui::MenuBar() {
             ImGui::Separator();
             ImGui::EndMenu();
         }
-
+*/
         if (ImGui::BeginMenu("About")) {
             ImGui::Text("Fractals");
             ImGui::Separator();
@@ -329,7 +367,7 @@ void Gui::MainParameters() {
 	ImGui::SetNextWindowSize(parametersSize);
     
     ImGui::Begin("Parameters", NULL, fractalParametersWindowFlags); 
-    ShaderProgram* program = fractalController->GetShaderProgram(); 
+    //ShaderProgram* program = fractalController->GetShaderProgram(); 
     bool flag = false;
 
     //-----------------------------Shadows-------------------------------
@@ -337,6 +375,8 @@ void Gui::MainParameters() {
         currentFractalType != FractalType::Apollonian3 && currentFractalType != FractalType::MengerSponge3) {
         if (ImGui::Checkbox("Soft shadows", &soft_shadows)) { 
             flag = true; 
+            //program->SetShaderParameters(soft_shadows);
+            fractalController->SetSoftShadows(soft_shadows);
         }
         if (MyDragFloat("Shadow strength", &shadow_strength, 1, 1, 128)) {
             fractalController->SetShadowStrength(shadow_strength);
@@ -560,7 +600,7 @@ void Gui::MainParameters() {
     //-------------------------------------------------------------------
     
     if (flag) {
-        program->SetShaderParameters(soft_shadows);
+        //program->SetShaderParameters(soft_shadows);
         fractalController->LoadShaderProgram();
     }
 
@@ -1108,6 +1148,755 @@ void Gui::ExportAs() {
     }
 }
 
+void Gui::SaveParameters(const char* path) {
+	nlohmann::json j;
+
+	//--------------------------Save camera parameters--------------------------
+	glm::mat4 view = camera->GetViewMatrix();
+	float* start = glm::value_ptr(view);
+	std::vector<float> view_vector(start, start + 16);
+
+	glm::vec3 position = camera->GetPosition();
+	start = glm::value_ptr(position);
+	std::vector<float> position_vector(start, start + 3);
+
+	float fieldOfView = camera->GetFieldOfView();
+	CameraType camera_type = camera->GetCameraType();
+
+	j["CameraType"] = (int)camera_type;
+
+	switch(camera_type) {
+		case CameraType::CartesianCamera: {
+			float pitch = camera->GetPitch();
+			float jaw = camera->GetYaw();
+
+			j["Camera"] = { {"View", view_vector}, 
+                            {"Position", position_vector}, 
+                            {"FOV", fieldOfView}, 
+                            {"CameraType", (int)camera_type},
+							{"Pitch", pitch}, 
+                            {"Jaw", jaw} };
+			break;
+		}
+		case CameraType::SphericalCamera: {
+			float phi = camera->GetPhi();
+			float theta = camera->GetTheta();
+			float r = camera->GetR();
+			j["Camera"] = { {"View", view_vector}, 
+                            {"Position", position_vector}, 
+                            {"FOV", fieldOfView}, 
+                            {"CameraType", (int)camera_type},
+							{"Phi", phi}, 
+                            {"Theta", theta}, 
+                            {"R", r} };
+			break;
+		}
+	}
+	//--------------------------------------------------------------------------
+
+	//---------------------------Save light parameters--------------------------
+    j["Light1"] = { {"Direction", light_direction1}, {"Color", light_color1}, {"Intensity", light_intensity1} };
+    j["Light2"] = { {"Direction", light_direction2}, {"Color", light_color2}, {"Intensity", light_intensity2} };
+	j["AmbientLight"] = { {"Color", ambient_fractal_light_color}, {"Intensity", ambient_light_intensity} };
+    //--------------------------------------------------------------------------
+
+	//-----------------------Save general fractal parameters--------------------
+	j["SoftShadows"] = soft_shadows;
+	j["ShadowStrength"] = shadow_strength;
+	j["Shininess"] = shininess;
+	j["Reflection"] = reflection;
+	j["ToneMapping"] = tone_mapping;
+	j["Exposure"] = exposure;
+	j["AntiAliasing"] = anti_aliasing;
+	//--------------------------------------------------------------------------
+
+	//----------------------Save background parameters--------------------------
+	j["RoomBackground"] = room_background;
+	j["BackgroundType"] = current_background_type;
+
+	switch(static_cast<BackgroundType>(current_background_type)) {
+		case BackgroundType::Solid: {
+			j["SolidBackground"] = { {"Color", background_color} };
+			break;
+		}
+		case BackgroundType::SolidWithSun: {
+			j["SolidBackgroundWithSun"] = { {"Color", background_color}, 
+                                            {"Sun", sun_color} };
+			break;
+		}
+		case BackgroundType::Skybox: {
+			if (static_cast<SkyboxTexture>(current_skybox_texture) == SkyboxTexture::Other) {
+				j["Skybox"] = { {"Brightness", background_brightness}, 
+                                     {"Path", skybox_paths},
+                                     {"Type", current_skybox_texture} };
+			}
+			else {
+				j["Skybox"] = { {"Brightness", background_brightness}, 
+                                {"Type", current_skybox_texture} };
+			}
+			break;
+		}
+		case BackgroundType::SkyboxHDR: {
+			if (static_cast<SkyboxTextureHDR>(current_skybox_texture_hdr) == SkyboxTextureHDR::OtherHDR) {
+				j["SkyboxHDR"] = { {"Brightness", background_brightness}, 
+                                        {"Irradiance", irradiance_cubemap}, 
+                                        {"Path", skybox_hdr_path},
+                                        {"Type", current_skybox_texture_hdr} };
+			}
+			else {
+				j["SkyboxHDR"] = { {"Brightness", background_brightness}, 
+                                   {"Irradiance", irradiance_cubemap}, 
+                                   {"Type", current_skybox_texture_hdr} };
+			}
+			break;
+		}
+	}
+	//--------------------------------------------------------------------------
+
+	//-----------------------Save fractal coloring parameters-------------------
+	j["ColoringType"] = (int)currentColoringType;
+
+	switch(currentColoringType) {
+		case ColoringType::Type1: {
+			j["Type1"] = { {"Color", type1_color} };
+			break;
+		}
+		case ColoringType::Type2: {
+			j["Type2"] = { {"Color1", type2_color1}, 
+                           {"Color2", type2_color2}, 
+                           {"Color3", type2_color3} };
+			break;
+		}
+		case ColoringType::Type3: {
+			j["Type3"] = { {"Color", type3_color}, 
+                           {"Coef", type3_coef} };
+			break;
+		}
+		case ColoringType::Type4: {
+			j["Type4"] = { {"Color", type4_color} };
+			break;
+		}
+		case ColoringType::Type5: {
+			j["Type5"] = { {"Color1", type5_color1}, 
+                           {"Color2", type5_color2}, 
+                           {"Color3", type5_color3} };
+			break;
+		}
+		case ColoringType::Type6: {
+			j["Type6"] = { {"Color", type6_color} };
+			break;
+		}
+		case ColoringType::Type7: {
+			j["Type7"] = { {"Color1", type7_color1}, 
+                           {"Color2", type7_color2}, 
+                           {"Color3", type7_color3} };
+			break;
+		}
+	}
+	//--------------------------------------------------------------------------
+
+	//--------------------------Save fractal parameters-------------------------
+    j["FractalType"] = current_fractal_type;
+
+	switch(currentFractalType) {
+		case FractalType::Test: {
+			break;
+		}
+		case FractalType::Mandelbulb: {
+			j["Mandelbulb"] = { {"Iterations", mandelbulb_iterations}, 
+                                {"Bailout", mandelbulb_bailout}, 
+                                {"Power", mandelbulb_power} };
+			break;
+		}
+		case FractalType::Juliabulb1: {
+			j["Juliabulb1"] = { {"Iterations", juliabulb1_iterations}, 
+                                {"Offset", juliabulb1_offset}, 
+                                {"Smoothness", juliabulb1_smoothness} };
+			break;
+		}
+		case FractalType::Julia1: {
+			j["Julia1"] = { {"Iterations", julia1_iterations}, 
+                            {"Offset", julia1_offset}, 
+                            {"Smoothness", julia1_smoothness} };
+			break;
+		}
+		case FractalType::Julia2: {
+			j["Julia2"] = { {"Iterations", julia2_iterations}, 
+                            {"Smoothness", julia2_smoothness}, 
+                            {"W", julia2_w}, 
+                            {"Offset", julia2_offset} };
+			break;
+		}
+		case FractalType::Julia3: {
+			j["Julia3"] = { {"Iterations", julia3_iterations}, 
+                            {"Offset", julia3_offset}, 
+                            {"Smoothness", julia3_smoothness} };
+			break;
+		}
+		case FractalType::Julia4: {
+			j["Julia4"] = { {"Iterations", julia4_iterations}, 
+                            {"Smoothness", julia4_smoothness}, 
+                            {"W", julia4_w}, 
+                            {"Offset", julia4_offset} };
+			break;
+		}
+		case FractalType::Sierpinski1: {
+			j["Sierpinski1"] = { {"Vector1", sierpinski1_va}, 
+                                 {"Vector2", sierpinski1_vb}, 
+                                 {"Vector3", sierpinski1_vc}, 
+                                 {"Vector4", sierpinski1_vd}, 
+                                 {"Iterations", sierpinski1_iterations} };
+			break;
+		}
+		case FractalType::Sierpinski2: {
+			j["Sierpinski2"] = { {"Vector1", sierpinski2_va}, 
+                                 {"Vector2", sierpinski2_vb}, 
+                                 {"Vector3", sierpinski2_vc}, 
+                                 {"Iterations", sierpinski2_iterations} };
+
+			break;
+		}
+		case FractalType::MengerSponge1: {
+			j["MengerSponge1"] = { {"Offset1", menger_sponge1_offset1}, 
+                                   {"Offset2", menger_sponge1_offset2}, 
+                                   {"Iterations", menger_sponge1_iterations} };
+			break;
+		}
+		case FractalType::MengerSponge2: {
+			j["MengerSponge2"] = { {"Offset1", menger_sponge2_offset1}, 
+                                   {"Offset2", menger_sponge2_offset2}, 
+                                   {"Iterations", menger_sponge2_iterations} };
+			break;
+		}
+		case FractalType::MengerSponge3: {
+			j["MengerSponge3"] = { {"Type", menger_sponge3_type} };
+			break;
+		}
+		case FractalType::Apollonian1: {
+			j["Apollonian1"] = { {"Offset1", apollonian1_offset1}, 
+                                 {"Offset2", apollonian1_offset2}, 
+                                 {"Iterations", apollonian1_iterations} };
+			break;
+		}
+		case FractalType::Apollonian2: {
+			j["Apollonian2"] = { {"Offset1", apollonian2_offset1}, 
+                                 {"Offset2", apollonian2_offset2}, 
+                                 {"Iterations", apollonian2_iterations} };
+			break;
+		}
+		case FractalType::Apollonian3: {
+			j["Apollonian3"] = { {"Offset1", apollonian3_offset1}, 
+                                 {"Offset2", apollonian3_offset2}, 
+                                 {"Offset3", apollonian3_offset3}, 
+                                 {"Iterations", apollonian3_iterations}, 
+                                 {"CSize", apollonian3_csize} };
+			break;
+		}
+	}
+	//--------------------------------------------------------------------------
+    //std::cout << j["Apollonian3"]["Offset1"] << std::endl;
+    //std::cout << j["FractalType"] << std::endl;
+
+	std::ofstream file(path);
+	file << j << std::endl;
+}
+
+void Gui::LoadParameters(const char* path) {
+    std::ifstream fail(path);
+    nlohmann::json j;
+    fail >> j;
+
+    //--------------------------Load camera parameters--------------------------
+    std::vector<float> view_vector = j["Camera"]["View"].get<std::vector<float>>();
+    glm::mat4 view = glm::make_mat4(view_vector.data());
+    camera->SetViewMatrix(view);
+
+    std::vector<float> position_vector = j["Camera"]["Position"].get<std::vector<float>>();
+    glm::vec3 position = glm::make_vec3(position_vector.data());
+    camera->SetPosition(position);
+
+    camera->SetFieldOfView(j["Camera"]["FOV"]);
+    currentCameraType = static_cast<CameraType>(j["CameraType"]);
+    camera->SetCameraType(currentCameraType);
+
+    switch(currentCameraType) {
+        case CameraType::CartesianCamera: {
+            camera->SetPitch(j["Camera"]["Pitch"]);
+            camera->SetYaw(j["Camera"]["Jaw"]);
+            break;
+        }
+        case CameraType::SphericalCamera: {
+            camera->SetPhi(j["Camera"]["Phi"]);
+            camera->SetTheta(j["Camera"]["Theta"]);
+            camera->SetR(j["Camera"]["R"]);
+            break;
+        }
+    }
+
+    //---------------------------Load light1 parameters--------------------------
+    std::vector<float> light_direction1_vector =  j["Light1"]["Direction"].get<std::vector<float>>();
+    light_direction1[1] = glm::degrees(acos(light_direction1_vector[1]));
+    light_direction1[0] = glm::degrees( acos(light_direction1_vector[0]/sin(glm::radians(light_direction1[1]))) );
+    fractalController->SetLightDirection1(glm::make_vec3(light_direction1_vector.data()));
+    
+    std::vector<float> light_color1_vector = j["Light1"]["Color"].get<std::vector<float>>();
+    memcpy(light_color1, light_color1_vector.data(), 3);
+    fractalController->SetLightColor1(glm::make_vec3(light_color1_vector.data()));
+
+    light_intensity1 = j["Light1"]["Intensity"];
+    fractalController->SetLightIntensity1(light_intensity1);
+    //--------------------------------------------------------------------------
+
+    //---------------------------Load light2 parameters--------------------------
+    std::vector<float> light_direction2_vector =  j["Light2"]["Direction"].get<std::vector<float>>();
+    light_direction2[1] = glm::degrees(acos(light_direction2_vector[1]));
+    light_direction2[0] = glm::degrees( acos(light_direction2_vector[0]/sin(glm::radians(light_direction2[1]))) );
+    fractalController->SetLightDirection2(glm::make_vec3(light_direction2_vector.data()));
+    
+    std::vector<float> light_color2_vector = j["Light2"]["Color"].get<std::vector<float>>();
+    memcpy(light_color2, light_color2_vector.data(), 3);
+    fractalController->SetLightColor2(glm::make_vec3(light_color2_vector.data()));
+
+    light_intensity2 = j["Light2"]["Intensity"];
+    fractalController->SetLightIntensity2(light_intensity2);
+    //--------------------------------------------------------------------------
+
+    //------------------------Load ambient light parameters---------------------
+    std::vector<float> ambient_color_vector = j["AmbientLight"]["Color"].get<std::vector<float>>();
+    memcpy(ambient_fractal_light_color, ambient_color_vector.data(), 3);
+    fractalController->SetLightColor2(glm::make_vec3(ambient_color_vector.data()));
+
+    ambient_light_intensity = j["AmbientLight"]["Intensity"];
+    fractalController->SetLightIntensity2(ambient_light_intensity);
+    //--------------------------------------------------------------------------
+
+    //-----------------------Load general fractal parameters--------------------
+	soft_shadows = j["SoftShadows"];
+    fractalController->SetSoftShadows(soft_shadows);
+
+	shadow_strength = j["ShadowStrength"];
+    fractalController->SetShadowStrength(shadow_strength);
+
+	shininess = j["Shininess"];
+    fractalController->SetFractalShininess(shininess);
+
+	reflection = j["Reflection"];
+    fractalController->SetFractalReflect(reflection);
+
+	tone_mapping = j["ToneMapping"];
+    fractalController->SetToneMapping(tone_mapping);
+
+    std::vector<float> exposure_vector = j["Exposure"].get<std::vector<float>>();
+    memcpy(exposure, exposure_vector.data(), 3);
+    fractalController->SetExposure(glm::make_vec3(exposure_vector.data()));
+
+	// anti_aliasing = j["AntiAliasing"];
+	//--------------------------------------------------------------------------
+
+    //----------------------Load background parameters--------------------------
+    std::vector<float> room_background_vector = j["RoomBackground"].get<std::vector<float>>();
+    memcpy(room_background, room_background_vector.data(), 3);
+    fractalController->SetRoomBackgroundColor(glm::make_vec3(room_background_vector.data()));
+    
+    current_background_type = j["BackgroundType"];
+
+	switch(static_cast<BackgroundType>(current_background_type)) {
+		case BackgroundType::Solid: {
+            std::vector<float> background_color_vector = j["SolidBackground"]["Color"].get<std::vector<float>>();
+            memcpy(background_color, background_color_vector.data(), 3);
+            fractalController->SetBackgroundColor(glm::make_vec3(background_color_vector.data()));
+    		break;
+		}
+		case BackgroundType::SolidWithSun: {
+            std::vector<float> background_color_vector = j["SolidBackgroundWithSun"]["Color"].get<std::vector<float>>();
+            memcpy(background_color, background_color_vector.data(), 3);
+            fractalController->SetBackgroundColor(glm::make_vec3(background_color_vector.data()));
+    		
+            std::vector<float> sun_color_vector = j["SolidBackgroundWithSun"]["Sun"].get<std::vector<float>>();
+            memcpy(sun_color, sun_color_vector.data(), 3);
+            fractalController->SetSunColor(glm::make_vec3(sun_color_vector.data()));
+    		
+			break;
+		}
+		case BackgroundType::Skybox: {
+            current_skybox_texture = j["Skybox"]["Type"];
+
+            background_brightness = j["Skybox"]["Brightness"];
+            fractalController->SetBackgroundBrightness(background_brightness);
+
+			if (static_cast<SkyboxTexture>(current_skybox_texture) == SkyboxTexture::Other) {   
+                std::vector<std::string> skybox_paths_vector = j["Skybox"]["Path"].get<std::vector<std::string>>();
+                std::copy_n(skybox_paths_vector.begin(), 6, skybox_paths.begin());
+                fractalController->SetSkyboxTexture(skybox_paths);
+            }
+			
+			break;
+		}
+		case BackgroundType::SkyboxHDR: {
+            current_skybox_texture_hdr = j["SkyboxHDR"]["Type"];
+
+            background_brightness = j["SkyboxHDR"]["Brightness"];
+            fractalController->SetBackgroundBrightness(background_brightness);
+
+            irradiance_cubemap =  j["SkyboxHDR"]["Irradiance"];
+            fractalController->SetIrradianceMap(irradiance_cubemap);
+
+			if (static_cast<SkyboxTextureHDR>(current_skybox_texture_hdr) == SkyboxTextureHDR::OtherHDR) {
+			    skybox_hdr_path = j["SkyboxHDR"]["Path"];
+			}
+	
+			break;
+		}
+	}
+	//--------------------------------------------------------------------------
+
+    //-----------------------Load fractal coloring parameters-------------------
+	current_coloring_type = j["ColoringType"];
+    currentColoringType = static_cast<ColoringType>(current_coloring_type);
+
+	switch(currentColoringType) {
+		case ColoringType::Type1: {
+            std::vector<float> type1_color_vector = j["Type1"]["Color"].get<std::vector<float>>();
+            memcpy(type1_color, type1_color_vector.data(), 3);
+            fractalController->SetType1Color(glm::make_vec3(type1_color_vector.data()));
+			break;
+		}
+		case ColoringType::Type2: {
+            std::vector<float> type2_color1_vector = j["Type2"]["Color1"].get<std::vector<float>>();
+            memcpy(type2_color1, type2_color1_vector.data(), 3);
+            fractalController->SetType2Color1(glm::make_vec3(type2_color1_vector.data()));
+			
+            std::vector<float> type2_color2_vector = j["Type2"]["Color2"].get<std::vector<float>>();
+            memcpy(type2_color2, type2_color2_vector.data(), 3);
+            fractalController->SetType2Color2(glm::make_vec3(type2_color2_vector.data()));
+			
+            std::vector<float> type2_color3_vector = j["Type2"]["Color3"].get<std::vector<float>>();
+            memcpy(type2_color3, type2_color3_vector.data(), 3);
+            fractalController->SetType2Color3(glm::make_vec3(type2_color3_vector.data()));
+			
+			break;
+		}
+		case ColoringType::Type3: {
+            std::vector<float> type3_color_vector = j["Type3"]["Color"].get<std::vector<float>>();
+            memcpy(type3_color, type3_color_vector.data(), 3);
+            fractalController->SetType3Color(glm::make_vec3(type3_color_vector.data()));
+			
+            type3_coef = j["Type3"]["Coef"];
+			fractalController->SetType3Coef(type3_coef);
+
+			break;
+		}
+		case ColoringType::Type4: {
+            std::vector<float> type4_color_vector = j["Type4"]["Color"].get<std::vector<float>>();
+            memcpy(type4_color, type4_color_vector.data(), 3);
+            fractalController->SetType4Color(glm::make_vec3(type4_color_vector.data()));
+			break;
+		}
+		case ColoringType::Type5: {
+            std::vector<float> type5_color1_vector = j["Type5"]["Color1"].get<std::vector<float>>();
+            memcpy(type5_color1, type5_color1_vector.data(), 3);
+            fractalController->SetType5Color1(glm::make_vec3(type5_color1_vector.data()));
+			
+            std::vector<float> type5_color2_vector = j["Type5"]["Color2"].get<std::vector<float>>();
+            memcpy(type5_color2, type5_color2_vector.data(), 3);
+            fractalController->SetType5Color2(glm::make_vec3(type5_color2_vector.data()));
+			
+            std::vector<float> type5_color3_vector = j["Type5"]["Color3"].get<std::vector<float>>();
+            memcpy(type5_color3, type5_color3_vector.data(), 3);
+            fractalController->SetType5Color3(glm::make_vec3(type5_color3_vector.data()));
+			
+			break;
+		}
+		case ColoringType::Type6: {
+            std::vector<float> type6_color_vector = j["Type6"]["Color"].get<std::vector<float>>();
+            memcpy(type6_color, type6_color_vector.data(), 3);
+            fractalController->SetType6Color(glm::make_vec3(type6_color_vector.data()));
+			break;
+		}
+		case ColoringType::Type7: {
+            std::vector<float> type7_color1_vector = j["Type7"]["Color1"].get<std::vector<float>>();
+            memcpy(type7_color1, type7_color1_vector.data(), 3);
+            fractalController->SetType7Color1(glm::make_vec3(type7_color1_vector.data()));
+			
+            std::vector<float> type7_color2_vector = j["Type7"]["Color2"].get<std::vector<float>>();
+            memcpy(type7_color2, type7_color2_vector.data(), 3);
+            fractalController->SetType7Color2(glm::make_vec3(type7_color2_vector.data()));
+			
+            std::vector<float> type7_color3_vector = j["Type7"]["Color3"].get<std::vector<float>>();
+            memcpy(type7_color3, type7_color3_vector.data(), 3);
+            fractalController->SetType7Color3(glm::make_vec3(type7_color3_vector.data()));
+			
+			break;
+		}
+	}
+	//--------------------------------------------------------------------------
+
+    //--------------------------Load fractal parameters-------------------------
+    current_fractal_type = j["FractalType"];
+    currentFractalType = static_cast<FractalType>(current_fractal_type);
+
+	switch(currentFractalType) {
+		case FractalType::Test: {
+			break;
+		}
+		case FractalType::Mandelbulb: {
+            mandelbulb_iterations = j["Mandelbulb"]["Iterations"];
+            fractalController->SetMandelbulbIterations(mandelbulb_iterations);
+
+            mandelbulb_bailout = j["Mandelbulb"]["Bailout"];
+            fractalController->SetMandelbulbBailout(mandelbulb_bailout);
+
+            mandelbulb_power = j["Mandelbulb"]["Power"];
+            fractalController->SetMandelbulbPower(mandelbulb_power);
+
+			break;
+		}
+		case FractalType::Juliabulb1: {
+            juliabulb1_iterations = j["Juliabulb1"]["Iterations"];
+            fractalController->SetJuliabulb1Iterations(juliabulb1_iterations);
+
+            juliabulb1_offset = j["Juliabulb1"]["Offset"];
+            fractalController->SetJuliabulb1Offset(juliabulb1_offset);
+
+            juliabulb1_smoothness = j["Juliabulb1"]["Smoothness"];
+            fractalController->SetJuliabulb1Smoothness(juliabulb1_smoothness);
+
+			break;
+		}
+		case FractalType::Julia1: {
+            julia1_iterations = j["Julia1"]["Iterations"];
+            fractalController->SetJulia1Iterations(julia1_iterations);
+
+            julia1_offset = j["Julia1"]["Offset"];
+            fractalController->SetJulia1Offset(julia1_offset);
+
+            julia1_smoothness = j["Julia1"]["Smoothness"];
+            fractalController->SetJulia1Smoothness(julia1_smoothness);
+
+			break;
+		}
+		case FractalType::Julia2: {
+            julia2_iterations = j["Julia2"]["Iterations"];
+            fractalController->SetJulia2Iterations(julia2_iterations);
+
+            std::vector<float> julia2_offset_vector = j["Julia2"]["Offset"].get<std::vector<float>>();
+            memcpy(julia2_offset, julia2_offset_vector.data(), 3);
+            fractalController->SetJulia2Offset(glm::make_vec3(julia2_offset_vector.data()));
+
+            julia2_smoothness = j["Julia2"]["Smoothness"];
+            fractalController->SetJulia2Smoothness(julia2_smoothness);
+
+            julia2_w = j["Julia2"]["W"];
+            fractalController->SetJulia2W(julia2_w);
+
+			break;
+		}
+		case FractalType::Julia3: {
+            julia3_iterations = j["Julia3"]["Iterations"];
+            fractalController->SetJulia3Iterations(julia3_iterations);
+
+            julia3_offset = j["Julia3"]["Offset"];
+            fractalController->SetJulia3Offset(julia3_offset);
+
+            julia3_smoothness = j["Julia3"]["Smoothness"];
+            fractalController->SetJulia3Smoothness(julia3_smoothness);
+
+			break;
+		}
+		case FractalType::Julia4: {
+            julia4_iterations = j["Julia4"]["Iterations"];
+            fractalController->SetJulia4Iterations(julia4_iterations);
+
+            std::vector<float> julia4_offset_vector = j["Julia4"]["Offset"].get<std::vector<float>>();
+            memcpy(julia4_offset, julia4_offset_vector.data(), 3);
+            fractalController->SetJulia4Offset(glm::make_vec3(julia4_offset_vector.data()));
+
+            julia4_smoothness = j["Julia4"]["Smoothness"];
+            fractalController->SetJulia4Smoothness(julia4_smoothness);
+
+            julia4_w = j["Julia4"]["W"];
+            fractalController->SetJulia4W(julia4_w);
+
+			break;
+		}
+		case FractalType::Sierpinski1: {
+            std::vector<float> sierpinski1_va_vector = j["Sierpinski1"]["Vector1"].get<std::vector<float>>();
+            memcpy(sierpinski1_va, sierpinski1_va_vector.data(), 3);
+            fractalController->SetSierpinski1Vector1(glm::make_vec3(sierpinski1_va_vector.data()));
+			
+            std::vector<float> sierpinski1_vb_vector = j["Sierpinski1"]["Vector2"].get<std::vector<float>>();
+            memcpy(sierpinski1_vb, sierpinski1_vb_vector.data(), 3);
+            fractalController->SetSierpinski1Vector2(glm::make_vec3(sierpinski1_vb_vector.data()));
+			
+            std::vector<float> sierpinski1_vc_vector = j["Sierpinski1"]["Vector3"].get<std::vector<float>>();
+            memcpy(sierpinski1_vc, sierpinski1_vc_vector.data(), 3);
+            fractalController->SetSierpinski1Vector3(glm::make_vec3(sierpinski1_vc_vector.data()));
+			
+            std::vector<float> sierpinski1_vd_vector = j["Sierpinski1"]["Vector4"].get<std::vector<float>>();
+            memcpy(sierpinski1_vd, sierpinski1_vd_vector.data(), 3);
+            fractalController->SetSierpinski1Vector4(glm::make_vec3(sierpinski1_vd_vector.data()));
+			
+            sierpinski1_iterations = j["Sierpinski1"]["Iterations"];
+            fractalController->SetSierpinski1Iterations(sierpinski1_iterations);
+
+			break;
+		}
+		case FractalType::Sierpinski2: {
+            std::vector<float> sierpinski2_va_vector = j["Sierpinski2"]["Vector1"].get<std::vector<float>>();
+            memcpy(sierpinski2_va, sierpinski2_va_vector.data(), 3);
+            fractalController->SetSierpinski2Vector1(glm::make_vec3(sierpinski2_va_vector.data()));
+			
+            std::vector<float> sierpinski2_vb_vector = j["Sierpinski2"]["Vector2"].get<std::vector<float>>();
+            memcpy(sierpinski2_vb, sierpinski2_vb_vector.data(), 3);
+            fractalController->SetSierpinski2Vector2(glm::make_vec3(sierpinski2_vb_vector.data()));
+			
+            std::vector<float> sierpinski2_vc_vector = j["Sierpinski2"]["Vector3"].get<std::vector<float>>();
+            memcpy(sierpinski2_vc, sierpinski2_vc_vector.data(), 3);
+            fractalController->SetSierpinski2Vector3(glm::make_vec3(sierpinski2_vc_vector.data()));
+			
+            sierpinski2_iterations = j["Sierpinski2"]["Iterations"];
+            fractalController->SetSierpinski2Iterations(sierpinski2_iterations);
+
+			break;
+		}
+		case FractalType::MengerSponge1: {
+            menger_sponge1_offset1 = j["MengerSponge1"]["Offset1"];
+            fractalController->SetMengerSponge1Offset1(menger_sponge1_offset1);
+
+            menger_sponge1_offset2 = j["MengerSponge1"]["Offset2"];
+            fractalController->SetMengerSponge1Offset2(menger_sponge1_offset2);
+
+            menger_sponge1_iterations = j["MengerSponge1"]["Iterations"];
+            fractalController->SetMengerSponge1Iterations(menger_sponge1_iterations);
+
+			break;
+		}
+		case FractalType::MengerSponge2: {
+            menger_sponge2_offset1 = j["MengerSponge2"]["Offset1"];
+            fractalController->SetMengerSponge2Offset1(menger_sponge2_offset1);
+
+            menger_sponge2_offset2 = j["MengerSponge2"]["Offset2"];
+            fractalController->SetMengerSponge2Offset2(menger_sponge2_offset2);
+
+            menger_sponge2_iterations = j["MengerSponge2"]["Iterations"];
+            fractalController->SetMengerSponge2Iterations(menger_sponge2_iterations);
+
+			break;
+		}
+		case FractalType::MengerSponge3: {
+            current_menger_sponge3_type = j["MengerSponge3"]["Type"];
+            fractalController->SetMengerSponge3Type(current_menger_sponge3_type);
+			break;
+		}
+		case FractalType::Apollonian1: {
+            apollonian1_offset1 = j["Apollonian1"]["Offset1"];
+            fractalController->SetApollonian1Offset1(apollonian1_offset1);
+
+            apollonian1_offset2 = j["Apollonian1"]["Offset2"];
+            fractalController->SetApollonian1Offset2(apollonian1_offset2);
+
+            apollonian1_iterations = j["Apollonian1"]["Iterations"];
+            fractalController->SetApollonian1Iterations(apollonian1_iterations);
+
+			break;
+		}
+		case FractalType::Apollonian2: {
+            apollonian2_offset1 = j["Apollonian2"]["Offset1"];
+            fractalController->SetApollonian2Offset1(apollonian2_offset1);
+
+            apollonian2_offset2 = j["Apollonian2"]["Offset2"];
+            fractalController->SetApollonian2Offset2(apollonian2_offset2);
+
+            apollonian2_iterations = j["Apollonian2"]["Iterations"];
+            fractalController->SetApollonian2Iterations(apollonian2_iterations);
+
+			break;
+		}
+		case FractalType::Apollonian3: {
+            apollonian3_offset1 = j["Apollonian3"]["Offset1"];
+            fractalController->SetApollonian3Offset1(apollonian3_offset1);
+
+            apollonian3_offset2 = j["Apollonian3"]["Offset2"];
+            fractalController->SetApollonian3Offset2(apollonian3_offset2);
+
+            apollonian3_offset3 = j["Apollonian3"]["Offset3"];
+            fractalController->SetApollonian3Offset3(apollonian3_offset3);
+
+            apollonian3_iterations = j["Apollonian3"]["Iterations"];
+            fractalController->SetApollonian3Iterations(apollonian3_iterations);
+
+            std::vector<float> apollonian3_csize_vector = j["Apollonian3"]["CSize"].get<std::vector<float>>();
+            memcpy(apollonian3_csize, apollonian3_csize_vector.data(), 3);
+            fractalController->SetApollonian3Csize(glm::make_vec3(apollonian3_csize_vector.data()));
+			
+			break;
+		}
+	}
+    //--------------------------------------------------------------------------
+
+    fractalController->LoadShaderProgram();
+}
+
+void Gui::SaveParameters() {    
+    if (saveWindowFlag) {
+        ImGuiWindowFlags saveWindowFlags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse;
+        int width, height;
+        window->GetSize(&width, &height);
+        ImGui::SetNextWindowPos(ImVec2(0.10f*width, 0.15f*height));
+        ImVec2 windowSize = ImVec2(0.65f*width, 0.10f*height);
+	    ImGui::SetNextWindowSize(windowSize);
+        ImGui::Begin("Save parameters", &saveWindowFlag, saveWindowFlags);
+    
+        if (ImGui::Button("File name:")) {
+            fileBrowserSaveParameters.Open();
+        }
+        ImGui::SameLine();
+        std::string t = save_path + save_name;
+        ImGui::Text("%s", t.c_str());
+
+        if (ImGui::Button("Save")) {
+            SaveParameters(t.c_str());
+            saveWindowFlag = false;
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel")) {
+            saveWindowFlag = false;
+        }
+        ImGui::End();
+    }
+}
+
+void Gui::LoadParameters() {    
+    if (loadWindowFlag) {
+        ImGuiWindowFlags loadWindowFlags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse;
+        int width, height;
+        window->GetSize(&width, &height);
+        ImGui::SetNextWindowPos(ImVec2(0.10f*width, 0.15f*height));
+        ImVec2 windowSize = ImVec2(0.65f*width, 0.10f*height);
+	    ImGui::SetNextWindowSize(windowSize);
+        ImGui::Begin("Load parameters", &loadWindowFlag, loadWindowFlags);
+
+        if (ImGui::Button("File name:")) {
+            fileBrowserLoadParameters.Open();
+        }
+        ImGui::SameLine();
+        std::string t = load_path + load_name;
+        ImGui::Text("%s", t.c_str());
+
+        if (ImGui::Button("Load")) {
+            LoadParameters(t.c_str());
+            loadWindowFlag = false;
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel")) {
+            loadWindowFlag = false;
+        }
+        ImGui::End();
+    }
+}
+
 
 void Gui::Update() {
     // Start the Dear ImGui frame
@@ -1163,8 +1952,12 @@ void Gui::Update() {
         MainParameters();
         FractalParameters();
         ExportAs();
+        SaveParameters();
+        LoadParameters();
         
         FileBrowserExport();
+        FileBrowserSaveParameters();
+        FileBrowserLoadParameters();
         FileBrowserSetupSkybox();
         FileBrowserSetupSkyboxHDR();
 

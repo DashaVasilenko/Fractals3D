@@ -46,6 +46,7 @@ void FractalController::SetSkyboxTexture(SkyboxTexture skyboxTexture) {
 
 void FractalController::SetSkyboxTexture(std::array<std::string, 6>& paths) { 
     renderer->fractalsParameters.skybox_texture = SkyboxTexture::Other;
+    renderer->fractalsParameters.skybox_paths = paths;
     skybox->Reload(paths);
 }
 
@@ -96,6 +97,7 @@ void FractalController::SetIrradianceMap(bool irradianceMap) {
 
 void FractalController::SetSkyboxTextureHDR(std::string path) { 
     renderer->fractalsParameters.skybox_texture_hdr = SkyboxTextureHDR::OtherHDR;
+    renderer->fractalsParameters.skybox_hdr_path = path;
     skyboxHDR->ReloadHDR(path);
     renderer->ConvertHdrMapToCubemap();   
     skyboxHDR->ReloadIrradianceCubemap();

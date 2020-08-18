@@ -78,7 +78,7 @@ void ShaderProgram::Load() {
     
     //------------------create all defines before compilation-------------------
     defines = "";
-    if (shader_parameters)
+    if (soft_shadows)
         defines += "#define FLAG_SOFT_SHADOWS" + std::string("\n");
 
     if (toneMapping) 
