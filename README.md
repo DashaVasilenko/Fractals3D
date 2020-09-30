@@ -15,6 +15,7 @@ Fractals + ray marching
 C++, OpenGL, glm, glew, glfw, Dear ImGui, stb_image, stb_image_write, nlohmannn/json
 
 ## Graphical results
+![](https://github.com/DashaVasilenko/Fractals/raw/master/0.jpg)
 ![](https://github.com/DashaVasilenko/Fractals/raw/master/1.png)
 ![](https://github.com/DashaVasilenko/Fractals/raw/master/2_1.png)
 ![](https://github.com/DashaVasilenko/Fractals/raw/master/3.png)
