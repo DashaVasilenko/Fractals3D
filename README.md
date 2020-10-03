@@ -1,12 +1,15 @@
 # Fractals3D
-Fractals3D is a program for creating 3D fractals of different types. It is a project for course PV097 Visual
-creativity informatics 2020 at Masaryk University.
+Fractals3D is a program for creating 3D fractals of different types. 
 
 ## Author
 Daria Vasilenko
 
 ## Basic math concept
 Fractals + ray marching
+
+## Requirements
+OS - Windows or Mac OS
+OpenGL 3.3+
 
 ## Exports
 8640x8640 PNG, JPG, BMP, TGA + JSON configurations
