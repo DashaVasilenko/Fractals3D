@@ -1,5 +1,5 @@
 # Fractals3D
-Fractals3D is a program for creating 3D fractals of different types. 
+Fractals3D is a program for creating 3D fractals of different types, color them and morph and change the lighting and background.
 
 ## Author
 Daria Vasilenko
