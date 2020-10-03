@@ -21,7 +21,7 @@ uniform float fieldOfView;
     uniform vec3 sunColor;
 #endif
 
-uniform float Time;
+//uniform float Time;
 uniform int antiAliasing;
 uniform float shadowStrength;
 
@@ -329,7 +329,7 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp ) {
 
 void main() {
     float s = shadowStrength;
-    float t = Time;
+    //float t = Time;
     
     vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
     //vec3 dir = rayDirection(fieldOfView, iResolution, pixelCoord);

@@ -12,7 +12,7 @@
 
 class Gui {
 public:
-    void Init(Window* window, FractalController* fr);
+    void Init(Window* window, FractalController* fr, const std::string& path);
     void Update();
     void Destroy();
 
@@ -63,9 +63,9 @@ private:
     const char* coloring_type[7] = { "Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7" };
     int current_coloring_type = 0; 
     float type1_color[3] = { 1.0, 0.8, 0.7 };
-    float type2_color1[3] = { 0.10, 0.20, 0.30 };
-    float type2_color2[3] = { 0.02, 0.10, 0.30 };
-    float type2_color3[3] = { 0.30, 0.10, 0.02 };
+    float type2_color1[3] = { 0.0, 0.75, 0.24 };
+    float type2_color2[3] = { 0.175, 0.204, 0.178 };
+    float type2_color3[3] = { 0.30, 0.9, 0.02 };
     float type3_color[3] = { 1.0, 0.8, 0.7 };
     float type3_coef = 2.0;
     float type4_color[3] = { 1.0, 0.8, 0.7 };
@@ -181,7 +181,8 @@ private:
 
     // setup new HDR skybox
     ImGui::FileBrowser fileBrowserSetupSkyboxHDR = ImGui::FileBrowser(ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
-    std::string skybox_hdr_path = "/" + std::filesystem::current_path().u8string() + "/textures/HDR/Milkyway/Milkyway.hdr";
+    //std::string skybox_hdr_path = "/" + std::filesystem::current_path().u8string() + "/textures/HDR/Milkyway/Milkyway.hdr";
+    std::string skybox_hdr_path = "textures/HDR/Milkyway/Milkyway.hdr";
     std::string skybox_hdr_root = "";
     std::string skybox_hdr_name = "";
 
@@ -189,31 +190,31 @@ private:
     CubemapSide cubemapSide;
     ImGui::FileBrowser fileBrowserSetupSkybox = ImGui::FileBrowser(ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
     std::string path = "/" + std::filesystem::current_path().u8string();
-    std::array<std::string, 6> skybox_paths = { path + "/textures/error.jpg",
-                                                path + "/textures/error.jpg",
-                                                path + "/textures/error.jpg",
-                                                path + "/textures/error.jpg",
-                                                path + "/textures/error.jpg",
-                                                path + "/textures/error.jpg"    
+    std::array<std::string, 6> skybox_paths = { "textures/error.jpg",
+                                                "textures/error.jpg",
+                                                "textures/error.jpg",
+                                                "textures/error.jpg",
+                                                "textures/error.jpg",
+                                                "textures/error.jpg"    
     };
     std::array<std::string, 6> skybox_roots;
     std::array<std::string, 6> skybox_names;
 
     // Other
     ImGuiWindowFlags parametersWindowFlags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse ;
-    ImGuiWindowFlags fractalParametersWindowFlags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus;
+    ImGuiWindowFlags fractalParametersWindowFlags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove; //| ImGuiWindowFlags_NoBringToFrontOnFocus;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-    bool show_demo_window = true; // потом надо удалить !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    bool show_another_window = false; // потом надо удалить !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     CameraType currentCameraType = CameraType::SphericalCamera;
 
     FractalController* fractalController;
     Window* window;
     FrameBuffer* fbo;
     Camera* camera;
+    std::string program_path;
 
     void MenuBar();
     void Preview();
+    void FractalTypeWindow();
     void Stats();
     void MainParameters();
     void FractalColor();

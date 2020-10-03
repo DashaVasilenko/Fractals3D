@@ -60,7 +60,7 @@ private:
     float theta;
     float r;
 
-    float speed = 1.0f; //5.0f
+    float speed = 15.0f; //5.0f
     float mouse_sense = 0.5f;
     float deltaTime = 0.0f;
 };

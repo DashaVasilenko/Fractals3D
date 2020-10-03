@@ -25,7 +25,7 @@ uniform float fieldOfView;
     uniform vec3 sunColor;
 #endif
 
-uniform float Time;
+//uniform float Time;
 uniform int antiAliasing;
 
 uniform vec3 lightDirection1;
@@ -97,7 +97,7 @@ float differenceSDF(float distA, float distB) {
 // Absolute value of the return value indicates the distance to the surface. 
 // Sign indicates whether the point is inside or outside the surface, negative indicating inside.
 float sceneSDF(vec3 point, out vec4 resColor) {
-    float time = Time;
+    //float time = Time;
     float m = dot(point, point);
 
 #if defined COLORING_TYPE_1 || defined COLORING_TYPE_2 || defined COLORING_TYPE_4 || defined COLORING_TYPE_5 || defined COLORING_TYPE_7

@@ -8,68 +8,68 @@ void ShaderProgram::Init(const std::map<GLenum, std::string>& mapSources) {
     this->mapSources = mapSources;
 }
 
-void ShaderProgram::Load() {
+void ShaderProgram::Load(const std::string& path) {
     //--------------------download the necessary program------------------------
-    mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
+    // mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
     switch(currentFractalType) {
         case FractalType::Test: {
- 	        mapSources[GL_FRAGMENT_SHADER] = "glsl/quad_pixel.glsl";
+ 	        mapSources[GL_FRAGMENT_SHADER] = path + "glsl/quad_pixel.glsl";
             break;
         }
         case FractalType::Mandelbulb: {
- 	        mapSources[GL_FRAGMENT_SHADER] = "glsl/mandelbulb_pixel.glsl";
+ 	        mapSources[GL_FRAGMENT_SHADER] = path + "glsl/mandelbulb_pixel.glsl";
             break;
         }
         case FractalType::Juliabulb1: {
- 	        mapSources[GL_FRAGMENT_SHADER] = "glsl/juliabulb_pixel.glsl";
+ 	        mapSources[GL_FRAGMENT_SHADER] = path + "glsl/juliabulb_pixel.glsl";
             break;
         }
         case FractalType::Julia1: {
- 	        mapSources[GL_FRAGMENT_SHADER] = "glsl/julia1_pixel.glsl";
+ 	        mapSources[GL_FRAGMENT_SHADER] = path + "glsl/julia1_pixel.glsl";
             break;
         }
         case FractalType::Julia2: {
- 	        mapSources[GL_FRAGMENT_SHADER] = "glsl/julia2_pixel.glsl";
+ 	        mapSources[GL_FRAGMENT_SHADER] = path + "glsl/julia2_pixel.glsl";
             break;
         }
         case FractalType::Julia3: {
- 	        mapSources[GL_FRAGMENT_SHADER] = "glsl/julia3_pixel.glsl";
+ 	        mapSources[GL_FRAGMENT_SHADER] = path + "glsl/julia3_pixel.glsl";
             break;
         }
         case FractalType::Julia4: {
- 	        mapSources[GL_FRAGMENT_SHADER] = "glsl/julia4_pixel.glsl";
+ 	        mapSources[GL_FRAGMENT_SHADER] = path + "glsl/julia4_pixel.glsl";
             break;
         }
         case FractalType::Sierpinski1: {
-            mapSources[GL_FRAGMENT_SHADER] = "glsl/sierpinski1_pixel.glsl";
+            mapSources[GL_FRAGMENT_SHADER] = path + "glsl/sierpinski1_pixel.glsl";
             break;
         }
         case FractalType::Sierpinski2: {
-            mapSources[GL_FRAGMENT_SHADER] = "glsl/sierpinski2_pixel.glsl";
+            mapSources[GL_FRAGMENT_SHADER] = path + "glsl/sierpinski2_pixel.glsl";
             break;
         }
         case FractalType::MengerSponge1: {
-            mapSources[GL_FRAGMENT_SHADER] = "glsl/menger_sponge1_pixel.glsl";
+            mapSources[GL_FRAGMENT_SHADER] = path + "glsl/menger_sponge1_pixel.glsl";
             break;
         }
         case FractalType::MengerSponge2: {
-            mapSources[GL_FRAGMENT_SHADER] = "glsl/menger_sponge2_pixel.glsl";
+            mapSources[GL_FRAGMENT_SHADER] = path + "glsl/menger_sponge2_pixel.glsl";
             break;
         }
         case FractalType::MengerSponge3: {
-            mapSources[GL_FRAGMENT_SHADER] = "glsl/menger_sponge3_pixel.glsl";
+            mapSources[GL_FRAGMENT_SHADER] = path + "glsl/menger_sponge3_pixel.glsl";
             break;
         }
         case FractalType::Apollonian1: {
-            mapSources[GL_FRAGMENT_SHADER] = "glsl/apollonian1_pixel.glsl";
+            mapSources[GL_FRAGMENT_SHADER] = path + "glsl/apollonian1_pixel.glsl";
             break;
         }
         case FractalType::Apollonian2: {
-            mapSources[GL_FRAGMENT_SHADER] = "glsl/apollonian2_pixel.glsl";
+            mapSources[GL_FRAGMENT_SHADER] = path + "glsl/apollonian2_pixel.glsl";
             break;
         }
         case FractalType::Apollonian3: {
-            mapSources[GL_FRAGMENT_SHADER] = "glsl/apollonian3_pixel.glsl";
+            mapSources[GL_FRAGMENT_SHADER] = path + "glsl/apollonian3_pixel.glsl";
             break;
         }
     }
@@ -147,7 +147,7 @@ void ShaderProgram::Load() {
 
 void ShaderProgram::Compile() {
     for (auto& element: mapSources) {
-        std::ifstream t(element.second);
+        std::ifstream t(element.second, std::ios_base::binary);
  	    std::string source_cpp;
  	    t.seekg(0, std::ios::end);   
  	    source_cpp.reserve(t.tellg());

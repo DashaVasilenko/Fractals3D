@@ -27,7 +27,7 @@ uniform float fieldOfView;
     uniform vec3 sunColor;
 #endif
 
-uniform float Time;
+//uniform float Time;
 uniform int antiAliasing;
 
 uniform vec3 lightDirection1;
@@ -78,7 +78,7 @@ const float EPSILON = 0.0005;
 // https://iquilezles.org/www/articles/ftrapsgeometric/ftrapsgeometric.htm
 // https://en.wikipedia.org/wiki/Orbit_trap
 float mandelbulb(vec3 pos, out vec4 resColor) {
-    float t = Time;
+    //float t = Time;
     
     vec3 point = pos;
 	float dr = 1.0;
@@ -352,7 +352,8 @@ vec4 Render(vec3 eye, vec3 dir, vec2 sp) {
 
 void main() {
     float s = shadowStrength;
-    float time = Time*.1;
+/*
+    //float time = Time*.1;
     vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
     float f = fieldOfView;
 
@@ -375,26 +376,24 @@ void main() {
 
     vec3  eye = vec3( cam[0].w, cam[1].w, cam[2].w );
 	vec3  dir = normalize( (cam*vec4(sp,fle,0.0)).xyz );
+*/
 
-/*
     vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
     vec3 dir = rayDirection(fieldOfView, iResolution, pixelCoord);
     vec3 eye = viewMatrix[3].xyz;
     vec2  sp = (2.0*pixelCoord-iResolution.xy) / iResolution.y;
-*/
-    int a = antiAliasing;
-    outColor = Render(eye, dir, sp);
-    
-/*
-    vec4 col = vec4(0.0);
-    for( int i = 0; i < antiAliasing; i++ )
+
+    //int a = antiAliasing;
+    //outColor = Render(eye, dir, sp);
+
+   vec4 col = vec4(0.0);
+    for( int i = 0; i < antiAliasing; i++ ) {
         for( int j = 0; j < antiAliasing; j++ ) {
             vec2 pixel = pixelCoord + (vec2(i,j)/float(antiAliasing));
             vec3 dir = rayDirection(fieldOfView, iResolution, pixel);
-	        col += render(eye, dir, sp);
+	        col += Render(eye, dir, sp);
         }
     }
 	col /= float(antiAliasing*antiAliasing);
     outColor = col;
-*/
 } 

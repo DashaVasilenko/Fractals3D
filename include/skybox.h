@@ -13,8 +13,8 @@
 
 class SkyBox {
 public:
-    void Load(const std::array<std::string, 6>& fileNames);
-    void Reload(const std::array<std::string, 6>& fileNames);
+    void Load(const std::array<std::string, 6>& fileNames, const std::string& path);
+    void Reload(const std::array<std::string, 6>& fileNames, const std::string& path);
 
     unsigned int GetDescriptor() { return descriptor; }
     ~SkyBox();
@@ -88,9 +88,9 @@ private:
 
 class SkyBoxHDR {
 public:
-	void LoadHDR(const std::string& fileName);
+	void LoadHDR(const std::string& fileName, const std::string& path);
 	void InitIrradianceCubemap();
-    void ReloadHDR(const std::string& fileName);
+    void ReloadHDR(const std::string& fileName, const std::string& path);
 	void ReloadIrradianceCubemap();
 
     unsigned int GetDescriptor() { return descriptor; }

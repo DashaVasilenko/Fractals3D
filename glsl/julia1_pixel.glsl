@@ -21,7 +21,7 @@ uniform float fieldOfView;
     uniform vec3 sunColor;
 #endif
 
-uniform float Time;
+//uniform float Time;
 uniform int antiAliasing;
 uniform float shadowStrength;
 
@@ -61,7 +61,7 @@ uniform int iterations;
 const int MAX_MARCHING_STEPS = 128;
 const float MIN_DIST = 0.0;
 const float MAX_DIST = 10.0; 
-const float EPSILON = 0.0005;
+const float EPSILON = 0.000005;
 
 //-------------------------------------------------------------------------------------------------------
 // square a quaterion
@@ -338,12 +338,12 @@ vec4 render(vec3 eye, vec3 dir, vec4 c, vec2 sp ) {
 
 void main() {
     float s = shadowStrength;
-    float t = Time;
+    //float t = Time;
 
     vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
     //vec3 dir = rayDirection(fieldOfView, iResolution, pixelCoord);
     vec3 eye = viewMatrix[3].xyz;
-    vec2  sp = (2.0*pixelCoord-iResolution.xy) / iResolution.y;
+    vec2 sp = (2.0*pixelCoord-iResolution.xy) / iResolution.y;
     vec4 c = 0.45*cos( vec4(0.5,3.9,1.4,1.1) + offset*vec4(1.2,1.7,1.3,2.5) ) - vec4(0.3,0.0,0.0,0.0);
     
     vec4 col = vec4(0.0);

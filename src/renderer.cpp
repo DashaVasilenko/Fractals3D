@@ -2,6 +2,7 @@
 #include "inputSystem.h"
 
 
+
 const GLfloat Renderer::vertices[20] = {  -1.0f,  1.0f, 0.0f, 1.0f, 0.0f,
     									   1.0f,  1.0f, 0.0f, 0.0f, 0.0f,
     									   1.0f, -1.0f, 0.0f, 1.0f, 1.0f,
@@ -112,12 +113,13 @@ void Renderer::CreateIrradianceCubeMap() {
     GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 }
 
-void Renderer::Init() {
+void Renderer::Init(const std::string& path) {
+	resolution = width/height;
 	GLCall(glViewport(0, 0, width, height));
-	mapSources[GL_VERTEX_SHADER] = "glsl/quad_vertex.glsl";
- 	mapSources[GL_FRAGMENT_SHADER] = "glsl/quad_pixel.glsl";
+	mapSources[GL_VERTEX_SHADER] = path + "glsl/quad_vertex.glsl";
+ 	mapSources[GL_FRAGMENT_SHADER] = path + "glsl/quad_pixel.glsl";
 	program.Init(mapSources);
-	program.Load();
+	program.Load(path);
  	program.Compile();
  	program.Link();
 	program.DeleteShaders();
@@ -148,12 +150,13 @@ void Renderer::Init() {
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
 
 	//-------------create shader program, vao, vbo, ibo for cubemap-------------
-	cubeMapSources[GL_VERTEX_SHADER] = "glsl/equirectangular_to_cubemap_vertex.glsl";
- 	cubeMapSources[GL_FRAGMENT_SHADER] = "glsl/equirectangular_to_cubemap_pixel.glsl";
+	cubeMapSources[GL_VERTEX_SHADER] = path + "glsl/equirectangular_to_cubemap_vertex.glsl";
+ 	cubeMapSources[GL_FRAGMENT_SHADER] = path + "glsl/equirectangular_to_cubemap_pixel.glsl";
 	cubeProgram.Init(cubeMapSources);
  	cubeProgram.Compile();
  	cubeProgram.Link();
 	cubeProgram.DeleteShaders();
+
 
 	GLCall(glGenVertexArrays(1, &cubeVAO));
 	GLCall(glBindVertexArray(cubeVAO));
@@ -178,8 +181,8 @@ void Renderer::Init() {
 	//--------------------------------------------------------------------------
 
 	//-------------------create shader for irradiance cubemap-------------------
-	irradianceMapSources[GL_VERTEX_SHADER] = "glsl/get_irradiance_vertex.glsl";
- 	irradianceMapSources[GL_FRAGMENT_SHADER] = "glsl/get_irradiance_pixel.glsl";
+	irradianceMapSources[GL_VERTEX_SHADER] = path + "glsl/get_irradiance_vertex.glsl";
+ 	irradianceMapSources[GL_FRAGMENT_SHADER] = path + "glsl/get_irradiance_pixel.glsl";
 	irradianceProgram.Init(irradianceMapSources);
  	irradianceProgram.Compile();
  	irradianceProgram.Link();
@@ -189,23 +192,23 @@ void Renderer::Init() {
 	program.Run();
 	program.SetUniform("skyBox", 0);
 	program.SetUniform("irradianceMap", 1);
- 	skyBox.Load(skyBox.orbital);
-	skyBoxHDR.LoadHDR(skyBoxHDR.winterForestHDR);
+ 	skyBox.Load(skyBox.orbital, path);
+	skyBoxHDR.LoadHDR(skyBoxHDR.winterForestHDR, path);
 	ConvertHdrMapToCubemap();
 	skyBoxHDR.InitIrradianceCubemap();
 	CreateIrradianceCubeMap();
 }
 
-void Renderer::Render(int width, int height) {
-	GLCall(glViewport(0, 0, width, height));
+void Renderer::Render(int w, int h) {
+	GLCall(glViewport(0, 0, w, h));
 	GLCall(glEnable(GL_DEPTH_TEST));
     GLCall(glDepthFunc(GL_LEQUAL)); // set depth function to less than AND equal for skybox depth trick
 
 	//---------------------------change size of window--------------------------
 	if (InputSystem::isWindowSizeChange) {
-		FBO.Resize(width, height);
-		this->width = width;
-		this->height = height;
+		FBO.Resize(w, h);
+		this->width = w;
+		this->height = h;
 	}
 	//--------------------------------------------------------------------------
 	
@@ -217,18 +220,19 @@ void Renderer::Render(int width, int height) {
 	program.Run();
 	//-------------set general parameters and light parameters------------------ 
 	program.SetUniform("View", view);
-	program.SetUniform("iResolution", glm::vec2(width, height));
+	program.SetUniform("iResolution", glm::vec2(w, h));
 	program.SetUniform("fieldOfView", fov);
-	program.SetUniform("Time", (float)glfwGetTime());
-	program.SetUniform("antiAliasing", fractalsParameters.anti_aliasing);
-	if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2 &&
-		currentFractalType != FractalType::Apollonian3 && currentFractalType != FractalType::MengerSponge3) {
-		program.SetUniform("shadowStrength", fractalsParameters.shadow_strength);
+	//program.SetUniform("Time", (float)glfwGetTime());
+	if (fractalsParameters.soft_shadows) {
+		if (currentFractalType != FractalType::Apollonian1 && currentFractalType != FractalType::Apollonian2 &&
+			currentFractalType != FractalType::Apollonian3 && currentFractalType != FractalType::MengerSponge3) {
+			program.SetUniform("shadowStrength", fractalsParameters.shadow_strength);
+		}
 	}
+	program.SetUniform("antiAliasing", fractalsParameters.anti_aliasing);
 	if (fractalsParameters.tone_mapping) {
 		program.SetUniform("exposure", fractalsParameters.exposure);
 	}
-
 	program.SetUniform("lightDirection1", fractalsParameters.lightDirection1);
 	program.SetUniform("lightColor1", fractalsParameters.lightColor1);
 	program.SetUniform("lightIntensity1", fractalsParameters.lightIntensity1);

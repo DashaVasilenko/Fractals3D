@@ -23,7 +23,7 @@ public:
     void ConvertHdrMapToCubemap();
     void CreateIrradianceCubeMap();
 
-    void Init();
+    void Init(const std::string& path);
     void Update();
     void Render(int width, int height);
     void Destroy();
@@ -74,9 +74,9 @@ private:
         // Fractals coloring
         ColoringType coloring_type = ColoringType::Type1;
         glm::vec3 type1_color = { 1.0, 0.8, 0.7 };
-        glm::vec3 type2_color1 = { 0.10, 0.20, 0.30 };
-        glm::vec3 type2_color2 = { 0.02, 0.10, 0.30 };
-        glm::vec3 type2_color3 = { 0.30, 0.10, 0.02 };
+        glm::vec3 type2_color1 = { 0.0, 0.75, 0.24 };
+        glm::vec3 type2_color2 = { 0.175, 0.204, 0.178 };
+        glm::vec3 type2_color3 = { 0.30, 0.9, 0.02 };
         glm::vec3 type3_color = { 1.0, 0.8, 0.7 };
         float type3_coef = 2.0;
         glm::vec3 type4_color = { 1.0, 0.8, 0.7 };
@@ -146,7 +146,7 @@ private:
         int menger_sponge2_iterations = 5;
 
         //MengerSponge3 fractal parameters
-        int menger_sponge3_type;
+        int menger_sponge3_type = 0;
 
         // Apollonian1 fractal parameters
         float apollonian1_offset1 = 12.0f;
@@ -189,6 +189,7 @@ private:
 
     Camera* camera;
 
+    float resolution;
     int width;
     int height;
 };

@@ -21,7 +21,7 @@ uniform float fieldOfView;
     uniform vec3 sunColor;
 #endif
 
-uniform float Time;
+//uniform float Time;
 uniform int antiAliasing;
 uniform float shadowStrength;
 uniform vec3 exposure;
@@ -207,7 +207,7 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp) {
     vec3 point = eye + dist*dir; // The closest point on the surface to the eyepoint along the view ray
     vec3 outNormal = computeNormal(point); // N
     vec3 col = backgroundColor;
-        
+
     if (dist > 0) {
     #ifdef COLORING_TYPE_1
         vec3 albedo = color*0.3;
@@ -252,7 +252,7 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp) {
 		     lin += lightIntensity1*lightColor1*dif1; // light1
 		     lin += lightIntensity2*lightColor2*dif2; //light2
              lin +=  ambientLightIntensity3*ambientLightColor3*(0.7 + 0.3*outNormal.y)*occlusion; // ambient light
-        col = albedo*lin*exp(-0.3*dist);     
+        col = albedo*lin*exp(-0.3*dist);   
 
     #ifdef TONE_MAPPING
         // luma based Reinhard tone mapping
@@ -269,7 +269,7 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp) {
 
 
 void main() {
-    float t = Time;
+    //float t = Time;
     
     vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
     //vec3 dir = rayDirection(fieldOfView, iResolution, pixelCoord);

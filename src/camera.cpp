@@ -23,6 +23,7 @@ void Camera::SetCameraType(CameraType t) {
             up = glm::vec3(0.0f, 1.0f, 0.0f);
             right = glm::vec3(1.0f, 0.0f, 0.0f);
             front = glm::vec3(0.0f, 0.0f, -1.0f);
+            speed = 5.0f;
             break;
         }
         case CameraType::SphericalCamera: {
@@ -30,6 +31,7 @@ void Camera::SetCameraType(CameraType t) {
             phi = glm::degrees(atan(position.z/position.x));
             theta = glm::degrees(atan(sqrt(position.x*position.x + position.z*position.z)/position.y));
             r = glm::length(position);
+            speed = 15.0f;
             break;
         }
     }
@@ -74,6 +76,13 @@ void Camera::UpdatePosition(const float& delta) {
             phi += InputSystem::deltaCursPosX*mouse_sense;
             theta += InputSystem::deltaCursPosY*mouse_sense;
             r = glm::length(position);
+
+            //if (phi >= 179.0f) phi = 179.0f;
+            //if (phi <= -179.0f) phi = -179.0f;
+
+            if (theta >= 179.0f) theta = 179.0f;
+            if (theta <= 0.1f) theta = 0.1f;
+
 
             position.x = r * sin(glm::radians(theta)) * cos(glm::radians(phi));
             position.y = r * cos(glm::radians(theta));

@@ -13,7 +13,7 @@
 class ShaderProgram {
 public:
     void Init(const std::map<GLenum, std::string>& );
-    void Load();
+    void Load(const std::string& path);
     void Compile();
     void Link();
     void Run();

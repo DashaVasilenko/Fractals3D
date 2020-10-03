@@ -4,7 +4,7 @@ out vec4 outColor;
 uniform vec2 iResolution; 
 uniform float fieldOfView;
 
-uniform float Time;
+//uniform float Time;
 uniform int antiAliasing;
 
 uniform vec3 lightDirection1;
@@ -228,7 +228,7 @@ vec4 render(vec3 eye, vec3 dir, vec2 sp, float s ) {
 }
 
 void main() {
-    float t = Time;
+    //float t = Time;
     
     vec2 pixelCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
     //vec3 dir = rayDirection(fieldOfView, iResolution, pixelCoord);

@@ -1,19 +1,26 @@
+#include <filesystem>
+
 #include "skybox.h"
 
-void SkyBox::Load(const std::array<std::string, 6>& fileNames) {
+void SkyBox::Load(const std::array<std::string, 6>& fileNames, const std::string& path) {
     GLCall(glGenTextures(1, &descriptor));
     GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, descriptor));
 
     stbi_set_flip_vertically_on_load(false);
     int width, height, nrChannels;
     for(unsigned int i = 0; i < fileNames.size(); i++) {
-        unsigned char *data = stbi_load(fileNames[i].c_str(), &width, &height, &nrChannels, 0);
+        std::filesystem::path p = fileNames[i];
+        std::string absoluteFileName = fileNames[i];
+        if (!p.is_absolute()) {
+            absoluteFileName = path + fileNames[i];
+        }
+        unsigned char *data = stbi_load(absoluteFileName.c_str(), &width, &height, &nrChannels, 0);
         if (data) {
             GLCall(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data));
             //stbi_image_free(data);
         }
         else {
-            std::cout << "Cubemap texture failed to load at path: " << fileNames[i] << std::endl;
+            std::cout << "Cubemap texture failed to load at path: " << absoluteFileName << std::endl;
             stbi_image_free(data);
         }
     }
@@ -25,19 +32,24 @@ void SkyBox::Load(const std::array<std::string, 6>& fileNames) {
     GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE));  
 }
 
-void SkyBox::Reload(const std::array<std::string, 6>& fileNames) {
+void SkyBox::Reload(const std::array<std::string, 6>& fileNames, const std::string& path) {
     GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, descriptor));
 
     stbi_set_flip_vertically_on_load(false);
     int width, height, nrChannels;
     for(unsigned int i = 0; i < fileNames.size(); i++) {
-        unsigned char *data = stbi_load(fileNames[i].c_str(), &width, &height, &nrChannels, 0);
+        std::filesystem::path p = fileNames[i];
+        std::string absoluteFileName = fileNames[i];
+        if (!p.is_absolute()) {
+            absoluteFileName = path + fileNames[i];
+        }
+        unsigned char *data = stbi_load(absoluteFileName.c_str(), &width, &height, &nrChannels, 0);
         if (data) {
             GLCall(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data));
             stbi_image_free(data);
         }
         else {
-            std::cout << "Cubemap texture failed to load at path: " << fileNames[i] << std::endl;
+            std::cout << "Cubemap texture failed to load at path: " << absoluteFileName << std::endl;
             stbi_image_free(data);
         }
     }
@@ -57,7 +69,7 @@ SkyBox::~SkyBox() {
 //-------------------------------------------------------------------------------------------------
 // initialization: setup framebuffer, load the HDR environment map, setup and attach cubemap
 //-------------------------------------------------------------------------------------------------
-void SkyBoxHDR::LoadHDR(const std::string& fileName) {
+void SkyBoxHDR::LoadHDR(const std::string& fileName, const std::string& path) {
     // ----------------------------setup framebuffer----------------------------
     GLCall(glGenFramebuffers(1, &FBO));
     GLCall(glGenRenderbuffers(1, &RBO));
@@ -71,7 +83,12 @@ void SkyBoxHDR::LoadHDR(const std::string& fileName) {
     //----------------------load the HDR environment map------------------------
     stbi_set_flip_vertically_on_load(true);
     int width, height, nrComponents;
-    float *data = stbi_loadf(fileName.c_str(), &width, &height, &nrComponents, 0);
+    std::filesystem::path p = fileName;
+    std::string absoluteFileName = fileName;
+    if (!p.is_absolute()) {
+        absoluteFileName = path + fileName;
+    }
+    float *data = stbi_loadf(absoluteFileName.c_str(), &width, &height, &nrComponents, 0);
     if (data) {
         GLCall(glGenTextures(1, &descriptor));
         GLCall(glBindTexture(GL_TEXTURE_2D, descriptor));
@@ -134,7 +151,7 @@ void SkyBoxHDR::InitIrradianceCubemap() {
 //-------------------------------------------------------------------------------------------------
 // reload the HDR environment map
 //-------------------------------------------------------------------------------------------------
-void SkyBoxHDR::ReloadHDR(const std::string& fileName) {
+void SkyBoxHDR::ReloadHDR(const std::string& fileName, const std::string& path) {
     // rescale FBO to environment cubemap scale
     GLCall(glBindFramebuffer(GL_FRAMEBUFFER, FBO));
     GLCall(glBindRenderbuffer(GL_RENDERBUFFER, RBO));
@@ -143,7 +160,12 @@ void SkyBoxHDR::ReloadHDR(const std::string& fileName) {
 
     stbi_set_flip_vertically_on_load(true);
     int width, height, nrComponents;
-    float *data = stbi_loadf(fileName.c_str(), &width, &height, &nrComponents, 0);
+    std::filesystem::path p = fileName;
+    std::string absoluteFileName = fileName;
+    if (!p.is_absolute()) {
+        absoluteFileName = path + fileName;
+    }
+    float *data = stbi_loadf(absoluteFileName.c_str(), &width, &height, &nrComponents, 0);
     if (data) {
         GLCall(glBindTexture(GL_TEXTURE_2D, descriptor));
 

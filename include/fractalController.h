@@ -6,9 +6,9 @@
 
 class FractalController {
 public:
-    void Init(Renderer* r);
+    void Init(Renderer* r, const std::string& path);
     void Render(int width, int height) { renderer->Render(width, height); }
-    void LoadShaderProgram() { program->Load(); }
+    void LoadShaderProgram(const std::string& path) { program->Load(path); }
 
     FrameBuffer* GetFBO() { return renderer->GetFBO(); }
     Camera* GetCamera() { return renderer->GetCamera(); }
@@ -158,6 +158,7 @@ private:
     ShaderProgram* program;
     SkyBox* skybox;
     SkyBoxHDR* skyboxHDR;
+    std::string program_path;
 
 };
 
