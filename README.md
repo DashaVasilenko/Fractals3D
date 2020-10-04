@@ -18,17 +18,17 @@ OpenGL 3.3+
 C++, OpenGL, glm, glew, glfw, Dear ImGui, stb_image, stb_image_write, nlohmannn/json
 
 ## Graphical results
-![](https://github.com/DashaVasilenko/Fractals/raw/master/0.jpg)
-![](https://github.com/DashaVasilenko/Fractals/raw/master/1.png)
-![](https://github.com/DashaVasilenko/Fractals/raw/master/2_1.png)
-![](https://github.com/DashaVasilenko/Fractals/raw/master/3.png)
-![](https://github.com/DashaVasilenko/Fractals/raw/master/4.png)
-![](https://github.com/DashaVasilenko/Fractals/raw/master/5.png)
-![](https://github.com/DashaVasilenko/Fractals/raw/master/6.png)
-![](https://github.com/DashaVasilenko/Fractals/raw/master/7.png)
-![](https://github.com/DashaVasilenko/Fractals/raw/master/8.png)
-![](https://github.com/DashaVasilenko/Fractals/raw/master/9.jpg)
-![](https://github.com/DashaVasilenko/Fractals/raw/master/10.jpg)
+![](https://github.com/DashaVasilenko/Fractals/raw/master/screenshots/0.jpg)
+![](https://github.com/DashaVasilenko/Fractals/raw/master/screenshots/1.png)
+![](https://github.com/DashaVasilenko/Fractals/raw/master/screenshots/2_1.png)
+![](https://github.com/DashaVasilenko/Fractals/raw/master/screenshots/3.png)
+![](https://github.com/DashaVasilenko/Fractals/raw/master/screenshots/4.png)
+![](https://github.com/DashaVasilenko/Fractals/raw/master/screenshots/5.png)
+![](https://github.com/DashaVasilenko/Fractals/raw/master/screenshots/6.png)
+![](https://github.com/DashaVasilenko/Fractals/raw/master/screenshots/7.png)
+![](https://github.com/DashaVasilenko/Fractals/raw/master/screenshots/8.png)
+![](https://github.com/DashaVasilenko/Fractals/raw/master/screenshots/9.jpg)
+![](https://github.com/DashaVasilenko/Fractals/raw/master/screenshots/10.jpg)
 
 
 
