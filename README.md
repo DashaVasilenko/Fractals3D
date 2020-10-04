@@ -8,7 +8,7 @@ Daria Vasilenko
 Fractals + ray marching
 
 ## Requirements
-OS - Windows or Mac OS
+OS - Windows or Mac OS\
 OpenGL 3.3+
 
 ## Exports
