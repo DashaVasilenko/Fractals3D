@@ -15,7 +15,7 @@ OpenGL 3.3+
 8640x8640 PNG, JPG, BMP, TGA + JSON configurations
 
 ## Used tools
-C++, OpenGL, glm, glew, glfw, Dear ImGui, stb_image, stb_image_write, nlohmannn/json
+C++, OpenGL, [glm](https://github.com/g-truc/glm), [glew](https://github.com/nigels-com/glew), [glfw](https://github.com/glfw/glfw), [Dear ImGui](https://github.com/ocornut/imgui), [stb_image](https://github.com/nothings/stb), [stb_image_write](https://github.com/nothings/stb), [nlohmannn/json](https://github.com/nlohmann/json)
 
 ## Graphical results
 ![](https://github.com/DashaVasilenko/Fractals/raw/master/screenshots/0.jpg)
