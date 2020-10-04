@@ -137,7 +137,11 @@ void Gui::FileBrowserSetupSkyboxHDR() {
 void Gui::FileBrowserSetupSkybox() {
     fileBrowserSetupSkybox.Display();
     if(fileBrowserSetupSkybox.HasSelected()) {
-        skybox_paths[static_cast<int>(cubemapSide)] = fileBrowserSetupSkybox.GetSelected().parent_path().u8string();
+        //skybox_paths[static_cast<int>(cubemapSide)] = fileBrowserSetupSkybox.GetSelected().parent_path().u8string();
+        //skybox_roots[static_cast<int>(cubemapSide)] = fileBrowserSetupSkybox.GetSelected().root_path().u8string();
+        //skybox_names[static_cast<int>(cubemapSide)] = fileBrowserSetupSkybox.GetSelected().filename().u8string();
+
+        skybox_paths[static_cast<int>(cubemapSide)] = fileBrowserSetupSkybox.GetSelected().u8string();
         skybox_roots[static_cast<int>(cubemapSide)] = fileBrowserSetupSkybox.GetSelected().root_path().u8string();
         skybox_names[static_cast<int>(cubemapSide)] = fileBrowserSetupSkybox.GetSelected().filename().u8string();
 
